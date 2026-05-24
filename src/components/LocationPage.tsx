@@ -68,7 +68,7 @@ export function LocationPage({ location }: Props) {
             <div className="flex flex-col gap-3 md:flex-row md:flex-wrap md:items-center md:gap-4">
               <Link
                 href={`${linkPrefix}/contact`}
-                className="flex items-center justify-center gap-2 rounded-md bg-accent px-6 py-4 font-mono text-sm font-medium uppercase tracking-wider text-canvas transition-shadow duration-200 hover:shadow-[0_0_40px_rgba(0,212,255,0.5)] active:scale-[0.98]"
+                className="flex items-center justify-center gap-2 rounded-md bg-accent px-6 py-4 font-mono text-sm font-medium uppercase tracking-wider text-canvas transition-shadow duration-200 hover:shadow-[0_0_40px_rgba(0,212,255,0.5)] active:scale-[0.98] max-md:min-h-[56px]"
               >
                 Start a project
                 <span aria-hidden>→</span>
@@ -109,11 +109,7 @@ export function LocationPage({ location }: Props) {
           <div className="container-content">
             <div className="mb-12 flex flex-col gap-4">
               <SectionHeading className="text-display text-4xl md:text-6xl">
-                Websites built
-                <br />
-                for real Houston
-                <br />
-                businesses.
+                Websites built for real Houston businesses.
               </SectionHeading>
             </div>
             {/* Tight grid — 16px gap, image does the talking */}
@@ -210,7 +206,7 @@ export function LocationPage({ location }: Props) {
                   key={i}
                   className="flex flex-col gap-5 rounded-lg border border-hairline bg-surface-1 p-8"
                 >
-                  <span className="font-display text-6xl font-extrabold text-accent">
+                  <span className="font-display text-5xl font-extrabold text-accent md:text-6xl">
                     0{i + 1}
                   </span>
                   <h3 className="font-display text-xl font-bold tracking-tight text-ink">
@@ -234,7 +230,7 @@ export function LocationPage({ location }: Props) {
               </span>
               <span className="h-px flex-1 bg-hairline" aria-hidden />
             </div>
-            <div className="grid grid-cols-1 gap-12 md:grid-cols-2">
+            <div className="grid grid-cols-1 gap-8 md:gap-12 md:grid-cols-2">
               {testimonials.map((t, i) => (
                 <TestimonialCard
                   key={i}
@@ -315,7 +311,7 @@ export function LocationPage({ location }: Props) {
             <div className="flex w-full flex-col gap-3 sm:w-auto sm:flex-row sm:flex-wrap sm:items-center sm:justify-center sm:gap-4">
               <Link
                 href={`${linkPrefix}/contact`}
-                className="flex items-center justify-center gap-2 rounded-md bg-accent px-6 py-4 font-mono text-sm font-medium uppercase tracking-wider text-canvas transition-shadow duration-200 hover:shadow-[0_0_40px_rgba(0,212,255,0.5)] active:scale-[0.98]"
+                className="flex items-center justify-center gap-2 rounded-md bg-accent px-6 py-4 font-mono text-sm font-medium uppercase tracking-wider text-canvas transition-shadow duration-200 hover:shadow-[0_0_40px_rgba(0,212,255,0.5)] active:scale-[0.98] max-md:min-h-[56px]"
               >
                 Start a project
                 <span aria-hidden>→</span>
