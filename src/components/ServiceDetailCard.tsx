@@ -11,6 +11,7 @@ type Props = {
   startingFrom: string;
   includes: string[];
   delay?: number;
+  linkPrefix?: string;
 };
 
 export default function ServiceDetailCard({
@@ -20,6 +21,7 @@ export default function ServiceDetailCard({
   startingFrom,
   includes,
   delay = 0,
+  linkPrefix = "",
 }: Props) {
   const reduce = useReducedMotion();
 
@@ -60,7 +62,7 @@ export default function ServiceDetailCard({
       </ul>
       <div className="mt-2 flex items-center justify-between border-t border-hairline pt-5">
         <Link
-          href="/contact"
+          href={`${linkPrefix}/contact`}
           className="font-mono text-xs uppercase tracking-wider text-accent transition-opacity duration-200 hover:opacity-80"
         >
           Discuss this →

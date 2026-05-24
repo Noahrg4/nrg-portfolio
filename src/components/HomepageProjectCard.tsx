@@ -12,6 +12,7 @@ type Props = {
   imageSrc?: string;
   imageAlt?: string;
   delay?: number;
+  linkPrefix?: string;
 };
 
 export default function HomepageProjectCard({
@@ -22,6 +23,7 @@ export default function HomepageProjectCard({
   imageSrc,
   imageAlt,
   delay = 0,
+  linkPrefix = "",
 }: Props) {
   const reduce = useReducedMotion();
 
@@ -34,7 +36,7 @@ export default function HomepageProjectCard({
       className="group transition-transform duration-200 ease-out hover:-translate-y-1"
     >
       {/* Whole card is a link to /work */}
-      <Link href="/work" className="flex flex-col gap-3 cursor-pointer">
+      <Link href={`${linkPrefix}/work`} className="flex flex-col gap-3 cursor-pointer">
         {/* Frame — entry animation suppressed (card handles it); hover glow via className */}
         <BrowserMockup
           url={url}

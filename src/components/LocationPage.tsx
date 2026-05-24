@@ -26,10 +26,11 @@ const slugToCardKey: Record<string, keyof typeof locationContent.root.cardTitles
 
 export function LocationPage({ location }: Props) {
   const content = locationContent[location]
+  const linkPrefix = location === "root" ? "" : `/${location}`
 
   return (
     <>
-      <Nav logoHref={content.navLogoHref} />
+      <Nav logoHref={content.navLogoHref} linkPrefix={linkPrefix} />
       <main className="pt-16" style={{ overflowX: "clip" }}>
         {/* HERO */}
         <section className="relative flex min-h-[calc(100vh-4rem)] items-center overflow-visible">
@@ -65,7 +66,7 @@ export function LocationPage({ location }: Props) {
             {/* CTAs: full-width stack on mobile, row on desktop */}
             <div className="flex flex-col gap-3 md:flex-row md:flex-wrap md:items-center md:gap-4">
               <Link
-                href="/contact"
+                href={`${linkPrefix}/contact`}
                 className="flex items-center justify-center gap-2 rounded-md bg-accent px-6 py-3.5 font-mono text-sm font-medium uppercase tracking-wider text-canvas transition-shadow duration-200 hover:shadow-[0_0_40px_rgba(0,212,255,0.5)] active:scale-[0.98]"
               >
                 Start a project
@@ -73,7 +74,7 @@ export function LocationPage({ location }: Props) {
               </Link>
               {/* Ghost CTA — desktop only */}
               <Link
-                href="/work"
+                href={`${linkPrefix}/work`}
                 className="hidden items-center gap-2 rounded-md border border-hairline-strong px-6 py-3.5 font-mono text-sm font-medium uppercase tracking-wider text-ink transition-colors duration-200 hover:border-accent hover:text-accent md:inline-flex"
               >
                 See my work
@@ -129,6 +130,7 @@ export function LocationPage({ location }: Props) {
                     imageSrc={p.imageSrc}
                     imageAlt={p.imageAlt}
                     delay={i * 0.08}
+                    linkPrefix={linkPrefix}
                   />
                 )
               })}
@@ -136,7 +138,7 @@ export function LocationPage({ location }: Props) {
             {/* Right-aligned "All projects →" below the grid */}
             <div className="mt-6 flex justify-end">
               <Link
-                href="/work"
+                href={`${linkPrefix}/work`}
                 className="font-mono text-[13px] text-accent transition-opacity duration-200 hover:opacity-80"
               >
                 All projects →
@@ -279,7 +281,7 @@ export function LocationPage({ location }: Props) {
               </ul>
               <div>
                 <Link
-                  href="/about"
+                  href={`${linkPrefix}/about`}
                   className="inline-flex items-center gap-2 font-mono text-sm uppercase tracking-wider text-accent transition-opacity duration-200 hover:opacity-80"
                 >
                   More about me →
@@ -308,7 +310,7 @@ export function LocationPage({ location }: Props) {
             </p>
             <div className="flex w-full flex-col gap-3 sm:w-auto sm:flex-row sm:flex-wrap sm:items-center sm:justify-center sm:gap-4">
               <Link
-                href="/contact"
+                href={`${linkPrefix}/contact`}
                 className="flex items-center justify-center gap-2 rounded-md bg-accent px-6 py-3.5 font-mono text-sm font-medium uppercase tracking-wider text-canvas transition-shadow duration-200 hover:shadow-[0_0_40px_rgba(0,212,255,0.5)] active:scale-[0.98]"
               >
                 Start a project
@@ -325,7 +327,7 @@ export function LocationPage({ location }: Props) {
         </section>
       </main>
       <Footer logoHref={content.navLogoHref} />
-      <FloatingCta />
+      <FloatingCta linkPrefix={linkPrefix} />
     </>
   )
 }

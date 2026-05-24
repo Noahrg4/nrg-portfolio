@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 
-export default function FloatingCta() {
+export default function FloatingCta({ linkPrefix = "" }: { linkPrefix?: string }) {
   const [visible, setVisible] = useState(false);
   const pathname = usePathname();
   const reduce = useReducedMotion();
@@ -17,7 +17,8 @@ export default function FloatingCta() {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  const show = visible && pathname !== "/contact";
+  const contactPath = `${linkPrefix}/contact`;
+  const show = visible && pathname !== contactPath;
 
   return (
     <AnimatePresence>
@@ -30,7 +31,7 @@ export default function FloatingCta() {
           className="fixed bottom-8 right-8 z-50"
         >
           <Link
-            href="/contact"
+            href={contactPath}
             className="font-mono text-[15px] uppercase tracking-wider text-accent underline-offset-4 transition-all hover:underline md:text-sm"
           >
             Let&apos;s talk →
