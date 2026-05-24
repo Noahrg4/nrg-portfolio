@@ -31,11 +31,7 @@ export default function HomepageProjectCard({
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "-60px" }}
       transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1], delay }}
-      whileHover={reduce ? undefined : {
-        y: -4,
-        transition: { duration: 0.2, ease: [0.16, 1, 0.3, 1] },
-      }}
-      className="group"
+      className="group transition-transform duration-200 ease-out hover:-translate-y-1"
     >
       {/* Whole card is a link to /work */}
       <Link href="/work" className="flex flex-col gap-3 cursor-pointer">
