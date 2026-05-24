@@ -21,7 +21,7 @@ export default function WorkPage() {
         {/* Page header */}
         <section>
           <div className="container-content flex flex-col gap-6">
-            <h1 className="text-display text-[clamp(2rem,8vw,4.5rem)]">
+            <h1 className="text-display text-[clamp(2.75rem,8vw,4.5rem)]">
               Work
             </h1>
           </div>
