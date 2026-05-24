@@ -57,7 +57,7 @@ export default function BrowserMockup({
           />
         </div>
         <div className="flex-1">
-          <div className="mx-auto max-w-md rounded-md border border-hairline bg-surface-3 px-3 py-1 text-center font-mono text-[11px] text-ink-secondary">
+          <div className="mx-auto max-w-md truncate overflow-hidden rounded-md border border-hairline bg-surface-3 px-3 py-1 text-center font-mono text-[11px] text-ink-secondary">
             {url}
           </div>
         </div>
