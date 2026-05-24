@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
 const baseLinks = [
@@ -20,6 +20,8 @@ export default function Nav({ logoHref = "/", linkPrefix = "" }: NavProps) {
   const links = baseLinks.map((l) => ({ ...l, href: `${linkPrefix}${l.href}` }));
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen]         = useState(false);
+  const hamburgerRef = useRef<HTMLButtonElement>(null);
+  const overlayRef   = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 50);
@@ -32,6 +34,47 @@ export default function Nav({ logoHref = "/", linkPrefix = "" }: NavProps) {
   useEffect(() => {
     document.body.style.overflow = open ? "hidden" : "";
     return () => { document.body.style.overflow = ""; };
+  }, [open]);
+
+  // Focus management + Escape key + focus trap
+  useEffect(() => {
+    if (!open) return;
+
+    // Focus the first link in the overlay when it opens
+    const firstLink = overlayRef.current?.querySelector<HTMLElement>("a, button");
+    firstLink?.focus();
+
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        setOpen(false);
+        hamburgerRef.current?.focus();
+        return;
+      }
+
+      // Focus trap: keep Tab cycling within the overlay
+      if (e.key === "Tab" && overlayRef.current) {
+        const focusable = overlayRef.current.querySelectorAll<HTMLElement>(
+          'a[href], button, [tabindex]:not([tabindex="-1"])'
+        );
+        const first = focusable[0];
+        const last  = focusable[focusable.length - 1];
+
+        if (e.shiftKey) {
+          if (document.activeElement === first) {
+            e.preventDefault();
+            last?.focus();
+          }
+        } else {
+          if (document.activeElement === last) {
+            e.preventDefault();
+            first?.focus();
+          }
+        }
+      }
+    };
+
+    document.addEventListener("keydown", onKey);
+    return () => document.removeEventListener("keydown", onKey);
   }, [open]);
 
   return (
@@ -77,9 +120,11 @@ export default function Nav({ logoHref = "/", linkPrefix = "" }: NavProps) {
 
         {/* Hamburger — mobile only */}
         <button
+          ref={hamburgerRef}
           type="button"
           aria-label={open ? "Close menu" : "Open menu"}
           aria-expanded={open}
+          aria-controls="mobile-nav-overlay"
           onClick={() => setOpen((v) => !v)}
           className="flex h-11 w-11 flex-col items-center justify-center gap-1.5 md:hidden"
         >
@@ -105,13 +150,23 @@ export default function Nav({ logoHref = "/", linkPrefix = "" }: NavProps) {
       <AnimatePresence>
         {open && (
           <motion.div
+            id="mobile-nav-overlay"
+            ref={overlayRef}
+            role="dialog"
+            aria-modal="true"
+            aria-label="Navigation menu"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1, transition: { duration: 0.2, ease: [0.16, 1, 0.3, 1] } }}
             exit={{ opacity: 0, transition: { duration: 0.15, ease: [0.16, 1, 0.3, 1] } }}
-            className="fixed inset-0 top-16 z-40 flex flex-col border-t border-hairline bg-canvas/95 px-6 py-10 backdrop-blur-xl md:hidden"
+            className="fixed inset-0 top-16 z-40 flex flex-col border-t border-hairline bg-canvas/95 px-6 py-10 md:hidden"
+            onClick={() => setOpen(false)}
           >
             {/* Nav links — each 60px tall minimum for thumb-friendly tapping */}
-            <nav className="flex flex-col" aria-label="Mobile">
+            <nav
+              className="flex flex-col"
+              aria-label="Mobile"
+              onClick={(e) => e.stopPropagation()}
+            >
               {links.map((l) => (
                 <Link
                   key={l.href}
@@ -125,7 +180,7 @@ export default function Nav({ logoHref = "/", linkPrefix = "" }: NavProps) {
             </nav>
 
             {/* Bottom CTA */}
-            <div className="mt-auto">
+            <div className="mt-auto" onClick={(e) => e.stopPropagation()}>
               <Link
                 href={`${linkPrefix}/contact`}
                 onClick={() => setOpen(false)}

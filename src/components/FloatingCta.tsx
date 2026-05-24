@@ -28,11 +28,12 @@ export default function FloatingCta({ linkPrefix = "" }: { linkPrefix?: string }
           animate={reduce ? { opacity: 1 } : { opacity: 1, y: 0 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
-          className="fixed bottom-8 right-8 z-50"
+          className="fixed right-8 z-50"
+          style={{ bottom: "calc(2rem + env(safe-area-inset-bottom, 0px))" }}
         >
           <Link
             href={contactPath}
-            className="font-mono text-[15px] uppercase tracking-wider text-accent underline-offset-4 transition-all hover:underline md:text-sm"
+            className="inline-flex min-h-[44px] items-center px-4 py-3 font-mono text-[15px] uppercase tracking-wider text-accent underline-offset-4 transition-all hover:underline md:text-sm"
           >
             Let&apos;s talk →
           </Link>
