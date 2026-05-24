@@ -8,7 +8,10 @@ export default function Footer({ logoHref = "/" }: FooterProps) {
   const year = new Date().getFullYear();
   return (
     <footer className="border-t border-hairline">
-      <div className="container-content py-8">
+      <div
+        className="container-content pt-8"
+        style={{ paddingBottom: "max(2rem, calc(2rem + env(safe-area-inset-bottom, 0px)))" }}
+      >
 
         {/* ── Mobile: two centered lines ─────────────────────────────────── */}
         <div className="flex flex-col items-center gap-2 text-center md:hidden">

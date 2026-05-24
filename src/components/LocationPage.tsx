@@ -67,7 +67,7 @@ export function LocationPage({ location }: Props) {
             <div className="flex flex-col gap-3 md:flex-row md:flex-wrap md:items-center md:gap-4">
               <Link
                 href={`${linkPrefix}/contact`}
-                className="flex items-center justify-center gap-2 rounded-md bg-accent px-6 py-3.5 font-mono text-sm font-medium uppercase tracking-wider text-canvas transition-shadow duration-200 hover:shadow-[0_0_40px_rgba(0,212,255,0.5)] active:scale-[0.98]"
+                className="flex items-center justify-center gap-2 rounded-md bg-accent px-6 py-4 font-mono text-sm font-medium uppercase tracking-wider text-canvas transition-shadow duration-200 hover:shadow-[0_0_40px_rgba(0,212,255,0.5)] active:scale-[0.98]"
               >
                 Start a project
                 <span aria-hidden>→</span>
@@ -139,7 +139,7 @@ export function LocationPage({ location }: Props) {
             <div className="mt-6 flex justify-end">
               <Link
                 href={`${linkPrefix}/work`}
-                className="font-mono text-[13px] text-accent transition-opacity duration-200 hover:opacity-80"
+                className="inline-flex min-h-[44px] items-center font-mono text-[13px] text-accent transition-opacity duration-200 hover:opacity-80"
               >
                 All projects →
               </Link>
@@ -282,7 +282,7 @@ export function LocationPage({ location }: Props) {
               <div>
                 <Link
                   href={`${linkPrefix}/about`}
-                  className="inline-flex items-center gap-2 font-mono text-sm uppercase tracking-wider text-accent transition-opacity duration-200 hover:opacity-80"
+                  className="inline-flex min-h-[44px] items-center gap-2 font-mono text-sm uppercase tracking-wider text-accent transition-opacity duration-200 hover:opacity-80"
                 >
                   More about me →
                 </Link>
@@ -311,14 +311,14 @@ export function LocationPage({ location }: Props) {
             <div className="flex w-full flex-col gap-3 sm:w-auto sm:flex-row sm:flex-wrap sm:items-center sm:justify-center sm:gap-4">
               <Link
                 href={`${linkPrefix}/contact`}
-                className="flex items-center justify-center gap-2 rounded-md bg-accent px-6 py-3.5 font-mono text-sm font-medium uppercase tracking-wider text-canvas transition-shadow duration-200 hover:shadow-[0_0_40px_rgba(0,212,255,0.5)] active:scale-[0.98]"
+                className="flex items-center justify-center gap-2 rounded-md bg-accent px-6 py-4 font-mono text-sm font-medium uppercase tracking-wider text-canvas transition-shadow duration-200 hover:shadow-[0_0_40px_rgba(0,212,255,0.5)] active:scale-[0.98]"
               >
                 Start a project
                 <span aria-hidden>→</span>
               </Link>
               <a
                 href="tel:+17135550000"
-                className="flex items-center justify-center gap-2 rounded-md border border-hairline-strong px-6 py-3.5 font-mono text-sm font-medium uppercase tracking-wider text-ink transition-colors duration-200 hover:border-accent hover:text-accent"
+                className="flex items-center justify-center gap-2 rounded-md border border-hairline-strong px-6 py-4 font-mono text-sm font-medium uppercase tracking-wider text-ink transition-colors duration-200 hover:border-accent hover:text-accent"
               >
                 Or call (713) 555-0000
               </a>

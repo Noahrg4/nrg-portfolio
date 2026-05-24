@@ -63,7 +63,7 @@ export default function ServiceDetailCard({
       <div className="mt-2 flex items-center justify-between border-t border-hairline pt-5">
         <Link
           href={`${linkPrefix}/contact`}
-          className="font-mono text-xs uppercase tracking-wider text-accent transition-opacity duration-200 hover:opacity-80"
+          className="inline-flex min-h-[44px] items-center font-mono text-xs uppercase tracking-wider text-accent transition-opacity duration-200 hover:opacity-80"
         >
           Discuss this →
         </Link>
