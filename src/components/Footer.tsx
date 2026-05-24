@@ -1,6 +1,10 @@
 import Link from "next/link";
 
-export default function Footer() {
+type FooterProps = {
+  logoHref?: string;
+};
+
+export default function Footer({ logoHref = "/" }: FooterProps) {
   const year = new Date().getFullYear();
   return (
     <footer className="border-t border-hairline">
@@ -9,7 +13,7 @@ export default function Footer() {
         {/* ── Mobile: two centered lines ─────────────────────────────────── */}
         <div className="flex flex-col items-center gap-2 text-center md:hidden">
           <Link
-            href="/"
+            href={logoHref}
             className="font-display text-xl font-extrabold tracking-tight text-ink"
             aria-label="NRG home"
           >
@@ -29,7 +33,7 @@ export default function Footer() {
         {/* ── Desktop: horizontal row ────────────────────────────────────── */}
         <div className="hidden items-center justify-between md:flex">
           <Link
-            href="/"
+            href={logoHref}
             className="font-display text-xl font-extrabold tracking-tight text-ink"
             aria-label="NRG home"
           >

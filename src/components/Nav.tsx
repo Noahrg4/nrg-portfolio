@@ -11,7 +11,11 @@ const links = [
   { href: "/contact", label: "Contact"  },
 ];
 
-export default function Nav() {
+type NavProps = {
+  logoHref?: string
+}
+
+export default function Nav({ logoHref = "/" }: NavProps) {
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen]         = useState(false);
 
@@ -39,7 +43,7 @@ export default function Nav() {
       <div className="container-content flex h-16 items-center justify-between gap-6">
         {/* Wordmark */}
         <Link
-          href="/"
+          href={logoHref}
           className="font-display text-2xl font-extrabold tracking-tight text-ink"
           aria-label="NRG home"
         >
