@@ -128,7 +128,7 @@ export function LocationPage({ location }: Props) {
                     gradient={p.gradient}
                     imageSrc={p.imageSrc}
                     imageAlt={p.imageAlt}
-                    delay={i * 0.1}
+                    delay={i * 0.08}
                   />
                 )
               })}
@@ -237,7 +237,7 @@ export function LocationPage({ location }: Props) {
                   quote={t.quote}
                   author={t.author}
                   business={t.business}
-                  delay={i * 0.1}
+                  delay={i * 0.08}
                 />
               ))}
             </div>
