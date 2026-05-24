@@ -109,7 +109,7 @@ export function LocationPage({ location }: Props) {
           <div className="container-content">
             <div className="mb-12 flex flex-col gap-4">
               <SectionHeading className="text-display text-4xl md:text-6xl">
-                Websites built for real Houston businesses.
+                {content.workSectionHeading}
               </SectionHeading>
             </div>
             {/* Tight grid — 16px gap, image does the talking */}
@@ -259,9 +259,7 @@ export function LocationPage({ location }: Props) {
             </div>
             <div className="flex flex-col gap-6">
               <SectionHeading className="text-display text-4xl md:text-5xl">
-                Built for Houston.
-                <br />
-                By someone you can reach.
+                {content.aboutTeaserHeadline}
               </SectionHeading>
               <p className="text-base leading-relaxed text-ink-secondary md:text-lg">
                 {content.aboutOpener}
