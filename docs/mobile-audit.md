@@ -203,7 +203,7 @@ SEVERITY: Low
 
 ISSUE 18: BrowserMockup URL Bar — Text Potentially Clipped on Narrow Cards
 VIEWPORT: 375px
-PROBLEM: The BrowserMockup URL bar has `mx-auto max-w-md` containing `font-mono text-[11px]` URL text. URLs like `nrgbuilds.co/work/restaurant` are long (28 chars at 11px mono ≈ 176px). At 375px, the URL bar flex container (`flex-1`) is approximately 335px wide minus the traffic-light dots (~36px) and right spacer (~48px) = ~251px. The URL text should fit centered at 176px. However on the 2-column grid at md breakpoint, cards are narrower and URL bars are tighter. This is a cosmetic issue only — the URL is decorative.
+PROBLEM: The BrowserMockup URL bar has `mx-auto max-w-md` containing `font-mono text-[11px]` URL text. URLs like `nrgwebsites.com/work/restaurant` are long (28 chars at 11px mono ≈ 176px). At 375px, the URL bar flex container (`flex-1`) is approximately 335px wide minus the traffic-light dots (~36px) and right spacer (~48px) = ~251px. The URL text should fit centered at 176px. However on the 2-column grid at md breakpoint, cards are narrower and URL bars are tighter. This is a cosmetic issue only — the URL is decorative.
 FIX: Add `truncate` to the URL text div to prevent any overflow: change `className="mx-auto max-w-md rounded-md border border-hairline bg-surface-3 px-3 py-1 text-center font-mono text-[11px] text-ink-secondary"` to include `truncate overflow-hidden`.
 FILE: src/components/BrowserMockup.tsx — line 57
 SEVERITY: Low
@@ -212,7 +212,7 @@ SEVERITY: Low
 
 ISSUE 19: Footer — Email Address Renders at 11px on Mobile
 VIEWPORT: all mobile
-PROBLEM: The mobile footer has `font-mono text-[11px] uppercase tracking-wider text-ink-secondary` for the one-liner containing "Houston, TX · © year · noah@nrgbuilds.com". At 11px, `noah@nrgbuilds.com` in uppercase mono is very small. The `<a>` mailto link is technically tappable but the tap target is ~11px tall × ~160px wide (the email portion). This is a low-severity issue because the email is also available in the sidebar of the contact page and via the floating CTA.
+PROBLEM: The mobile footer has `font-mono text-[11px] uppercase tracking-wider text-ink-secondary` for the one-liner containing "Houston, TX · © year · noah@nrgwebsites.com". At 11px, `noah@nrgwebsites.com` in uppercase mono is very small. The `<a>` mailto link is technically tappable but the tap target is ~11px tall × ~160px wide (the email portion). This is a low-severity issue because the email is also available in the sidebar of the contact page and via the floating CTA.
 FIX: Split the footer mobile layout into two lines: NRG wordmark on line 1, then "Houston, TX · © year" on line 2 at text-[11px], then the email on its own line at `text-[13px]` with explicit `py-2` padding for tap target. This is a cosmetic/UX polish change.
 FILE: src/components/Footer.tsx — lines 14–31 (mobile footer block)
 SEVERITY: Low

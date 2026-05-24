@@ -158,8 +158,8 @@
 
 ## LOW — All 5 URL slugs confirmed correct
 **File**: `src/lib/projects.ts` (lines 23, 36, 51, 63, 75)
-**Problem**: None — all 5 `url` fields use `nrgbuilds.co/work/[slug]` format with correct slugs: `excavating`, `media`, `restaurant`, `hvac`, `law`. PASS.
-**Expected**: `nrgbuilds.co/work/excavating`, `nrgbuilds.co/work/media`, `nrgbuilds.co/work/restaurant`, `nrgbuilds.co/work/hvac`, `nrgbuilds.co/work/law`.
+**Problem**: None — all 5 `url` fields use `nrgwebsites.com/work/[slug]` format with correct slugs: `excavating`, `media`, `restaurant`, `hvac`, `law`. PASS.
+**Expected**: `nrgwebsites.com/work/excavating`, `nrgwebsites.com/work/media`, `nrgwebsites.com/work/restaurant`, `nrgwebsites.com/work/hvac`, `nrgwebsites.com/work/law`.
 **Actual**: All correct.
 
 ---

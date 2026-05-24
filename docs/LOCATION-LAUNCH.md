@@ -50,7 +50,7 @@ src/components/Footer.tsx        — logoHref prop added
 - **Canonical tags**: all 4 location pages set correctly
 - **Sitemap**: `/sitemap.xml` — 8 URLs (4 location + work, about, services, contact)
 - **robots.txt**: `/robots.txt` — allow `*`, sitemap declared
-- **metadataBase**: `https://nrgbuilds.com` (corrected from placeholder)
+- **metadataBase**: `https://nrgwebsites.com` (corrected from placeholder)
 - **JSON-LD**: Houston (City-level), Michigan (State-level)
 
 ---
@@ -60,20 +60,20 @@ src/components/Footer.tsx        — logoHref prop added
 1. Push this branch to GitHub (see hosting setup notes)
 2. Netlify auto-deploys on push to main
 3. After deploy, verify:
-   - `https://nrgbuilds.com/houston` loads with "for Houston small businesses." headline
-   - `https://nrgbuilds.com/texas` loads with "for Texas small businesses." headline  
-   - `https://nrgbuilds.com/michigan` loads with "for Michigan small businesses." headline
-   - `https://nrgbuilds.com/sitemap.xml` returns 8 URLs
-   - `https://nrgbuilds.com/robots.txt` returns "allow /"
+   - `https://nrgwebsites.com/houston` loads with "for Houston small businesses." headline
+   - `https://nrgwebsites.com/texas` loads with "for Texas small businesses." headline  
+   - `https://nrgwebsites.com/michigan` loads with "for Michigan small businesses." headline
+   - `https://nrgwebsites.com/sitemap.xml` returns 8 URLs
+   - `https://nrgwebsites.com/robots.txt` returns "allow /"
 
 ---
 
 ## Post-Launch SEO Steps (Noah must do these manually)
 
 1. **Google Search Console** — verify domain at search.google.com/search-console
-2. **Submit sitemap** — submit `https://nrgbuilds.com/sitemap.xml` in Search Console
+2. **Submit sitemap** — submit `https://nrgwebsites.com/sitemap.xml` in Search Console
 3. **Monitor indexing** — check each location page's coverage status after 1–2 weeks
-4. **Google Business Profile** — set primary URL to `https://nrgbuilds.com/houston`
+4. **Google Business Profile** — set primary URL to `https://nrgwebsites.com/houston`
 
 ---
 

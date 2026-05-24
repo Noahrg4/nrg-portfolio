@@ -49,12 +49,12 @@ Resend handles the contact form emails. The free tier covers 100 emails/day — 
    ```
 
 ### Verifying your sending domain (recommended for production)
-By default Resend sends from a shared address. To send from `noreply@nrgbuilds.com`:
+By default Resend sends from a shared address. To send from `noreply@nrgwebsites.com`:
 1. In the Resend dashboard, click **Domains** → **Add Domain**.
-2. Enter `nrgbuilds.com`.
+2. Enter `nrgwebsites.com`.
 3. Resend gives you DNS records (SPF, DKIM). Add them at your domain registrar (see the Vercel domain section below for where DNS lives).
 4. Wait 5–30 minutes for verification.
-5. Once verified, emails from the form will come from `noreply@nrgbuilds.com`.
+5. Once verified, emails from the form will come from `noreply@nrgwebsites.com`.
 
 If you haven't verified a domain yet, change the `from:` address in `src/app/api/contact/route.ts` to `onboarding@resend.dev` temporarily — that address works without a verified domain.
 
@@ -95,10 +95,10 @@ Vercel is free for personal projects and is built by the team behind Next.js, so
 ## Adding your custom domain
 
 1. In Vercel, open your project → **Settings** → **Domains**.
-2. Type your domain (e.g., `nrgbuilds.com`) and click **Add**.
+2. Type your domain (e.g., `nrgwebsites.com`) and click **Add**.
 3. Vercel shows you DNS records to add at your domain registrar (GoDaddy, Namecheap, Cloudflare, Google Domains, etc.).
-   - **Apex domain** (`nrgbuilds.com`): add an `A` record pointing to `76.76.21.21`.
-   - **www subdomain** (`www.nrgbuilds.com`): add a `CNAME` pointing to `cname.vercel-dns.com`.
+   - **Apex domain** (`nrgwebsites.com`): add an `A` record pointing to `76.76.21.21`.
+   - **www subdomain** (`www.nrgwebsites.com`): add a `CNAME` pointing to `cname.vercel-dns.com`.
 4. Save at your registrar. Vercel auto-checks every minute — usually verified in 5–15 minutes.
 5. Once verified, Vercel issues a free SSL certificate. Your site is live on your custom domain with HTTPS.
 

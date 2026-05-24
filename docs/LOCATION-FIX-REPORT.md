@@ -120,10 +120,10 @@ The `FloatingCta` is a `"use client"` component — it starts with `visible = fa
 `ContactForm.tsx` line 50: `fetch("/api/contact", ...)` — hardcoded absolute path, always hits the single API route. PASS.
 
 **Canonical URLs:**  
-- `/houston` → `https://nrgbuilds.com/houston` — PASS
-- `/texas` → `https://nrgbuilds.com/texas` — PASS
-- `/michigan` → `https://nrgbuilds.com/michigan` — PASS
-- `/houston/work` → `https://nrgbuilds.com/houston/work` — PASS
+- `/houston` → `https://nrgwebsites.com/houston` — PASS
+- `/texas` → `https://nrgwebsites.com/texas` — PASS
+- `/michigan` → `https://nrgwebsites.com/michigan` — PASS
+- `/houston/work` → `https://nrgwebsites.com/houston/work` — PASS
 - All 12 sub-pages have correct canonicals — PASS
 - Root shared pages (`/work`, `/about`, `/services`, `/contact`) have no canonical set (inherit from `metadataBase`) — acceptable.
 

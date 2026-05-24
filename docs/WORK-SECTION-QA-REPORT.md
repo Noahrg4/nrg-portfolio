@@ -14,7 +14,7 @@
 - **"Selected work" label bright cyan**: Changed `text-accent` to `text-white/40` on the mono label above the project grid in `src/app/work/page.tsx`. Label is now subdued and consistent with category labels.
 
 ## Confirmed Passing (No Changes Needed)
-- URL bars: all 5 show nrgbuilds.co/work/[slug] ✓
+- URL bars: all 5 show nrgwebsites.com/work/[slug] ✓
 - Card structure: category below frame, title below category, no descriptions/tags ✓
 - Grid gaps: gap-4 (16px) on both homepage and /work page ✓
 - .section-pad: clamp(3rem, 8vw, 6rem) ✓

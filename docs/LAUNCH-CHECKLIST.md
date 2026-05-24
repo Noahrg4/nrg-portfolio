@@ -31,7 +31,7 @@ Set these in Vercel → Project → Settings → Environment Variables:
 
 | Variable | Required | Description |
 |----------|----------|-------------|
-| `NOAH_EMAIL` | ✅ Yes | Where contact form submissions go (e.g. `noah@nrgbuilds.com`) |
+| `NOAH_EMAIL` | ✅ Yes | Where contact form submissions go (e.g. `noah@nrgwebsites.com`) |
 | `NOAH_PHONE` | Optional | For Twilio SMS alerts (format: `+17131234567`) |
 | `RESEND_API_KEY` | ✅ Yes | Get from [resend.com](https://resend.com) — free tier handles the volume |
 | `TWILIO_SID` | Optional | Enables SMS alerts — leave blank to skip |

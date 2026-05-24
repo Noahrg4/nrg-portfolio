@@ -161,7 +161,7 @@ The 4th paragraph (`"Based in Houston. Available for projects now."`) from COPY-
 | `[PHOTO NEEDED]` — professional headshot | `about/page.tsx` line 106 (renders as visible label in monogram placeholder) |
 | `[REPLACE WITH REAL TESTIMONIAL]` | `testimonials.ts` — all 3 testimonials flagged as placeholders |
 | Real phone number | `page.tsx` CTA band (line 347), `contact/page.tsx` sidebar (line 79), `Footer.tsx` (line 59) — currently `(989) 488-7309` |
-| Real email | `contact/page.tsx` sidebar and `Footer.tsx` — currently `hello@nrg.example.com` (also conflicts with `noah@nrgbuilds.com` referenced in `route.ts` error messages) |
+| Real email | `contact/page.tsx` sidebar and `Footer.tsx` — currently `hello@nrg.example.com` (also conflicts with `noah@nrgwebsites.com` referenced in `route.ts` error messages) |
 | Project card screenshots | All 3 cards use gradient placeholders — `BrowserMockup` supports `imageSrc` prop for real screenshots |
 
 ---

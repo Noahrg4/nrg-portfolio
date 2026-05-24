@@ -9,12 +9,12 @@ This file is auto-read by Claude Code at session start. It gives a new session e
 **What this is:** Noah Reuter-Gushow's portfolio and lead-generation website for NRG — a one-person web design + automation business targeting small businesses in Houston, TX (primary), Texas (secondary), and Michigan (legacy market).
 
 **Business context:**
-- Owner: Noah Reuter-Gushow (nrgbuilds.com / noah@nrgbuilds.com)
+- Owner: Noah Reuter-Gushow (nrgwebsites.com / noah@nrgwebsites.com)
 - Target customers: Houston restaurants, HVAC companies, law offices, salons, trades
 - Value proposition: No-agency, direct operator. Flat pricing ($500–$800 sites). Live in 1–2 weeks.
 - Phone: (989) 488-7309 (placeholder — update when real number confirmed)
 
-**Live domain:** `https://nrgbuilds.com` (pending GitHub push + Netlify deploy — see §13)
+**Live domain:** `https://nrgwebsites.com` (pending GitHub push + Netlify deploy — see §13)
 
 ---
 
@@ -27,7 +27,7 @@ This file is auto-read by Claude Code at session start. It gives a new session e
 | Animation | Framer Motion v12 |
 | Fonts | Syne (display/headings), DM Sans (body), DM Mono (mono/labels) — Google Fonts |
 | Hosting | Netlify Free (Vercel Hobby prohibited for commercial use) |
-| Email | noah@nrgbuilds.com via Zoho Mail Free |
+| Email | noah@nrgwebsites.com via Zoho Mail Free |
 | Contact form backend | `/api/contact` (Next.js API route) |
 
 **Key package versions (do not upgrade without testing):**
@@ -272,7 +272,7 @@ Each location can override project card titles via `content.cardTitles[key]`.
 ### `BrowserMockup` — `src/components/BrowserMockup.tsx`
 ```tsx
 <BrowserMockup
-  url="nrgbuilds.co/work/restaurant"
+  url="nrgwebsites.com/work/restaurant"
   imageSrc="/work/rustic-table.png"
   imageAlt="..."
   delay={0.1}
@@ -306,7 +306,7 @@ Used on the homepage work preview grid (3 cards). Wraps `BrowserMockup` in a `<L
 <HomepageProjectCard
   category="Restaurant"
   title="Full Web Presence — Houston Restaurant"
-  url="nrgbuilds.co/work/restaurant"
+  url="nrgwebsites.com/work/restaurant"
   gradient="bg-gradient-to-br from-[#1a1818] ..."
   imageSrc="/work/rustic-table.png"
   imageAlt="..."
@@ -441,7 +441,7 @@ Each location page file (`src/app/houston/page.tsx` etc.) exports:
 export const metadata: Metadata = {
   title: locationContent.houston.metaTitle,
   description: locationContent.houston.metaDescription,
-  alternates: { canonical: 'https://nrgbuilds.com/houston' },
+  alternates: { canonical: 'https://nrgwebsites.com/houston' },
 }
 ```
 Houston and Michigan also have JSON-LD `<script type="application/ld+json">` in the page component JSX — `LocalBusiness + ProfessionalService` schema.
@@ -547,16 +547,16 @@ Always pass `noEntry` to `BrowserMockup` when it's inside a card that already ha
 ## 9. Page-by-Page Reference
 
 ### `/` (root) — `src/app/page.tsx`
-Thin wrapper: `<LocationPage location="root" />` + metadata with canonical `https://nrgbuilds.com`.
+Thin wrapper: `<LocationPage location="root" />` + metadata with canonical `https://nrgwebsites.com`.
 
 ### `/houston` — `src/app/houston/page.tsx`
-`<LocationPage location="houston" />` + JSON-LD `LocalBusiness` (City: Houston, State: Texas) + canonical `https://nrgbuilds.com/houston`.
+`<LocationPage location="houston" />` + JSON-LD `LocalBusiness` (City: Houston, State: Texas) + canonical `https://nrgwebsites.com/houston`.
 
 ### `/texas` — `src/app/texas/page.tsx`
-`<LocationPage location="texas" />` + canonical `https://nrgbuilds.com/texas`.
+`<LocationPage location="texas" />` + canonical `https://nrgwebsites.com/texas`.
 
 ### `/michigan` — `src/app/michigan/page.tsx`
-`<LocationPage location="michigan" />` + JSON-LD `LocalBusiness` (State: Michigan) + canonical `https://nrgbuilds.com/michigan`.
+`<LocationPage location="michigan" />` + JSON-LD `LocalBusiness` (State: Michigan) + canonical `https://nrgwebsites.com/michigan`.
 
 ### `/work` — `src/app/work/page.tsx`
 Full 2-column `ProjectCard` grid. All 5 projects. "More work available on request" caption. CTA section linking to `/contact`.
@@ -575,7 +575,7 @@ Contact form. `ContactForm` is a client component. Form POST target: `/api/conta
 ## 10. SEO Infrastructure
 
 ### What's in place
-- **`src/app/layout.tsx`** — global `metadataBase: new URL("https://nrgbuilds.com")`, OpenGraph title/description
+- **`src/app/layout.tsx`** — global `metadataBase: new URL("https://nrgwebsites.com")`, OpenGraph title/description
 - **`src/app/sitemap.ts`** — auto-generates `/sitemap.xml` with 8 URLs (priorities: / = 1.0, location pages = 0.9, /work = 0.8, /services = 0.7, /about = 0.6, /contact = 0.5)
 - **`src/app/robots.ts`** — auto-generates `/robots.txt` with `allow: '/'` and sitemap reference
 - **Canonical tags** — `alternates: { canonical: '...' }` on all 4 location pages
@@ -583,7 +583,7 @@ Contact form. `ContactForm` is a client component. Form POST target: `/api/conta
 - **Unique meta titles + descriptions** — per page, all under 160 chars
 
 ### Manual SEO steps still needed (Noah does these post-launch)
-1. Verify domain in Google Search Console → submit `https://nrgbuilds.com/sitemap.xml`
+1. Verify domain in Google Search Console → submit `https://nrgwebsites.com/sitemap.xml`
 2. Set up Google Business Profile with `/houston` as primary URL
 3. Monitor location page indexing status after 2 weeks
 
@@ -624,14 +624,14 @@ Nav links from ALL pages (including location pages) go to the shared pages. The 
 **Status:** All code is local only. Not yet on GitHub. Not yet on Netlify.
 
 ### Plan
-1. **Domain:** Buy `nrgbuilds.com` + `nrgbuilds.co` (used in project card URL bars)
+1. **Domain:** Buy `nrgwebsites.com` + `nrgwebsites.com` (used in project card URL bars)
 2. **GitHub:** Create new public repo `nrg-portfolio`, push local `main` branch
 3. **Netlify:** Connect Netlify account (Noah has one) → "Add new site from Git" → pick the GitHub repo → auto-deploy
 4. **Build settings for Netlify:**
    - Build command: `npm run build`
    - Publish directory: `.next`
    - Node version: 18+
-5. **Email:** Zoho Mail Free for noah@nrgbuilds.com
+5. **Email:** Zoho Mail Free for noah@nrgwebsites.com
 6. **Contact form:** Resend (free tier) for transactional email from the `/api/contact` route
 
 ### GitHub Push (what was interrupted)

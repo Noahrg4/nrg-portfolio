@@ -140,7 +140,7 @@ This is the single source of truth for every word on the site. The UI/UX agent s
 **Headline:** `Ready to get online?`
 **Sub:** `Most projects are live in 1–2 weeks.`
 **Button:** `Start a project`
-**Below button:** `noah@nrgbuilds.com · (989) 488-7309`
+**Below button:** `noah@nrgwebsites.com · (989) 488-7309`
 
 ---
 
@@ -241,7 +241,7 @@ Use the same 3 project cards from the homepage (Project 1, 2, 3 above) at full s
 
 ### Sidebar contact info
 
-- **Email:** `noah@nrgbuilds.com`
+- **Email:** `noah@nrgwebsites.com`
 - **Response time:** `Usually responds same day.`
 - **Location:** `Based in Houston, TX`
 - **Phone:** `[NOAH'S PHONE: add real number here]`
