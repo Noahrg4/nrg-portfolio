@@ -148,6 +148,20 @@ textarea:focus-visible {
   padding-bottom: clamp(4rem, 10vw, 8rem);
 }
 
+/* Mobile-only: tighter vertical rhythm — floor 40px instead of 48px */
+@media (max-width: 767px) {
+  .section-pad,
+  .py-section {
+    padding-top: clamp(2.5rem, 8vw, 4rem);
+    padding-bottom: clamp(2.5rem, 8vw, 4rem);
+  }
+
+  .py-section-lg {
+    padding-top: clamp(3rem, 10vw, 5rem);
+    padding-bottom: clamp(3rem, 10vw, 5rem);
+  }
+}
+
 /* Subpage top-padding utility — replaces ad-hoc pt-24 md:pt-40 */
 .page-top {
   padding-top: clamp(6rem, 14vw, 10rem);
