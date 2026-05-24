@@ -56,7 +56,7 @@ export default function ContactPage() {
                   href="mailto:noah@nrgbuilds.com"
                   className="group flex flex-col gap-1"
                 >
-                  <span className="font-mono text-[10px] uppercase tracking-wider text-ink-subtle">
+                  <span className="font-mono text-[11px] uppercase tracking-wider text-ink-secondary">
                     Email
                   </span>
                   <span className="text-base text-ink transition-colors group-hover:text-accent">
@@ -67,7 +67,7 @@ export default function ContactPage() {
                   href="tel:+17135550000"
                   className="group flex flex-col gap-1"
                 >
-                  <span className="font-mono text-[10px] uppercase tracking-wider text-ink-subtle">
+                  <span className="font-mono text-[11px] uppercase tracking-wider text-ink-secondary">
                     Phone
                   </span>
                   <span className="text-base text-ink transition-colors group-hover:text-accent">

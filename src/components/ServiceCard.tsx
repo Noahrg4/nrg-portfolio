@@ -41,9 +41,9 @@ export default function ServiceCard({
       </div>
       <div className="mt-2 flex items-center justify-between border-t border-hairline pt-4">
         {startingFrom && (
-          <p className="hidden font-mono text-[11px] uppercase tracking-wider text-ink-subtle sm:block">
+          <p className="hidden font-mono text-[11px] uppercase tracking-wider text-ink-secondary sm:block">
             Starting from{" "}
-            <span className="text-ink-secondary">{startingFrom}</span>
+            <span className="text-ink">{startingFrom}</span>
           </p>
         )}
         <span

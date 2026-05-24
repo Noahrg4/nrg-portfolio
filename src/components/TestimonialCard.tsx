@@ -42,7 +42,7 @@ export default function TestimonialCard({
         <span className="font-display text-base font-bold text-ink">
           {author}
         </span>
-        <span className="font-mono text-xs uppercase tracking-wider text-ink-subtle">
+        <span className="font-mono text-xs uppercase tracking-wider text-ink-secondary">
           {business}
         </span>
       </figcaption>

@@ -19,7 +19,7 @@ export default function Footer({ logoHref = "/" }: FooterProps) {
           >
             NRG
           </Link>
-          <p className="font-mono text-[11px] uppercase tracking-wider text-ink-subtle">
+          <p className="font-mono text-[11px] uppercase tracking-wider text-ink-secondary">
             Houston, TX &nbsp;·&nbsp; © {year} &nbsp;·&nbsp;{" "}
             <a
               href="mailto:noah@nrgbuilds.com"
@@ -39,16 +39,16 @@ export default function Footer({ logoHref = "/" }: FooterProps) {
           >
             NRG
           </Link>
-          <span className="font-mono text-[11px] uppercase tracking-wider text-ink-subtle">
+          <span className="font-mono text-[11px] uppercase tracking-wider text-ink-secondary">
             Houston, TX
           </span>
           <a
             href="mailto:noah@nrgbuilds.com"
-            className="font-mono text-[11px] uppercase tracking-wider text-ink-subtle transition-colors hover:text-ink"
+            className="font-mono text-[11px] uppercase tracking-wider text-ink-secondary transition-colors hover:text-ink"
           >
             noah@nrgbuilds.com
           </a>
-          <span className="font-mono text-[11px] uppercase tracking-wider text-ink-subtle">
+          <span className="font-mono text-[11px] uppercase tracking-wider text-ink-secondary">
             © {year}
           </span>
         </div>

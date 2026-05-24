@@ -192,7 +192,7 @@ export default function ContactForm() {
               {errors.project}
             </p>
           ) : (
-            <span id="project-hint" className="font-mono text-[10px] text-ink-subtle">
+            <span id="project-hint" className="font-mono text-[11px] text-ink-secondary">
               {project.length}/500
             </span>
           )}
