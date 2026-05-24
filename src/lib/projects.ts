@@ -33,10 +33,14 @@ export const projects: Project[] = [
   },
 
   // ── Spec / MVP work (replaced by screenshots as they're built) ────────────
+  // Titles below are location-neutral defensive fallbacks. The actually-rendered
+  // title for each card comes from locationContent.cardTitles via the
+  // slugToCardKey lookup in LocationPage.tsx and pages/WorkPage.tsx — the
+  // fallback only fires if a project's slug is missing from slugToCardKey.
   {
     slug: "houston-restaurant",
     category: "Restaurant",
-    title: "Full Web Presence — Houston Restaurant",
+    title: "Full Web Presence — Restaurant",
     url: "nrgbuilds.co/work/restaurant",
     gradient: "bg-gradient-to-br from-[#1a1818] via-[#241a14] to-[#0a0a0a]",
     imageSrc: "/work/rustic-table.png",
@@ -45,7 +49,7 @@ export const projects: Project[] = [
   {
     slug: "houston-hvac",
     category: "HVAC & Trades",
-    title: "Lead Generation Site — Houston HVAC Company",
+    title: "Lead Generation Site — HVAC Company",
     url: "nrgbuilds.co/work/hvac",
     gradient: "bg-gradient-to-br from-[#0d1b2a] via-[#0f1f2e] to-[#0a0a0a]",
     imageSrc: "/work/martinez-hvac.png",
@@ -54,7 +58,7 @@ export const projects: Project[] = [
   {
     slug: "houston-law",
     category: "Law Office",
-    title: "Client Acquisition Site — Houston Law Office",
+    title: "Client Acquisition Site — Law Office",
     url: "nrgbuilds.co/work/law",
     gradient: "bg-gradient-to-br from-[#1b3a2d] via-[#152e22] to-[#0a0a0a]",
     imageSrc: "/work/reyes-law.png",
