@@ -4,6 +4,7 @@ import Nav from "@/components/Nav";
 import Footer from "@/components/Footer";
 import FloatingCta from "@/components/FloatingCta";
 import SectionHeading from "@/components/SectionHeading";
+import ServiceDetailCard from "@/components/ServiceDetailCard";
 import { services } from "@/lib/services";
 
 export const metadata: Metadata = {
@@ -32,47 +33,16 @@ export default function ServicesPage() {
 
         <section className="section-pad">
           <div className="container-content grid grid-cols-1 gap-6 md:grid-cols-2">
-            {services.map((s) => (
-              <article
+            {services.map((s, i) => (
+              <ServiceDetailCard
                 key={s.slug}
-                className="group relative flex flex-col gap-6 rounded-xl border border-accent/20 bg-surface-2 p-8 transition-colors duration-200 hover:border-accent md:p-10"
-              >
-                <div className="flex items-start justify-between gap-4">
-                  <span className="text-accent">{s.icon}</span>
-                  <span className="font-mono text-[11px] uppercase tracking-wider text-ink-subtle">
-                    Starting from{" "}
-                    <span className="text-ink-secondary">{s.startingFrom}</span>
-                  </span>
-                </div>
-                <h2 className="font-display text-3xl font-bold tracking-tight text-ink md:text-4xl">
-                  {s.name}
-                </h2>
-                <p className="text-base leading-relaxed text-ink-secondary">
-                  {s.long}
-                </p>
-                <ul className="flex flex-col gap-2.5 border-t border-hairline pt-5">
-                  {s.includes.map((item) => (
-                    <li
-                      key={item}
-                      className="flex items-start gap-3 text-sm text-ink-secondary"
-                    >
-                      <span
-                        className="mt-1.5 inline-block h-1 w-1 flex-shrink-0 rounded-full bg-accent"
-                        aria-hidden
-                      />
-                      <span>{item}</span>
-                    </li>
-                  ))}
-                </ul>
-                <div className="mt-2 flex items-center justify-between border-t border-hairline pt-5">
-                  <Link
-                    href="/contact"
-                    className="font-mono text-xs uppercase tracking-wider text-accent transition-opacity duration-200 hover:opacity-80"
-                  >
-                    Discuss this →
-                  </Link>
-                </div>
-              </article>
+                icon={s.icon}
+                name={s.name}
+                long={s.long}
+                startingFrom={s.startingFrom}
+                includes={s.includes}
+                delay={i * 0.08}
+              />
             ))}
           </div>
         </section>

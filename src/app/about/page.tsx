@@ -4,6 +4,7 @@ import Nav from "@/components/Nav";
 import Footer from "@/components/Footer";
 import FloatingCta from "@/components/FloatingCta";
 import SectionHeading from "@/components/SectionHeading";
+import AboutSkillCard from "@/components/AboutSkillCard";
 import {
   IconWeb,
   IconAutomation,
@@ -109,19 +110,14 @@ export default function AboutPage() {
               </SectionHeading>
             </div>
             <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
-              {skills.map((s) => (
-                <article
+              {skills.map((s, i) => (
+                <AboutSkillCard
                   key={s.title}
-                  className="flex flex-col gap-4 rounded-lg border border-hairline bg-surface-1 p-8 transition-colors duration-200 hover:border-accent/50"
-                >
-                  <span className="text-accent">{s.icon}</span>
-                  <h3 className="font-display text-xl font-bold tracking-tight text-ink">
-                    {s.title}
-                  </h3>
-                  <p className="text-sm leading-relaxed text-ink-secondary">
-                    {s.body}
-                  </p>
-                </article>
+                  icon={s.icon}
+                  title={s.title}
+                  body={s.body}
+                  delay={i * 0.08}
+                />
               ))}
             </div>
           </div>
