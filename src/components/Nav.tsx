@@ -34,7 +34,7 @@ export default function Nav({ logoHref = "/" }: NavProps) {
 
   return (
     <header
-      className={`fixed inset-x-0 top-0 z-50 transition-all duration-200 ${
+      className={`fixed inset-x-0 top-0 z-50 transition-[background-color,backdrop-filter,border-color] duration-200 ${
         scrolled
           ? "border-b border-hairline bg-canvas/70 backdrop-blur-xl"
           : "border-b border-transparent bg-transparent"
@@ -67,7 +67,7 @@ export default function Nav({ logoHref = "/" }: NavProps) {
         <div className="hidden items-center gap-3 md:flex">
           <Link
             href="/contact"
-            className="rounded-md bg-accent px-4 py-2 font-mono text-[12px] font-medium uppercase tracking-wider text-canvas transition-shadow hover:shadow-[0_0_30px_rgba(0,212,255,0.4)]"
+            className="rounded-md bg-accent px-4 py-2 font-mono text-[12px] font-medium uppercase tracking-wider text-canvas transition-shadow duration-200 hover:shadow-[0_0_30px_rgba(0,212,255,0.4)] active:opacity-90"
           >
             Get in touch
           </Link>

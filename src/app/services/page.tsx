@@ -35,7 +35,7 @@ export default function ServicesPage() {
             {services.map((s) => (
               <article
                 key={s.slug}
-                className="group relative flex flex-col gap-6 rounded-xl border border-accent/20 bg-surface-2 p-8 transition-colors hover:border-accent md:p-10"
+                className="group relative flex flex-col gap-6 rounded-xl border border-accent/20 bg-surface-2 p-8 transition-colors duration-200 hover:border-accent md:p-10"
               >
                 <div className="flex items-start justify-between gap-4">
                   <span className="text-accent">{s.icon}</span>
@@ -67,7 +67,7 @@ export default function ServicesPage() {
                 <div className="mt-2 flex items-center justify-between border-t border-hairline pt-5">
                   <Link
                     href="/contact"
-                    className="font-mono text-xs uppercase tracking-wider text-accent transition-opacity hover:opacity-80"
+                    className="font-mono text-xs uppercase tracking-wider text-accent transition-opacity duration-200 hover:opacity-80"
                   >
                     Discuss this →
                   </Link>
@@ -110,7 +110,7 @@ export default function ServicesPage() {
             </p>
             <Link
               href="/contact"
-              className="inline-flex items-center gap-2 rounded-md bg-accent px-6 py-3.5 font-mono text-sm font-medium uppercase tracking-wider text-canvas transition-shadow hover:shadow-[0_0_40px_rgba(0,212,255,0.5)]"
+              className="inline-flex items-center gap-2 rounded-md bg-accent px-6 py-3.5 font-mono text-sm font-medium uppercase tracking-wider text-canvas transition-shadow duration-200 hover:shadow-[0_0_40px_rgba(0,212,255,0.5)] active:scale-[0.98]"
             >
               Start a project
               <span aria-hidden>→</span>

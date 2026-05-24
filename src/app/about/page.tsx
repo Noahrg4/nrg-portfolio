@@ -112,7 +112,7 @@ export default function AboutPage() {
               {skills.map((s) => (
                 <article
                   key={s.title}
-                  className="flex flex-col gap-4 rounded-lg border border-hairline bg-surface-1 p-8 transition-colors hover:border-accent/50"
+                  className="flex flex-col gap-4 rounded-lg border border-hairline bg-surface-1 p-8 transition-colors duration-200 hover:border-accent/50"
                 >
                   <span className="text-accent">{s.icon}</span>
                   <h3 className="font-display text-xl font-bold tracking-tight text-ink">
@@ -144,7 +144,7 @@ export default function AboutPage() {
             </SectionHeading>
             <Link
               href="/contact"
-              className="inline-flex items-center gap-2 rounded-md bg-accent px-6 py-3.5 font-mono text-sm font-medium uppercase tracking-wider text-canvas transition-shadow hover:shadow-[0_0_40px_rgba(0,212,255,0.5)]"
+              className="inline-flex items-center gap-2 rounded-md bg-accent px-6 py-3.5 font-mono text-sm font-medium uppercase tracking-wider text-canvas transition-shadow duration-200 hover:shadow-[0_0_40px_rgba(0,212,255,0.5)] active:scale-[0.98]"
             >
               Get in touch
               <span aria-hidden>→</span>
