@@ -12,34 +12,34 @@ import {
 } from "@/components/Icons";
 import { locationContent, type LocationSlug } from "@/lib/locationContent";
 
-const skills = [
-  {
-    icon: <IconWeb />,
-    title: "Web Design",
-    body: "Custom websites, mobile-first, fast loading, easy to update. Built to look professional and rank on Google.",
-  },
-  {
-    icon: <IconAutomation />,
-    title: "Automation",
-    body: "Contact alerts, booking confirmations, review requests, follow-up emails. Set up once, runs forever.",
-  },
-  {
-    icon: <IconSeo />,
-    title: "Local SEO",
-    body: "Google Business Profile, local search optimization. Show up when Houston customers search for you.",
-  },
-  {
-    icon: <IconSecurity />,
-    title: "Security & Hosting",
-    body: "SSL, secure servers, regular backups. Your site and customer data are protected.",
-  },
-];
-
 type Props = { location?: LocationSlug };
 
 export function AboutPage({ location = "root" }: Props) {
   const content = locationContent[location];
   const linkPrefix = location === "root" ? "" : `/${location}`;
+
+  const skills = [
+    {
+      icon: <IconWeb />,
+      title: "Web Design",
+      body: "Custom websites, mobile-first, fast loading, easy to update. Built to look professional and rank on Google.",
+    },
+    {
+      icon: <IconAutomation />,
+      title: "Automation",
+      body: "Contact alerts, booking confirmations, review requests, follow-up emails. Set up once, runs forever.",
+    },
+    {
+      icon: <IconSeo />,
+      title: "Local SEO",
+      body: content.aboutSeoSkillBody,
+    },
+    {
+      icon: <IconSecurity />,
+      title: "Security & Hosting",
+      body: "SSL, secure servers, regular backups. Your site and customer data are protected.",
+    },
+  ];
 
   return (
     <>
@@ -48,9 +48,7 @@ export function AboutPage({ location = "root" }: Props) {
         <section>
           <div className="container-content flex flex-col gap-6">
             <h1 className="text-display text-[clamp(2.75rem,8vw,4.5rem)]">
-              I build the web for
-              <br />
-              Houston&apos;s small businesses.
+              {content.aboutPageHeadline}
             </h1>
             <p className="max-w-2xl text-base leading-relaxed text-ink-secondary md:text-lg">
               Websites that show up on Google and actually bring in customers.
@@ -67,14 +65,14 @@ export function AboutPage({ location = "root" }: Props) {
                 in the middle.
               </SectionHeading>
               <div className="flex flex-col gap-5 text-base leading-relaxed text-ink-secondary md:text-lg">
-                <p>I build websites and automation for Houston small businesses — restaurants, trades companies, law offices, salons, and anyone else who deserves a professional web presence without the agency price tag.</p>
+                <p>{content.aboutBioParagraph1}</p>
                 <p>Before starting NRG, I spent two years inside the technology infrastructure of one of the largest companies in the world. I bring that same standard of reliability to every project — whether it&apos;s a $600 site for a local plumber or a full automation setup for a growing service business.</p>
                 <p>I graduated from Grand Valley State University with a degree in Computer Science and Cybersecurity. That background means your website and customer data are handled by someone who actually knows what they&apos;re doing — not just someone who can drag and drop in Squarespace.</p>
-                <p>Based in Houston. Available for projects now.</p>
+                <p>{content.aboutBioClosingLine}</p>
               </div>
               <div className="flex flex-wrap gap-2 pt-2">
                 {[
-                  "Houston-based",
+                  content.aboutLocationBadge,
                   "Solo",
                   "8 businesses live",
                   "Direct line",
@@ -92,7 +90,7 @@ export function AboutPage({ location = "root" }: Props) {
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src="/noah-headshot.jpg"
-                alt="Noah Reuter-Gushow — NRG web designer based in Houston, TX"
+                alt={content.aboutHeadshotAlt}
                 loading="lazy"
                 decoding="async"
                 className="h-full w-full object-cover object-top"
