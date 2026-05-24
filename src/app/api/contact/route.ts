@@ -6,12 +6,13 @@ type ContactPayload = {
   name?: unknown;
   phone?: unknown;
   message?: unknown;
+  project?: unknown;
 };
 
 type FieldErrors = {
   name?: string;
   phone?: string;
-  message?: string;
+  project?: string;
 };
 
 const PHONE_REGEX = /^\+?1?\s*[(]?[0-9]{3}[)]?[-\s]?[0-9]{3}[-\s]?[0-9]{4}$/;
@@ -40,7 +41,12 @@ function validate(payload: ContactPayload): {
 
   const rawName = typeof payload.name === 'string' ? payload.name : '';
   const rawPhone = typeof payload.phone === 'string' ? payload.phone : '';
-  const rawMessage = typeof payload.message === 'string' ? payload.message : '';
+  const rawMessage =
+    typeof payload.project === 'string'
+      ? payload.project
+      : typeof payload.message === 'string'
+        ? payload.message
+        : '';
 
   const name = sanitize(rawName);
   const phone = sanitize(rawPhone);
@@ -61,11 +67,11 @@ function validate(payload: ContactPayload): {
   }
 
   if (!message) {
-    errors.message = 'Tell me a little about what you need.';
+    errors.project = 'Tell me a little about what you need.';
   } else if (message.length < 10) {
-    errors.message = 'A few more details, please — at least 10 characters.';
+    errors.project = 'A few more details, please — at least 10 characters.';
   } else if (message.length > 500) {
-    errors.message = 'Keep it under 500 characters — we can dig in over a call.';
+    errors.project = 'Keep it under 500 characters — we can dig in over a call.';
   }
 
   return { errors, clean: { name, phone, message } };

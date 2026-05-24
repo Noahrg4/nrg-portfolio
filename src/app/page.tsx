@@ -1,101 +1,319 @@
-import Image from "next/image";
+import Link from "next/link";
+import type { Metadata } from "next";
+import Nav from "@/components/Nav";
+import Footer from "@/components/Footer";
+import FloatingCta from "@/components/FloatingCta";
+import HeroHeadline from "@/components/HeroHeadline";
+import HomepageProjectCard from "@/components/HomepageProjectCard";
+import ServiceCard from "@/components/ServiceCard";
+import TestimonialCard from "@/components/TestimonialCard";
+import SectionHeading from "@/components/SectionHeading";
+import { projects } from "@/lib/projects";
+import { services } from "@/lib/services";
+import { featuredTestimonial, testimonials } from "@/lib/testimonials";
 
-export default function Home() {
+export const metadata: Metadata = {
+  title: "NRG — Web Design & Automation for Houston Small Businesses",
+  description:
+    "Custom websites, automation, and local SEO for Houston restaurants, trades, and salons. 8 live businesses. Real results, no agency runaround.",
+};
+
+export default function HomePage() {
   return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="https://nextjs.org/icons/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
-
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="https://nextjs.org/icons/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
+    <>
+      <Nav />
+      <main className="pt-16" style={{ overflowX: "clip" }}>
+        {/* HERO */}
+        <section className="relative flex min-h-[calc(100vh-4rem)] items-center overflow-visible">
+          <div
+            aria-hidden
+            className="pointer-events-none absolute -top-40 -left-40 h-[600px] w-[600px] rounded-full opacity-40 blur-3xl"
+            style={{
+              background:
+                "radial-gradient(circle, rgba(0,212,255,0.18), transparent 70%)",
+            }}
+          />
+          <div className="container-content relative flex flex-col gap-6 py-8 text-left md:gap-10 md:py-24">
+            <HeroHeadline
+              lines={[
+                { text: "Real Clients." },
+                { text: "Real Websites." },
+                { text: "Real Results." },
+              ]}
             />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:min-w-44"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
-        </div>
+
+            {/* Sub-line — desktop only */}
+            <p className="hidden max-w-2xl font-display text-2xl font-bold tracking-tight text-accent md:block md:text-3xl">
+              For Houston Area Businesses
+            </p>
+
+            {/* Description — desktop only */}
+            <p className="hidden max-w-2xl text-base leading-relaxed text-ink-secondary md:block md:text-lg">
+              I build professional websites and the automations that keep your
+              business running — contact alerts, booking confirmations, review
+              requests. All handled.
+            </p>
+
+            {/* CTAs: full-width stack on mobile, row on desktop */}
+            <div className="flex flex-col gap-3 md:flex-row md:flex-wrap md:items-center md:gap-4">
+              <Link
+                href="/contact"
+                className="flex items-center justify-center gap-2 rounded-md bg-accent px-6 py-3.5 font-mono text-sm font-medium uppercase tracking-wider text-canvas transition-shadow hover:shadow-[0_0_40px_rgba(0,212,255,0.5)]"
+              >
+                Start a project
+                <span aria-hidden>→</span>
+              </Link>
+              {/* Ghost CTA — desktop only */}
+              <Link
+                href="/work"
+                className="hidden items-center gap-2 rounded-md border border-hairline-strong px-6 py-3.5 font-mono text-sm font-medium uppercase tracking-wider text-ink transition-colors hover:border-accent hover:text-accent md:inline-flex"
+              >
+                See my work
+              </Link>
+            </div>
+          </div>
+        </section>
+
+        {/* FEATURED TESTIMONIAL */}
+        <section className="section-pad border-t border-hairline">
+          <div className="container-content">
+            <div className="mb-10 flex items-center gap-4">
+              <span className="font-mono text-[11px] uppercase tracking-wider text-accent">
+                ▸ In their words
+              </span>
+              <span className="h-px flex-1 bg-hairline" aria-hidden />
+            </div>
+            <div className="mx-auto max-w-4xl">
+              <TestimonialCard
+                quote={featuredTestimonial.quote}
+                author={featuredTestimonial.author}
+                business={featuredTestimonial.business}
+                featured
+              />
+            </div>
+          </div>
+        </section>
+
+        {/* WORK PREVIEW */}
+        <section id="work" className="section-pad border-t border-hairline">
+          <div className="container-content">
+            <div className="mb-8 flex flex-col gap-4">
+              <SectionHeading className="text-display text-4xl md:text-6xl">
+                Websites built
+                <br />
+                for real Houston
+                <br />
+                businesses.
+              </SectionHeading>
+            </div>
+            {/* Tight grid — 16px gap, image does the talking */}
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
+              {projects.slice(0, 3).map((p, i) => (
+                <HomepageProjectCard
+                  key={p.slug}
+                  category={p.category}
+                  title={p.title}
+                  url={p.url}
+                  gradient={p.gradient}
+                  imageSrc={p.imageSrc}
+                  imageAlt={p.imageAlt}
+                  delay={i * 0.1}
+                />
+              ))}
+            </div>
+            {/* Right-aligned "All projects →" below the grid */}
+            <div className="mt-6 flex justify-end">
+              <Link
+                href="/work"
+                className="font-mono text-[13px] text-accent transition-opacity hover:opacity-75"
+              >
+                All projects →
+              </Link>
+            </div>
+          </div>
+        </section>
+
+        {/* SERVICES STRIP */}
+        <section
+          id="services"
+          className="section-pad border-t border-hairline bg-surface-1/30"
+        >
+          <div className="container-content">
+            <div className="mb-14 flex flex-col gap-4">
+              <SectionHeading className="text-display text-4xl md:text-6xl">
+                Everything your business
+                <br />
+                needs to get online.
+              </SectionHeading>
+              <p className="max-w-2xl text-base text-ink-secondary">
+                Outcomes, not jargon. Pick one piece or the whole system —
+                priced for small businesses, not agencies.
+              </p>
+            </div>
+            <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
+              {services.map((s, i) => (
+                <ServiceCard
+                  key={s.slug}
+                  icon={s.icon}
+                  name={s.name}
+                  description={s.short}
+                  startingFrom={s.startingFrom}
+                  delay={i * 0.08}
+                />
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* PROCESS */}
+        <section className="section-pad border-t border-hairline">
+          <div className="container-content">
+            <div className="mb-14 flex flex-col gap-4">
+              <SectionHeading className="text-display text-4xl md:text-6xl">
+                Simple from
+                <br />
+                start to live.
+              </SectionHeading>
+            </div>
+            <ol className="grid grid-cols-1 gap-8 md:grid-cols-3">
+              {[
+                {
+                  title: "We talk.",
+                  body: "Tell me about your business and what you need. No tech speak required.",
+                },
+                {
+                  title: "I build it.",
+                  body: "You see progress along the way. Nothing goes live until you're happy with it.",
+                },
+                {
+                  title: "You get customers.",
+                  body: "Your site goes live, your automations run, and you start showing up where your customers are looking.",
+                },
+              ].map((step, i) => (
+                <li
+                  key={i}
+                  className="flex flex-col gap-5 rounded-lg border border-hairline bg-surface-1 p-8"
+                >
+                  <span className="font-display text-6xl font-extrabold text-accent">
+                    0{i + 1}
+                  </span>
+                  <h3 className="font-display text-xl font-bold tracking-tight text-ink">
+                    {step.title}
+                  </h3>
+                  <p className="text-sm leading-relaxed text-ink-secondary">
+                    {step.body}
+                  </p>
+                </li>
+              ))}
+            </ol>
+          </div>
+        </section>
+
+        {/* MORE TESTIMONIALS */}
+        <section className="section-pad border-t border-hairline">
+          <div className="container-content">
+            <div className="mb-12 flex items-center gap-4">
+              <span className="h-px flex-1 bg-hairline" aria-hidden />
+            </div>
+            <div className="grid grid-cols-1 gap-12 md:grid-cols-2">
+              {testimonials.map((t, i) => (
+                <TestimonialCard
+                  key={i}
+                  quote={t.quote}
+                  author={t.author}
+                  business={t.business}
+                  delay={i * 0.1}
+                />
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* ABOUT TEASER */}
+        <section className="section-pad border-t border-hairline">
+          <div className="container-content grid grid-cols-1 items-start gap-12 md:grid-cols-2 md:gap-16">
+            <div className="relative hidden aspect-square overflow-hidden rounded-xl border border-hairline bg-surface-1 md:block">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src="/noah-headshot.jpg"
+                alt="Noah Reuter-Gushow — NRG web designer"
+                className="h-full w-full object-cover object-top"
+              />
+            </div>
+            <div className="flex flex-col gap-6">
+              <SectionHeading className="text-display text-4xl md:text-5xl">
+                Built for Houston.
+                <br />
+                By someone you can reach.
+              </SectionHeading>
+              <p className="text-base leading-relaxed text-ink-secondary md:text-lg">
+                I build websites for Houston small businesses — the kind that
+                show up on Google, look great on a phone, and don&apos;t require
+                you to call a developer every time you need a change. Before
+                NRG, I spent two years inside the tech infrastructure of one of
+                the largest companies in the world.
+              </p>
+              <ul className="flex flex-wrap gap-2">
+                {["Web", "Automation", "SEO", "Security"].map((p) => (
+                  <li
+                    key={p}
+                    className="rounded-full border border-hairline bg-surface-2 px-3 py-1.5 font-mono text-[11px] uppercase tracking-wider text-ink-secondary"
+                  >
+                    {p}
+                  </li>
+                ))}
+              </ul>
+              <div>
+                <Link
+                  href="/about"
+                  className="inline-flex items-center gap-2 font-mono text-sm uppercase tracking-wider text-accent transition-opacity hover:opacity-80"
+                >
+                  More about me →
+                </Link>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* CTA BAND */}
+        <section className="relative overflow-hidden border-t border-hairline">
+          <div
+            aria-hidden
+            className="pointer-events-none absolute inset-0 opacity-60"
+            style={{
+              background:
+                "radial-gradient(ellipse at 50% 100%, rgba(0,212,255,0.18), transparent 60%)",
+            }}
+          />
+          <div className="container-content relative flex flex-col items-center gap-8 py-section-lg text-center">
+            <SectionHeading className="text-display text-5xl md:text-7xl">
+              Ready to
+              <br />
+              get online?
+            </SectionHeading>
+            <p className="max-w-2xl text-base leading-relaxed text-ink-secondary md:text-lg">
+              Most projects are live in 2–3 weeks.
+            </p>
+            <div className="flex w-full flex-col gap-3 sm:w-auto sm:flex-row sm:flex-wrap sm:items-center sm:justify-center sm:gap-4">
+              <Link
+                href="/contact"
+                className="flex items-center justify-center gap-2 rounded-md bg-accent px-6 py-3.5 font-mono text-sm font-medium uppercase tracking-wider text-canvas transition-shadow hover:shadow-[0_0_40px_rgba(0,212,255,0.5)]"
+              >
+                Start a project
+                <span aria-hidden>→</span>
+              </Link>
+              <a
+                href="tel:+17135550000"
+                className="flex items-center justify-center gap-2 rounded-md border border-hairline-strong px-6 py-3.5 font-mono text-sm font-medium uppercase tracking-wider text-ink transition-colors hover:border-accent hover:text-accent"
+              >
+                Or call (713) 555-0000
+              </a>
+            </div>
+          </div>
+        </section>
       </main>
-      <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
-    </div>
+      <Footer />
+      <FloatingCta />
+    </>
   );
 }
