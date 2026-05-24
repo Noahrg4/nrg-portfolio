@@ -28,7 +28,7 @@ export default function BrowserMockup({
 
   return (
     <motion.div
-      initial={noEntry ? false : (reduce ? { opacity: 0 } : { opacity: 0, y: 30 })}
+      initial={noEntry ? false : (reduce ? { opacity: 0 } : { opacity: 0, y: 24 })}
       whileInView={noEntry ? undefined : { opacity: 1, y: 0 }}
       viewport={noEntry ? undefined : { once: true, margin: "-80px" }}
       transition={noEntry ? undefined : { duration: 0.6, ease: EASE, delay }}

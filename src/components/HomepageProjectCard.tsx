@@ -29,7 +29,7 @@ export default function HomepageProjectCard({
     <motion.div
       initial={reduce ? { opacity: 0 } : { opacity: 0, y: 24 }}
       whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: "-60px" }}
+      viewport={{ once: true, margin: "-80px" }}
       transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1], delay }}
       className="group transition-transform duration-200 ease-out hover:-translate-y-1"
     >
