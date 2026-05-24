@@ -1,6 +1,3 @@
-"use client";
-
-import { motion, useReducedMotion } from "framer-motion";
 import type { ReactNode } from "react";
 
 type Props = {
@@ -8,22 +5,11 @@ type Props = {
   className?: string;
 };
 
+// Plain h2. The prior framer-motion clip-path reveal silently hid headings
+// when whileInView's IntersectionObserver didn't fire (notably the CTA band
+// heading inside an overflow-hidden parent). A CSS-keyframe replacement had
+// its own failure modes (animation pinned at start frame in some renderers).
+// Visibility now does not depend on any animation completing.
 export default function SectionHeading({ children, className = "" }: Props) {
-  const reduce = useReducedMotion();
-
-  return (
-    <motion.h2
-      className={className}
-      initial={
-        reduce ? { opacity: 0 } : { clipPath: "inset(0 100% 0 0)", opacity: 1 }
-      }
-      whileInView={
-        reduce ? { opacity: 1 } : { clipPath: "inset(0 0% 0 0)", opacity: 1 }
-      }
-      viewport={{ once: true, margin: "-80px" }}
-      transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
-    >
-      {children}
-    </motion.h2>
-  );
+  return <h2 className={className}>{children}</h2>;
 }
