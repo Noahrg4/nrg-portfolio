@@ -22,7 +22,7 @@ export default function Footer({ logoHref = "/" }: FooterProps) {
           >
             NRG
           </Link>
-          <p className="font-mono text-[11px] uppercase tracking-wider text-ink-secondary">
+          <p className="font-mono text-[12px] uppercase tracking-wider text-ink-secondary">
             Houston, TX &nbsp;·&nbsp; © {year} &nbsp;·&nbsp;{" "}
             <a
               href="mailto:noah@nrgbuilds.com"
