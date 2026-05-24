@@ -3,11 +3,12 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 
 export default function FloatingCta() {
   const [visible, setVisible] = useState(false);
   const pathname = usePathname();
+  const reduce = useReducedMotion();
 
   useEffect(() => {
     const onScroll = () => setVisible(window.scrollY > 400);
@@ -22,8 +23,8 @@ export default function FloatingCta() {
     <AnimatePresence>
       {show && (
         <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
+          initial={reduce ? { opacity: 0 } : { opacity: 0, y: 8 }}
+          animate={reduce ? { opacity: 1 } : { opacity: 1, y: 0 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
           className="fixed bottom-8 right-8 z-50"
