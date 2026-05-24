@@ -35,10 +35,6 @@ const config: Config = {
         sans: ['"DM Sans"', "system-ui", "sans-serif"],
         mono: ['"DM Mono"', "ui-monospace", "monospace"],
       },
-      spacing: {
-        section: "96px",
-        "section-lg": "128px",
-      },
       borderRadius: {
         xs: "4px",
         sm: "6px",
