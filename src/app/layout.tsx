@@ -1,6 +1,15 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Syne, DM_Sans, DM_Mono } from "next/font/google";
 import "./globals.css";
+
+// viewport-fit=cover required for env(safe-area-inset-*) values to be
+// non-zero on iPhone — without this, the FloatingCta and Footer safe-area
+// padding fixes are no-ops.
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  viewportFit: "cover",
+};
 
 const syne = Syne({
   subsets: ["latin"],
