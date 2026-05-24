@@ -50,15 +50,15 @@ export function LocationPage({ location }: Props) {
               ]}
             />
 
-            {/* Location line — desktop only, only when not null */}
+            {/* Location line — only when not null */}
             {content.heroLocationLine !== null && (
-              <p className="hidden max-w-2xl font-display text-2xl font-bold tracking-tight text-accent md:block md:text-3xl">
+              <p className="max-w-2xl font-display text-xl font-bold tracking-tight text-accent md:text-3xl">
                 {content.heroLocationLine}
               </p>
             )}
 
-            {/* Description — desktop only */}
-            <p className="hidden max-w-2xl text-base leading-relaxed text-ink-secondary md:block md:text-lg">
+            {/* Description */}
+            <p className="max-w-2xl text-sm leading-relaxed text-ink-secondary md:text-lg">
               {content.heroSub}
             </p>
 
