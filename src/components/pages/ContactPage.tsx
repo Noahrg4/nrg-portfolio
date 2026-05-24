@@ -52,14 +52,14 @@ export function ContactPage({ location = "root" }: Props) {
                   Direct
                 </p>
                 <a
-                  href="mailto:noah@nrgbuilds.com"
+                  href="mailto:noah@nrgwebsites.com"
                   className="group flex flex-col gap-1"
                 >
                   <span className="font-mono text-[11px] uppercase tracking-wider text-ink-secondary">
                     Email
                   </span>
                   <span className="text-base text-ink transition-colors group-hover:text-accent">
-                    noah@nrgbuilds.com
+                    noah@nrgwebsites.com
                   </span>
                 </a>
                 <a

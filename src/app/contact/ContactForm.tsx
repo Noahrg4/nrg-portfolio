@@ -78,12 +78,12 @@ export default function ContactForm() {
       setServerMessage(
         data.message ??
           (res.status === 429
-            ? "Too many submissions. Please email noah@nrgbuilds.com directly."
-            : "Something went wrong. Email directly: noah@nrgbuilds.com")
+            ? "Too many submissions. Please email noah@nrgwebsites.com directly."
+            : "Something went wrong. Email directly: noah@nrgwebsites.com")
       );
       setStatus("error");
     } catch {
-      setServerMessage("Network error. Email directly: noah@nrgbuilds.com");
+      setServerMessage("Network error. Email directly: noah@nrgwebsites.com");
       setStatus("error");
     }
   }

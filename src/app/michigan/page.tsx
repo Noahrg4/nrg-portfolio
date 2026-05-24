@@ -5,7 +5,7 @@ import { locationContent } from '@/lib/locationContent'
 export const metadata: Metadata = {
   title: locationContent.michigan.metaTitle,
   description: locationContent.michigan.metaDescription,
-  alternates: { canonical: 'https://nrgbuilds.com/michigan' },
+  alternates: { canonical: 'https://nrgwebsites.com/michigan' },
 }
 
 export default function MichiganPage() {
@@ -23,7 +23,7 @@ export default function MichiganPage() {
               "@type": "State",
               "name": "Michigan"
             },
-            "url": "https://nrgbuilds.com/michigan"
+            "url": "https://nrgwebsites.com/michigan"
           })
         }}
       />

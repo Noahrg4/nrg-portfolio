@@ -37,7 +37,7 @@ export const metadata: Metadata = {
   title: "NRG — Web Design & Automation for Small Businesses",
   description:
     "Custom websites, automation, and local SEO for small businesses. Real results, no agency fluff.",
-  metadataBase: new URL("https://nrgbuilds.com"),
+  metadataBase: new URL("https://nrgwebsites.com"),
   openGraph: {
     title: "NRG — Web Design & Automation for Small Businesses",
     description:

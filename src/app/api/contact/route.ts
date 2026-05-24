@@ -142,7 +142,7 @@ async function sendEmail(clean: { name: string; phone: string; message: string }
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({
-      from: 'NRG Portfolio <noreply@nrgbuilds.com>',
+      from: 'NRG Portfolio <noreply@nrgwebsites.com>',
       to: [to],
       subject: `New project inquiry from ${clean.name}`,
       html,
@@ -195,7 +195,7 @@ export async function POST(req: NextRequest) {
 
   if (isRateLimited(ip)) {
     return NextResponse.json(
-      { success: false, message: 'Too many submissions. Please email noah@nrgbuilds.com directly.' },
+      { success: false, message: 'Too many submissions. Please email noah@nrgwebsites.com directly.' },
       { status: 429 }
     );
   }
@@ -221,7 +221,7 @@ export async function POST(req: NextRequest) {
 
     if (!emailed && process.env.NODE_ENV === 'production') {
       return NextResponse.json(
-        { success: false, message: 'Something went wrong. Email directly: noah@nrgbuilds.com' },
+        { success: false, message: 'Something went wrong. Email directly: noah@nrgwebsites.com' },
         { status: 500 }
       );
     }
@@ -233,7 +233,7 @@ export async function POST(req: NextRequest) {
   } catch (err) {
     console.error('[contact] Unexpected error:', err);
     return NextResponse.json(
-      { success: false, message: 'Something went wrong. Email directly: noah@nrgbuilds.com' },
+      { success: false, message: 'Something went wrong. Email directly: noah@nrgwebsites.com' },
       { status: 500 }
     );
   }

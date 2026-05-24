@@ -4,7 +4,7 @@ import { ContactPage } from "@/components/pages/ContactPage";
 export const metadata: Metadata = {
   title: "Contact — NRG Michigan",
   description: "Start a web design project with NRG.",
-  alternates: { canonical: "https://nrgbuilds.com/michigan/contact" },
+  alternates: { canonical: "https://nrgwebsites.com/michigan/contact" },
 };
 
 export default function MichiganContactPage() {

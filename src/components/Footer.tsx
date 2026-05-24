@@ -26,10 +26,10 @@ export default function Footer({ logoHref = "/", footerLocation = "Houston, TX" 
           <p className="font-mono text-[12px] uppercase tracking-wider text-ink-secondary">
             {footerLocation} &nbsp;·&nbsp; © {year} &nbsp;·&nbsp;{" "}
             <a
-              href="mailto:noah@nrgbuilds.com"
+              href="mailto:noah@nrgwebsites.com"
               className="transition-colors hover:text-ink"
             >
-              noah@nrgbuilds.com
+              noah@nrgwebsites.com
             </a>
           </p>
         </div>
@@ -47,10 +47,10 @@ export default function Footer({ logoHref = "/", footerLocation = "Houston, TX" 
             {footerLocation}
           </span>
           <a
-            href="mailto:noah@nrgbuilds.com"
+            href="mailto:noah@nrgwebsites.com"
             className="font-mono text-[11px] uppercase tracking-wider text-ink-secondary transition-colors hover:text-ink"
           >
-            noah@nrgbuilds.com
+            noah@nrgwebsites.com
           </a>
           <span className="font-mono text-[11px] uppercase tracking-wider text-ink-secondary">
             © {year}

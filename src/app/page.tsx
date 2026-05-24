@@ -5,7 +5,7 @@ import { locationContent } from '@/lib/locationContent'
 export const metadata: Metadata = {
   title: locationContent.root.metaTitle,
   description: locationContent.root.metaDescription,
-  alternates: { canonical: 'https://nrgbuilds.com' },
+  alternates: { canonical: 'https://nrgwebsites.com' },
 }
 
 export default function HomePage() {
