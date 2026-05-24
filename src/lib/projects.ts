@@ -40,7 +40,7 @@ export const projects: Project[] = [
     url: "nrgbuilds.co/work/restaurant",
     gradient: "bg-gradient-to-br from-[#1a1818] via-[#241a14] to-[#0a0a0a]",
     imageSrc: "/work/rustic-table.png",
-    imageAlt: "The Rustic Table — Houston Heights restaurant website",
+    imageAlt: "The Rustic Table — restaurant website",
   },
   {
     slug: "houston-hvac",
@@ -49,7 +49,7 @@ export const projects: Project[] = [
     url: "nrgbuilds.co/work/hvac",
     gradient: "bg-gradient-to-br from-[#0d1b2a] via-[#0f1f2e] to-[#0a0a0a]",
     imageSrc: "/work/martinez-hvac.png",
-    imageAlt: "Martinez Cooling & Heating — Houston HVAC website",
+    imageAlt: "Martinez Cooling & Heating — HVAC website",
   },
   {
     slug: "houston-law",
@@ -58,6 +58,6 @@ export const projects: Project[] = [
     url: "nrgbuilds.co/work/law",
     gradient: "bg-gradient-to-br from-[#1b3a2d] via-[#152e22] to-[#0a0a0a]",
     imageSrc: "/work/reyes-law.png",
-    imageAlt: "Reyes & Associates — Houston law firm website",
+    imageAlt: "Reyes & Associates — law firm website",
   },
 ];

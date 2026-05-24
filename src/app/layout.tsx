@@ -34,14 +34,14 @@ const dmMono = DM_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "NRG — Web Design & Automation for Houston Small Businesses",
+  title: "NRG — Web Design & Automation for Small Businesses",
   description:
-    "Custom websites, automation, and local SEO built for Houston restaurants, trades, and salons. Real results, no agency fluff.",
+    "Custom websites, automation, and local SEO for small businesses. Real results, no agency fluff.",
   metadataBase: new URL("https://nrgbuilds.com"),
   openGraph: {
-    title: "NRG — Web Design & Automation for Houston Small Businesses",
+    title: "NRG — Web Design & Automation for Small Businesses",
     description:
-      "Custom websites, automation, and local SEO built for Houston restaurants, trades, and salons.",
+      "Custom websites, automation, and local SEO for small businesses. Real results, no agency fluff.",
     type: "website",
     locale: "en_US",
   },

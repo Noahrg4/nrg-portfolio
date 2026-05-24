@@ -47,8 +47,8 @@ export const services: Service[] = [
     icon: <IconSeo />,
     name: "Google & Local SEO",
     short:
-      "Show up when Houston customers search for what you do.",
-    long: "You show up when someone in Houston searches for what you do. Your Google Business Profile gets set up and optimized. The technical work that makes Google trust your site — handled.",
+      "Show up when local customers search for what you do.",
+    long: "You show up when someone nearby searches for what you do. Your Google Business Profile gets set up and optimized. The technical work that makes Google trust your site — handled.",
     startingFrom: "Starting from $200",
     includes: [
       "Google Business Profile",
