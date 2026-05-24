@@ -40,7 +40,7 @@ export function ContactPage({ location = "root" }: Props) {
             </div>
 
             {/* Sidebar */}
-            <aside className="flex flex-col gap-8 rounded-xl border border-hairline bg-surface-1 p-8">
+            <aside className="flex flex-col gap-6 rounded-xl border border-hairline bg-surface-1 p-5 md:gap-8 md:p-8">
               <div className="flex flex-col gap-3">
                 <p className="text-sm leading-relaxed text-ink-secondary">
                   Currently taking on new projects. Houston-based, so if you&apos;d rather meet in person than trade emails, that works too.
