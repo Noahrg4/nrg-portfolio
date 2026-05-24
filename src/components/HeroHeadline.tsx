@@ -212,7 +212,7 @@ export default function HeroHeadline({ lines = [], className = "" }: Props) {
 
   return (
     <h1
-      className={`text-display text-[clamp(1.75rem,8vw,9rem)] ${className}`}
+      className={`text-display text-[clamp(1.5rem,7.5vw,9rem)] ${className}`}
       aria-label={[text0, text1, text2].filter(Boolean).join(" ")}
     >
       <span className="relative block overflow-hidden" style={{ cursor: "default" }}>
