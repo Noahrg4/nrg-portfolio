@@ -80,7 +80,7 @@ export function ServicesPage({ location = "root" }: Props) {
             </p>
             <Link
               href={`${linkPrefix}/contact`}
-              className="inline-flex items-center gap-2 rounded-md bg-accent px-6 py-3.5 font-mono text-sm font-medium uppercase tracking-wider text-canvas transition-shadow duration-200 hover:shadow-[0_0_40px_rgba(0,212,255,0.5)] active:scale-[0.98]"
+              className="flex w-full items-center justify-center gap-2 rounded-md bg-accent px-6 py-4 font-mono text-sm font-medium uppercase tracking-wider text-canvas transition-shadow duration-200 hover:shadow-[0_0_40px_rgba(0,212,255,0.5)] active:scale-[0.98] max-md:min-h-[56px] sm:w-auto sm:inline-flex"
             >
               Start a project
               <span aria-hidden>→</span>
