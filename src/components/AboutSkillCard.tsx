@@ -25,7 +25,7 @@ export default function AboutSkillCard({ icon, title, body, delay = 0 }: Props) 
       <h3 className="font-display text-xl font-bold tracking-tight text-ink">
         {title}
       </h3>
-      <p className="text-[15px] leading-relaxed text-ink-secondary">
+      <p className="text-base leading-relaxed text-ink-secondary">
         {body}
       </p>
     </motion.article>

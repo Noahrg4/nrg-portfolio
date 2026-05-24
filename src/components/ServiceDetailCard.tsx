@@ -50,7 +50,7 @@ export default function ServiceDetailCard({
         {includes.map((item) => (
           <li
             key={item}
-            className="flex items-start gap-3 text-[15px] text-ink-secondary"
+            className="flex items-start gap-3 text-base text-ink-secondary"
           >
             <span
               className="mt-1.5 inline-block h-1 w-1 flex-shrink-0 rounded-full bg-accent"
