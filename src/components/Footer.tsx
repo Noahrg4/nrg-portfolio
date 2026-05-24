@@ -2,9 +2,10 @@ import Link from "next/link";
 
 type FooterProps = {
   logoHref?: string;
+  footerLocation?: string;
 };
 
-export default function Footer({ logoHref = "/" }: FooterProps) {
+export default function Footer({ logoHref = "/", footerLocation = "Houston, TX" }: FooterProps) {
   const year = new Date().getFullYear();
   return (
     <footer className="border-t border-hairline">
@@ -23,7 +24,7 @@ export default function Footer({ logoHref = "/" }: FooterProps) {
             NRG
           </Link>
           <p className="font-mono text-[12px] uppercase tracking-wider text-ink-secondary">
-            Houston, TX &nbsp;·&nbsp; © {year} &nbsp;·&nbsp;{" "}
+            {footerLocation} &nbsp;·&nbsp; © {year} &nbsp;·&nbsp;{" "}
             <a
               href="mailto:noah@nrgbuilds.com"
               className="transition-colors hover:text-ink"
@@ -43,7 +44,7 @@ export default function Footer({ logoHref = "/" }: FooterProps) {
             NRG
           </Link>
           <span className="font-mono text-[11px] uppercase tracking-wider text-ink-secondary">
-            Houston, TX
+            {footerLocation}
           </span>
           <a
             href="mailto:noah@nrgbuilds.com"

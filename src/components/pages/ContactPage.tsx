@@ -97,7 +97,7 @@ export function ContactPage({ location = "root" }: Props) {
           </div>
         </section>
       </main>
-      <Footer logoHref={content.navLogoHref} />
+      <Footer logoHref={content.navLogoHref} footerLocation={content.footerLocation} />
     </>
   );
 }
