@@ -36,10 +36,11 @@ export function LocationPage({ location }: Props) {
         <section className="relative flex min-h-[calc(100vh-4rem)] items-center overflow-visible">
           <div
             aria-hidden
-            className="pointer-events-none absolute -top-40 -left-40 h-[600px] w-[600px] rounded-full opacity-40 blur-3xl"
+            className="pointer-events-none absolute -top-40 -left-40 h-[600px] w-[600px] rounded-full opacity-40 blur-2xl md:blur-3xl"
             style={{
               background:
                 "radial-gradient(circle, rgba(0,212,255,0.18), transparent 70%)",
+              willChange: "transform",
             }}
           />
           <div className="container-content relative flex flex-col gap-6 py-section text-left md:gap-10">
@@ -131,6 +132,7 @@ export function LocationPage({ location }: Props) {
                     imageAlt={p.imageAlt}
                     delay={i * 0.08}
                     linkPrefix={linkPrefix}
+                    priority={i === 0}
                   />
                 )
               })}
@@ -254,6 +256,8 @@ export function LocationPage({ location }: Props) {
               <img
                 src="/noah-headshot.jpg"
                 alt="Noah Reuter-Gushow — NRG web designer"
+                loading="lazy"
+                decoding="async"
                 className="h-full w-full object-cover object-top"
               />
             </div>

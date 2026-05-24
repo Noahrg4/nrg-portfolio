@@ -13,6 +13,7 @@ type Props = {
   imageAlt?: string;
   delay?: number;
   linkPrefix?: string;
+  priority?: boolean;
 };
 
 export default function HomepageProjectCard({
@@ -24,6 +25,7 @@ export default function HomepageProjectCard({
   imageAlt,
   delay = 0,
   linkPrefix = "",
+  priority = false,
 }: Props) {
   const reduce = useReducedMotion();
 
@@ -43,6 +45,7 @@ export default function HomepageProjectCard({
           imageSrc={imageSrc}
           imageAlt={imageAlt}
           noEntry
+          priority={priority}
           className="group-hover:shadow-[0_8px_32px_rgba(0,212,255,0.12)] transition-shadow duration-200"
         >
           {!imageSrc && (

@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { motion, useReducedMotion } from "framer-motion";
 import type { ReactNode } from "react";
 
@@ -11,6 +12,7 @@ type Props = {
   delay?: number;
   className?: string;
   noEntry?: boolean;
+  priority?: boolean;
 };
 
 const EASE = [0.16, 1, 0.3, 1] as const;
@@ -23,6 +25,7 @@ export default function BrowserMockup({
   delay = 0,
   className = "",
   noEntry = false,
+  priority = false,
 }: Props) {
   const reduce = useReducedMotion();
 
@@ -64,11 +67,13 @@ export default function BrowserMockup({
       {/* Content area */}
       <div className="relative aspect-[16/10] w-full overflow-hidden bg-surface-2">
         {imageSrc ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
+          <Image
             src={imageSrc}
             alt={imageAlt ?? ""}
-            className="block h-full w-full object-cover object-top"
+            fill
+            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+            className="object-cover object-top"
+            priority={priority}
           />
         ) : (
           children

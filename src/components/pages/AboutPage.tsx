@@ -93,6 +93,8 @@ export function AboutPage({ location = "root" }: Props) {
               <img
                 src="/noah-headshot.jpg"
                 alt="Noah Reuter-Gushow — NRG web designer based in Houston, TX"
+                loading="lazy"
+                decoding="async"
                 className="h-full w-full object-cover object-top"
               />
             </div>
