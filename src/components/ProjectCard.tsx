@@ -6,15 +6,17 @@ import BrowserMockup from "./BrowserMockup";
 type Props = {
   category: string;
   title: string;
-  outcome?: string;  // data compat — not rendered on cards
-  tags?: string[];   // data compat — not rendered on cards
   url: string;
   gradient: string;
-  monogram?: string; // data compat — not rendered
   imageSrc?: string;
   imageAlt?: string;
   delay?: number;
+  liveUrl?: string;
 };
+
+function normalizeHref(input: string): string {
+  return /^https?:\/\//i.test(input) ? input : `https://${input}`;
+}
 
 export default function ProjectCard({
   category,
@@ -24,18 +26,13 @@ export default function ProjectCard({
   imageSrc,
   imageAlt,
   delay = 0,
+  liveUrl,
 }: Props) {
   const reduce = useReducedMotion();
+  const href = liveUrl?.trim() ? normalizeHref(liveUrl.trim()) : null;
 
-  return (
-    <motion.article
-      initial={reduce ? { opacity: 0 } : { opacity: 0, y: 24 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: "-60px" }}
-      transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1], delay }}
-      className="flex flex-col gap-3 group transition-transform duration-200 ease-out hover:-translate-y-1"
-    >
-      {/* Frame — entry animation suppressed (card handles it); hover glow via className */}
+  const inner = (
+    <>
       <BrowserMockup
         url={url}
         delay={delay}
@@ -57,7 +54,6 @@ export default function ProjectCard({
         )}
       </BrowserMockup>
 
-      {/* Text below the frame — never overlapping */}
       <div className="flex flex-col gap-1">
         <span className="font-mono text-[11px] uppercase tracking-[0.1em] text-white/40 transition-colors duration-200 group-hover:text-white/70">
           {category}
@@ -69,6 +65,34 @@ export default function ProjectCard({
           {title}
         </h3>
       </div>
+    </>
+  );
+
+  const wrapperClass = `flex flex-col gap-3 group transition-transform duration-200 ease-out ${
+    href ? "hover:-translate-y-1" : ""
+  }`;
+
+  return (
+    <motion.article
+      initial={reduce ? { opacity: 0 } : { opacity: 0, y: 24 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: "-60px" }}
+      transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1], delay }}
+      className={wrapperClass}
+    >
+      {href ? (
+        <a
+          href={href}
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label={`${title} — opens in new tab`}
+          className="flex flex-col gap-3"
+        >
+          {inner}
+        </a>
+      ) : (
+        inner
+      )}
     </motion.article>
   );
 }

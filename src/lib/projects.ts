@@ -9,6 +9,7 @@ export type Project = {
   monogram?: string;
   imageSrc?: string;
   imageAlt?: string;
+  liveUrl?: string;
 };
 
 export const projects: Project[] = [

@@ -42,13 +42,11 @@ export default function WorkPage() {
                   key={p.slug}
                   category={p.category}
                   title={p.title}
-                  outcome={p.outcome}
-                  tags={p.tags}
                   url={p.url}
                   gradient={p.gradient}
-                  monogram={p.monogram}
                   imageSrc={p.imageSrc}
                   imageAlt={p.imageAlt}
+                  liveUrl={p.liveUrl}
                   delay={i * 0.08}
                 />
               ))}
