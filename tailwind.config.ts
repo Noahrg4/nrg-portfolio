@@ -31,9 +31,9 @@ const config: Config = {
         },
       },
       fontFamily: {
-        display: ["Syne", "system-ui", "sans-serif"],
-        sans: ['"DM Sans"', "system-ui", "sans-serif"],
-        mono: ['"DM Mono"', "ui-monospace", "monospace"],
+        display: ["var(--font-syne)", "system-ui", "sans-serif"],
+        sans: ["var(--font-dm-sans)", "system-ui", "sans-serif"],
+        mono: ["var(--font-dm-mono)", "ui-monospace", "monospace"],
       },
       borderRadius: {
         xs: "4px",
