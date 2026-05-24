@@ -13,7 +13,7 @@
 | aboutOpener | "I build websites for small businesses — the kind that show up on Google, look great on a phone, and bring in real customers." |
 | aboutParagraph2 | "Before starting NRG, I spent two years inside the technology infrastructure of one of the largest companies in the world. I bring that same standard of reliability to every project, regardless of size." |
 | ctaBandHeadline | "Ready to get online?" |
-| ctaBandSub | "Most projects are live in 2–3 weeks." |
+| ctaBandSub | "Most projects are live in 1–2 weeks." |
 | contactHeadline | "Let's talk about your project." |
 | contactSub | "Tell me what you need. I'll tell you what it costs and how long it takes." |
 | metaTitle | "NRG — Web Design + Automation" |
@@ -42,7 +42,7 @@
 | aboutOpener | "I build websites for Houston small businesses — the kind that show up on Google, look great on a phone, and bring in real customers from your neighborhood." |
 | aboutParagraph2 | "Before starting NRG, I spent two years inside the technology infrastructure of one of the largest companies in the world. I'm now based in Houston, bringing that same standard of reliability to local businesses who deserve better than a Squarespace template." |
 | ctaBandHeadline | "Ready to get online, Houston?" |
-| ctaBandSub | "Most Houston projects are live in 2–3 weeks." |
+| ctaBandSub | "Most Houston projects are live in 1–2 weeks." |
 | contactHeadline | "Let's talk about your Houston project." |
 | contactSub | "Tell me about your business. I'll tell you what it costs and how long it takes. No agencies, no runaround." |
 | metaTitle | "NRG — Web Design + Automation for Houston Small Businesses" |
@@ -71,7 +71,7 @@
 | aboutOpener | "I build websites for Texas small businesses — the kind that show up on Google, look great on a phone, and bring in real customers." |
 | aboutParagraph2 | "Based in Houston and working across Texas. Before starting NRG, I spent two years inside the technology infrastructure of one of the largest companies in the world. I bring that same standard of reliability to Texas businesses who are ready to get online and get found." |
 | ctaBandHeadline | "Ready to get your Texas business online?" |
-| ctaBandSub | "Most projects are live in 2–3 weeks." |
+| ctaBandSub | "Most projects are live in 1–2 weeks." |
 | contactHeadline | "Let's talk about your project." |
 | contactSub | "Tell me about your business. I'll tell you what it costs and how long it takes." |
 | metaTitle | "NRG — Web Design + Automation for Texas Small Businesses" |
@@ -100,7 +100,7 @@
 | aboutOpener | "I build websites for Michigan small businesses — the kind that show up on Google, look great on a phone, and bring in real customers." |
 | aboutParagraph2 | "I grew up in Michigan and understand the market. Before starting NRG, I spent two years inside the technology infrastructure of one of the largest companies in the world — including work for Michigan-based enterprise teams. I bring that same reliability to Michigan small businesses who are ready to stop relying on a Facebook page." |
 | ctaBandHeadline | "Ready to get your Michigan business online?" |
-| ctaBandSub | "Most projects are live in 2–3 weeks." |
+| ctaBandSub | "Most projects are live in 1–2 weeks." |
 | contactHeadline | "Let's talk about your project." |
 | contactSub | "Tell me about your business. I'll tell you what it costs and how long it takes." |
 | metaTitle | "NRG — Web Design + Automation for Michigan Small Businesses" |

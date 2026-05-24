@@ -158,8 +158,7 @@ export function LocationPage({ location }: Props) {
                 needs to get online.
               </SectionHeading>
               <p className="max-w-2xl text-base text-ink-secondary">
-                Outcomes, not jargon. Pick one piece or the whole system —
-                priced for small businesses, not agencies.
+                Outcomes, no matter what you are looking for. Pick one piece or the whole system, all priced for small businesses, not agencies.
               </p>
             </div>
             <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
@@ -315,10 +314,10 @@ export function LocationPage({ location }: Props) {
                 <span aria-hidden>→</span>
               </Link>
               <a
-                href="tel:+17135550000"
+                href="tel:+19894887309"
                 className="flex items-center justify-center gap-2 rounded-md border border-hairline-strong px-6 py-4 font-mono text-sm font-medium uppercase tracking-wider text-ink transition-colors duration-200 hover:border-accent hover:text-accent"
               >
-                Or call (713) 555-0000
+                Or call (989) 488-7309
               </a>
             </div>
           </div>

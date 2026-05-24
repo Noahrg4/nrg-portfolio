@@ -63,14 +63,14 @@ export function ContactPage({ location = "root" }: Props) {
                   </span>
                 </a>
                 <a
-                  href="tel:+17135550000"
+                  href="tel:+19894887309"
                   className="group flex flex-col gap-1"
                 >
                   <span className="font-mono text-[11px] uppercase tracking-wider text-ink-secondary">
                     Phone
                   </span>
                   <span className="text-base text-ink transition-colors group-hover:text-accent">
-                    (713) 555-0000
+                    (989) 488-7309
                   </span>
                 </a>
               </div>

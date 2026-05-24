@@ -159,7 +159,7 @@ The description was also updated to remove "Houston" from the generic page copy.
 
 2. **Testimonials are still placeholder copy.** Pre-existing — noted in CLAUDE.md §14.
 
-3. **Phone number `(713) 555-0000` is still a placeholder.** Pre-existing — noted in CLAUDE.md §14.
+3. **Phone number `(989) 488-7309` is still a placeholder.** Pre-existing — noted in CLAUDE.md §14.
 
 ---
 

@@ -117,9 +117,9 @@ export const projects: Project[] = [
 
 ### 5. Phone Number
 
-The placeholder phone `(713) 555-0000` appears in:
-- `src/app/page.tsx` (CTA band) — `href="tel:+17135550000"`
-- `src/app/contact/page.tsx` (sidebar) — `href="tel:+17135550000"`
+The placeholder phone `(989) 488-7309` appears in:
+- `src/app/page.tsx` (CTA band) — `href="tel:+19894887309"`
+- `src/app/contact/page.tsx` (sidebar) — `href="tel:+19894887309"`
 
 Replace both with your real number. Format: `href="tel:+17131234567"`, display: `(713) 123-4567`.
 

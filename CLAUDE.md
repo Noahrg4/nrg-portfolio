@@ -11,8 +11,8 @@ This file is auto-read by Claude Code at session start. It gives a new session e
 **Business context:**
 - Owner: Noah Reuter-Gushow (nrgbuilds.com / noah@nrgbuilds.com)
 - Target customers: Houston restaurants, HVAC companies, law offices, salons, trades
-- Value proposition: No-agency, direct operator. Flat pricing ($500–$800 sites). Live in 2–3 weeks.
-- Phone: (713) 555-0000 (placeholder — update when real number confirmed)
+- Value proposition: No-agency, direct operator. Flat pricing ($500–$800 sites). Live in 1–2 weeks.
+- Phone: (989) 488-7309 (placeholder — update when real number confirmed)
 
 **Live domain:** `https://nrgbuilds.com` (pending GitHub push + Netlify deploy — see §13)
 
@@ -650,7 +650,7 @@ Nav links from ALL pages (including location pages) go to the shared pages. The 
 | Location | What needs updating |
 |---|---|
 | `src/lib/testimonials.ts` | All 3 testimonials are placeholder copy |
-| `src/components/LocationPage.tsx` line ~316 | Phone number `(713) 555-0000` is placeholder |
+| `src/components/LocationPage.tsx` line ~316 | Phone number `(989) 488-7309` is placeholder |
 | `src/app/contact/ContactForm.tsx` | Needs real email handler wired to Resend |
 | `public/` | `noah-headshot.jpg` needs to exist |
 | `/about` page | CompTIA certifications listed — verify these are accurate |

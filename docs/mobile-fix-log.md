@@ -145,7 +145,7 @@ Both headshots are inside `hidden md:block` containers so they never show on mob
    - Nav overlay Escape/Tab focus trap works with VoiceOver
    - All tap targets are comfortably reachable with thumb
 
-3. **Update phone number** — `(713) 555-0000` placeholder in `LocationPage.tsx` CTA band needs a real number.
+3. **Update phone number** — `(989) 488-7309` placeholder in `LocationPage.tsx` CTA band needs a real number.
 
 ---
 

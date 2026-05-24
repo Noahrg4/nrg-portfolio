@@ -140,7 +140,7 @@ Verified at 1280×800 on /houston:
    }
    ```
 
-4. **Phone number placeholder:** `(713) 555-0000` in LocationPage.tsx CTA band needs a real number when confirmed.
+4. **Phone number placeholder:** `(989) 488-7309` in LocationPage.tsx CTA band needs a real number when confirmed.
 
 5. **Noah headshot:** `/public/noah-headshot.jpg` does not exist yet. The About section and location page about-teaser will show a blank dark rectangle until this file is added.
 

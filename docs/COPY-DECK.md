@@ -138,9 +138,9 @@ This is the single source of truth for every word on the site. The UI/UX agent s
 ### CTA Band
 
 **Headline:** `Ready to get online?`
-**Sub:** `Most projects are live in 2–3 weeks.`
+**Sub:** `Most projects are live in 1–2 weeks.`
 **Button:** `Start a project`
-**Below button:** `noah@nrgbuilds.com · (XXX) XXX-XXXX` `[NOAH: replace with real phone]`
+**Below button:** `noah@nrgbuilds.com · (989) 488-7309`
 
 ---
 
@@ -203,19 +203,19 @@ Use the same 3 project cards from the homepage (Project 1, 2, 3 above) at full s
 
 ### Service Cards (4)
 
-#### WEBSITE DESIGN — Starting from $500
+#### WEBSITE DESIGN — Starting from $100
 `You get a professional website built for your business, not a template from a library. It loads fast, works perfectly on phones, and you can make basic updates yourself — or I'll handle it as part of your support plan.`
 **Includes:** `Custom design · Mobile-first · Contact form · Basic SEO`
 
-#### AUTOMATION SETUP — Starting from $300
+#### AUTOMATION SETUP — Starting from $100
 `When a customer fills out your contact form, you get a text. When a job is done, your customer gets a review request. Set up once, runs in the background forever. Your business stays responsive without you lifting a finger.`
 **Includes:** `Form → SMS alerts · Booking confirmations · Review requests · Follow-up emails`
 
-#### GOOGLE & LOCAL SEO — Starting from $200
+#### GOOGLE & LOCAL SEO — Starting from $50
 `You show up when someone in Houston searches for what you do. Your Google Business Profile gets set up and optimized. The technical work that makes Google trust your site — handled.`
 **Includes:** `Google Business Profile · Local rankings · Citations · Map visibility`
 
-#### MONTHLY SUPPORT — Starting from $75/month
+#### MONTHLY SUPPORT — Starting from $20/month
 `A developer in your corner every month. Updates, changes, security patches, and someone you can text when something looks off.`
 **Includes:** `Monthly updates · Uptime monitoring · Security · Priority response`
 
@@ -256,7 +256,7 @@ Use the same 3 project cards from the homepage (Project 1, 2, 3 above) at full s
 
 ### Homepage
 - **Title:** `NRG — Web Design & Automation for Houston Small Businesses`
-- **Description:** `Professional websites and automation for Houston businesses. Get online, get found on Google, and get more customers. Most projects live in 2–3 weeks.`
+- **Description:** `Professional websites and automation for Houston businesses. Get online, get found on Google, and get more customers. Most projects live in 1–2 weeks.`
 
 ### /work
 - **Title:** `Work — NRG | Houston Web Design`
@@ -268,7 +268,7 @@ Use the same 3 project cards from the homepage (Project 1, 2, 3 above) at full s
 
 ### /services
 - **Title:** `Services & Pricing — NRG | Houston Web Design`
-- **Description:** `Simple, transparent web design and automation services for Houston businesses. Websites from $500. Most projects live in 2–3 weeks.`
+- **Description:** `Simple, transparent web design and automation services for Houston businesses. Websites from $100. Most projects live in 1–2 weeks.`
 
 ### /contact
 - **Title:** `Contact — NRG | Start a Web Design Project`

@@ -319,7 +319,7 @@ The following grep hits were reviewed and are **not bugs**:
 | `src/app/houston/*` wrappers | All Houston references in metadata | Houston-specific pages, correct |
 | `src/app/texas/*` wrappers | Texas references | Texas-specific, correct |
 | `src/app/michigan/*` wrappers | Michigan references | Michigan-specific, correct |
-| `ContactPage.tsx:67` | `tel:+17135550000` | Placeholder phone number — unrelated to location text accuracy, tracked separately in CLAUDE.md §14 |
+| `ContactPage.tsx:67` | `tel:+19894887309` | Placeholder phone number — unrelated to location text accuracy, tracked separately in CLAUDE.md §14 |
 
 ---
 

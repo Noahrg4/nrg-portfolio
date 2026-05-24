@@ -22,7 +22,7 @@ Uses `LocationPage` with `location="root"`, `navLogoHref="/"`.
 | All projects → | /work | LocationPage | ✓ |
 | More about me → | /about | LocationPage | ✓ |
 | Start a project (CTA band) | /contact | LocationPage | ✓ |
-| Or call (713) 555-0000 | tel:+17135550000 | LocationPage | external |
+| Or call (989) 488-7309 | tel:+19894887309 | LocationPage | external |
 | NRG (footer logo) | / | Footer | ✓ |
 | noah@nrgbuilds.com (footer) | mailto:noah@nrgbuilds.com | Footer | external |
 | Let's talk → (floating) | /contact | FloatingCta | ✓ |
@@ -46,7 +46,7 @@ Uses `LocationPage` with `location="houston"`, `navLogoHref="/houston"`.
 | All projects → | /work | LocationPage | ✓ |
 | More about me → | /about | LocationPage | ✓ |
 | Start a project (CTA band) | /contact | LocationPage | ✓ |
-| Or call (713) 555-0000 | tel:+17135550000 | LocationPage | external |
+| Or call (989) 488-7309 | tel:+19894887309 | LocationPage | external |
 | NRG (footer logo) | / | Footer | ✓ (⚠ see note) |
 | noah@nrgbuilds.com (footer) | mailto:noah@nrgbuilds.com | Footer | external |
 | Let's talk → (floating) | /contact | FloatingCta | ✓ |
@@ -70,7 +70,7 @@ Uses `LocationPage` with `location="texas"`, `navLogoHref="/texas"`.
 | All projects → | /work | LocationPage | ✓ |
 | More about me → | /about | LocationPage | ✓ |
 | Start a project (CTA band) | /contact | LocationPage | ✓ |
-| Or call (713) 555-0000 | tel:+17135550000 | LocationPage | external |
+| Or call (989) 488-7309 | tel:+19894887309 | LocationPage | external |
 | NRG (footer logo) | / | Footer | ✓ (⚠ see note) |
 | noah@nrgbuilds.com (footer) | mailto:noah@nrgbuilds.com | Footer | external |
 | Let's talk → (floating) | /contact | FloatingCta | ✓ |
@@ -94,7 +94,7 @@ Uses `LocationPage` with `location="michigan"`, `navLogoHref="/michigan"`.
 | All projects → | /work | LocationPage | ✓ |
 | More about me → | /about | LocationPage | ✓ |
 | Start a project (CTA band) | /contact | LocationPage | ✓ |
-| Or call (713) 555-0000 | tel:+17135550000 | LocationPage | external |
+| Or call (989) 488-7309 | tel:+19894887309 | LocationPage | external |
 | NRG (footer logo) | / | Footer | ✓ (⚠ see note) |
 | noah@nrgbuilds.com (footer) | mailto:noah@nrgbuilds.com | Footer | external |
 | Let's talk → (floating) | /contact | FloatingCta | ✓ |
@@ -163,7 +163,7 @@ Uses `LocationPage` with `location="michigan"`, `navLogoHref="/michigan"`.
 | Get in touch (nav CTA) | /contact | Nav | ✓ |
 | Form POST | /api/contact | ContactForm.tsx | ✓ |
 | noah@nrgbuilds.com (sidebar) | mailto:noah@nrgbuilds.com | contact/page.tsx | external |
-| (713) 555-0000 (sidebar) | tel:+17135550000 | contact/page.tsx | external |
+| (989) 488-7309 (sidebar) | tel:+19894887309 | contact/page.tsx | external |
 | NRG (footer logo) | / | Footer | ✓ |
 | noah@nrgbuilds.com (footer) | mailto:noah@nrgbuilds.com | Footer | external |
 | FloatingCta | hidden (pathname === /contact) | FloatingCta | N/A |
@@ -187,6 +187,6 @@ Uses `LocationPage` with `location="michigan"`, `navLogoHref="/michigan"`.
 - **Total internal links audited:** 60
 - **Broken (404):** 0
 - **Suspicious (location scoping concern):** 1 — Footer logo links to `/` on location pages instead of `/houston`, `/texas`, `/michigan`
-- **External links confirmed:** mailto:noah@nrgbuilds.com, tel:+17135550000 (appear on multiple pages)
+- **External links confirmed:** mailto:noah@nrgbuilds.com, tel:+19894887309 (appear on multiple pages)
 - **API endpoint confirmed:** ContactForm POSTs to `/api/contact` (route.ts exists)
 - **No `href="#"` placeholders found**

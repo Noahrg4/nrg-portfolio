@@ -20,7 +20,7 @@ Tool not found at `~/.agents/skills/impeccable/src/audit.mjs` — path does not 
 | C3 | Featured testimonial section BEFORE work preview section | **PASS** | Order in `page.tsx`: Hero → Featured Testimonial (line 86) → Work Preview (line 106) |
 | C4 | All testimonials mention a SPECIFIC OUTCOME (not vague praise) | **PASS** | Featured: "3 new customers call me directly from Google"; Alvarez: "booking out my Saturdays two weeks ahead"; Nguyen: "Two of them turned into clients in the first month" |
 | C5 | Contact form: exactly 3 fields | **PASS** | `ContactForm.tsx`: name, phone, project (textarea) — exactly 3 |
-| C6 | Phone/email visible on contact page without scrolling | **PASS** | Sidebar (right column, above fold on desktop): `hello@nrg.example.com` and `(713) 555-0000` — BUT these are placeholder values (see FAILS below) |
+| C6 | Phone/email visible on contact page without scrolling | **PASS** | Sidebar (right column, above fold on desktop): `hello@nrg.example.com` and `(989) 488-7309` — BUT these are placeholder values (see FAILS below) |
 | C7 | "Usually responds same day" or equivalent on contact page | **FAIL** | The sidebar "Response time" block reads `[PLACEHOLDER: e.g. Within 1 business day]` — not filled in |
 | C8 | "Start a project" CTA in hero | **FAIL** | Hero CTAs are "See my work" and "Get in touch" — "Start a project" does NOT appear in the hero. Count: hero band (line 341), sticky bar, work page, services page = 3 locations confirmed. Hero is missing it. |
 
@@ -121,7 +121,7 @@ QA1 marked "all [PLACEHOLDER] content on about, services, and work pages" as fix
 - Area note → (same as above, consolidate)
 - Response time → `Usually responds same day.`
 
-Also: placeholder email (`hello@nrg.example.com`) and phone (`(713) 555-0000`) are still on the contact page — these are placeholder values visible to users.
+Also: placeholder email (`hello@nrg.example.com`) and phone (`(989) 488-7309`) are still on the contact page — these are placeholder values visible to users.
 
 ---
 
@@ -160,7 +160,7 @@ The 4th paragraph (`"Based in Houston. Available for projects now."`) from COPY-
 |---|---|
 | `[PHOTO NEEDED]` — professional headshot | `about/page.tsx` line 106 (renders as visible label in monogram placeholder) |
 | `[REPLACE WITH REAL TESTIMONIAL]` | `testimonials.ts` — all 3 testimonials flagged as placeholders |
-| Real phone number | `page.tsx` CTA band (line 347), `contact/page.tsx` sidebar (line 79), `Footer.tsx` (line 59) — currently `(713) 555-0000` |
+| Real phone number | `page.tsx` CTA band (line 347), `contact/page.tsx` sidebar (line 79), `Footer.tsx` (line 59) — currently `(989) 488-7309` |
 | Real email | `contact/page.tsx` sidebar and `Footer.tsx` — currently `hello@nrg.example.com` (also conflicts with `noah@nrgbuilds.com` referenced in `route.ts` error messages) |
 | Project card screenshots | All 3 cards use gradient placeholders — `BrowserMockup` supports `imageSrc` prop for real screenshots |
 
