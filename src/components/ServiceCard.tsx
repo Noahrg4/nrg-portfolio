@@ -22,11 +22,11 @@ export default function ServiceCard({
 
   return (
     <motion.div
-      initial={reduce ? { opacity: 0 } : { opacity: 0, y: 20 }}
+      initial={reduce ? { opacity: 0 } : { opacity: 0, y: 24 }}
       whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: "-60px" }}
-      transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1], delay }}
-      className="group relative flex h-full flex-col gap-5 rounded-lg border border-accent/20 bg-surface-2 p-6 transition-all duration-300 hover:border-accent hover:-translate-y-1 hover:shadow-card-hover"
+      viewport={{ once: true, margin: "-80px" }}
+      transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1], delay }}
+      className="group relative flex h-full flex-col gap-5 rounded-lg border border-accent/20 bg-surface-2 p-6 transition-[transform,border-color,box-shadow] duration-200 ease-out hover:border-accent hover:-translate-y-1 hover:shadow-card-hover"
     >
       <div className="flex h-10 w-10 items-center justify-center text-accent">
         {icon}
@@ -35,7 +35,7 @@ export default function ServiceCard({
         <h3 className="font-display text-xl font-bold tracking-tight text-ink">
           {name}
         </h3>
-        <p className="text-sm leading-relaxed text-ink-secondary">
+        <p className="text-[15px] leading-relaxed text-ink-secondary">
           {description}
         </p>
       </div>
@@ -47,7 +47,7 @@ export default function ServiceCard({
           </p>
         )}
         <span
-          className="font-mono text-base text-accent transition-transform duration-300 group-hover:translate-x-1"
+          className="font-mono text-base text-accent transition-transform duration-200 group-hover:translate-x-1"
           aria-hidden
         >
           →
