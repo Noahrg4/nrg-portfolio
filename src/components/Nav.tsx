@@ -104,8 +104,8 @@ export default function Nav({ logoHref = "/" }: NavProps) {
         {open && (
           <motion.div
             initial={{ opacity: 0 }}
-            animate={{ opacity: 1, transition: { duration: 0.2, ease: "linear" } }}
-            exit={{ opacity: 0, transition: { duration: 0.15, ease: "linear" } }}
+            animate={{ opacity: 1, transition: { duration: 0.2, ease: [0.16, 1, 0.3, 1] } }}
+            exit={{ opacity: 0, transition: { duration: 0.15, ease: [0.16, 1, 0.3, 1] } }}
             className="fixed inset-0 top-16 z-40 flex flex-col border-t border-hairline bg-canvas/95 px-6 py-10 backdrop-blur-xl md:hidden"
           >
             {/* Nav links — each 60px tall minimum for thumb-friendly tapping */}
