@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
-const links = [
+const baseLinks = [
   { href: "/work",     label: "Work"     },
   { href: "/about",   label: "About"    },
   { href: "/services", label: "Services" },
@@ -13,9 +13,11 @@ const links = [
 
 type NavProps = {
   logoHref?: string
+  linkPrefix?: string
 }
 
-export default function Nav({ logoHref = "/" }: NavProps) {
+export default function Nav({ logoHref = "/", linkPrefix = "" }: NavProps) {
+  const links = baseLinks.map((l) => ({ ...l, href: `${linkPrefix}${l.href}` }));
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen]         = useState(false);
 
@@ -66,7 +68,7 @@ export default function Nav({ logoHref = "/" }: NavProps) {
         {/* Desktop CTA */}
         <div className="hidden items-center gap-3 md:flex">
           <Link
-            href="/contact"
+            href={`${linkPrefix}/contact`}
             className="rounded-md bg-accent px-4 py-2 font-mono text-[12px] font-medium uppercase tracking-wider text-canvas transition-shadow duration-200 hover:shadow-[0_0_30px_rgba(0,212,255,0.4)] active:opacity-90"
           >
             Get in touch
@@ -125,7 +127,7 @@ export default function Nav({ logoHref = "/" }: NavProps) {
             {/* Bottom CTA */}
             <div className="mt-auto">
               <Link
-                href="/contact"
+                href={`${linkPrefix}/contact`}
                 onClick={() => setOpen(false)}
                 className="font-mono text-sm uppercase tracking-wider text-accent"
               >
