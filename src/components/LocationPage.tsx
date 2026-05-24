@@ -41,7 +41,7 @@ export function LocationPage({ location }: Props) {
                 "radial-gradient(circle, rgba(0,212,255,0.18), transparent 70%)",
             }}
           />
-          <div className="container-content relative flex flex-col gap-6 py-8 text-left md:gap-10 md:py-24">
+          <div className="container-content relative flex flex-col gap-6 py-section text-left md:gap-10">
             <HeroHeadline
               lines={[
                 { text: "Real Clients." },
@@ -58,7 +58,7 @@ export function LocationPage({ location }: Props) {
             )}
 
             {/* Description */}
-            <p className="max-w-2xl text-sm leading-relaxed text-ink-secondary md:text-lg">
+            <p className="max-w-2xl text-base leading-relaxed text-ink-secondary md:text-lg">
               {content.heroSub}
             </p>
 
@@ -85,7 +85,7 @@ export function LocationPage({ location }: Props) {
         {/* FEATURED TESTIMONIAL */}
         <section className="section-pad border-t border-hairline">
           <div className="container-content">
-            <div className="mb-10 flex items-center gap-4">
+            <div className="mb-12 flex items-center gap-4">
               <span className="font-mono text-[11px] uppercase tracking-wider text-accent">
                 ▸ In their words
               </span>
@@ -105,7 +105,7 @@ export function LocationPage({ location }: Props) {
         {/* WORK PREVIEW */}
         <section id="work" className="section-pad border-t border-hairline">
           <div className="container-content">
-            <div className="mb-8 flex flex-col gap-4">
+            <div className="mb-12 flex flex-col gap-4">
               <SectionHeading className="text-display text-4xl md:text-6xl">
                 Websites built
                 <br />
@@ -151,7 +151,7 @@ export function LocationPage({ location }: Props) {
           className="section-pad border-t border-hairline bg-surface-1/30"
         >
           <div className="container-content">
-            <div className="mb-14 flex flex-col gap-4">
+            <div className="mb-12 flex flex-col gap-4">
               <SectionHeading className="text-display text-4xl md:text-6xl">
                 Everything your business
                 <br />
@@ -180,7 +180,7 @@ export function LocationPage({ location }: Props) {
         {/* PROCESS */}
         <section className="section-pad border-t border-hairline">
           <div className="container-content">
-            <div className="mb-14 flex flex-col gap-4">
+            <div className="mb-12 flex flex-col gap-4">
               <SectionHeading className="text-display text-4xl md:text-6xl">
                 Simple from
                 <br />
@@ -212,7 +212,7 @@ export function LocationPage({ location }: Props) {
                   <h3 className="font-display text-xl font-bold tracking-tight text-ink">
                     {step.title}
                   </h3>
-                  <p className="text-sm leading-relaxed text-ink-secondary">
+                  <p className="text-base leading-relaxed text-ink-secondary">
                     {step.body}
                   </p>
                 </li>
@@ -225,6 +225,9 @@ export function LocationPage({ location }: Props) {
         <section className="section-pad border-t border-hairline">
           <div className="container-content">
             <div className="mb-12 flex items-center gap-4">
+              <span className="font-mono text-[11px] uppercase tracking-wider text-accent">
+                ▸ More clients
+              </span>
               <span className="h-px flex-1 bg-hairline" aria-hidden />
             </div>
             <div className="grid grid-cols-1 gap-12 md:grid-cols-2">
