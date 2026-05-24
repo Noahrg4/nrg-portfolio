@@ -87,9 +87,9 @@ export const locationContent: Record<LocationSlug, LocationContent> = {
     cardTitles: {
       gushow: "Full Web Presence — Excavating Company",
       rewilding: "Brand Site — Nature & Wellness Content Platform",
-      rusticTable: "Full Web Presence — Restaurant",
-      martinezHvac: "Lead Generation Site — HVAC Company",
-      reyesLaw: "Client Acquisition Site — Law Office",
+      rusticTable: "Full Web Presence — Michigan Restaurant",
+      martinezHvac: "Lead Generation Site — Michigan HVAC Company",
+      reyesLaw: "Client Acquisition Site — Michigan Law Office",
     },
   },
 }
