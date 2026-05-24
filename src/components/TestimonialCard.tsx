@@ -26,7 +26,7 @@ export default function TestimonialCard({
       viewport={{ once: true, margin: "-80px" }}
       transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1], delay }}
       className={`flex flex-col gap-6 border-l-2 border-accent/35 ${
-        featured ? "pl-10 py-2 md:pl-14" : "pl-8 py-1"
+        featured ? "pl-6 py-2 md:pl-14" : "pl-6 py-1 md:pl-8"
       }`}
     >
       <blockquote
