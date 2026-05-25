@@ -1,25 +1,25 @@
 /**
  * src/lib/admin/db.ts
  *
- * File-system JSON data layer for the admin panel.
+ * JSON data layer for the admin panel. Two collections: leads + clients.
  *
- * Two collections: leads (data/leads.json) and clients (data/clients.json).
- * Files are created lazily on first write.
+ * Backend selection:
+ *   - On Netlify (process.env.NETLIFY === 'true'): Netlify Blobs (durable
+ *     key-value, persists across cold starts and deploys).
+ *   - Locally (npm run dev): file-system JSON in ./data/ (atomic temp-write +
+ *     rename). Easier to inspect during development.
  *
- * Atomicity: write to a temp file, then rename (atomic on POSIX; best-effort
- * on Windows — not a concern for Netlify/macOS).
+ * The Blobs path is required in production — Netlify Function runtimes have
+ * a read-only filesystem outside /tmp, so FS writes fail with EROFS.
  *
  * Node.js only — do NOT import this in middleware or client components.
- *
- * Netlify note: serverless function containers are ephemeral. Writes persist
- * only for the container's lifetime. For durable storage, swap this module
- * for a Netlify Blobs implementation — API routes are unaffected.
  */
 
-import { readFile, writeFile, rename, mkdir } from 'fs/promises';
+import { readFile, writeFile, rename, mkdir, unlink } from 'fs/promises';
 import { existsSync } from 'fs';
 import path from 'path';
 import crypto from 'crypto';
+import { getStore } from '@netlify/blobs';
 import {
   type Lead,
   type Client,
@@ -33,26 +33,30 @@ import {
 } from '@/lib/admin/types';
 
 // ---------------------------------------------------------------------------
-// Paths
+// Storage backend
 // ---------------------------------------------------------------------------
+
+const USE_BLOBS = process.env.NETLIFY === 'true';
+const STORE_NAME = 'nrg-admin';
+
+type CollectionKey = 'leads' | 'clients';
 
 const DATA_DIR = path.join(process.cwd(), 'data');
-const LEADS_FILE = path.join(DATA_DIR, 'leads.json');
-const CLIENTS_FILE = path.join(DATA_DIR, 'clients.json');
+const FS_PATHS: Record<CollectionKey, string> = {
+  leads: path.join(DATA_DIR, 'leads.json'),
+  clients: path.join(DATA_DIR, 'clients.json'),
+};
 
-// ---------------------------------------------------------------------------
-// Low-level file I/O
-// ---------------------------------------------------------------------------
-
-async function ensureDataDir(): Promise<void> {
-  if (!existsSync(DATA_DIR)) {
-    await mkdir(DATA_DIR, { recursive: true });
+async function readJson<T>(key: CollectionKey, defaultValue: T): Promise<T> {
+  if (USE_BLOBS) {
+    const store = getStore({ name: STORE_NAME, consistency: 'strong' });
+    const v = (await store.get(key, { type: 'json' })) as T | null;
+    return v ?? defaultValue;
   }
-}
 
-async function readJson<T>(filePath: string, defaultValue: T): Promise<T> {
+  // FS fallback (local dev)
   try {
-    const raw = await readFile(filePath, 'utf-8');
+    const raw = await readFile(FS_PATHS[key], 'utf-8');
     return JSON.parse(raw) as T;
   } catch (err: unknown) {
     if ((err as NodeJS.ErrnoException).code === 'ENOENT') {
@@ -62,16 +66,24 @@ async function readJson<T>(filePath: string, defaultValue: T): Promise<T> {
   }
 }
 
-async function writeJson<T>(filePath: string, data: T): Promise<void> {
-  await ensureDataDir();
+async function writeJson<T>(key: CollectionKey, data: T): Promise<void> {
+  if (USE_BLOBS) {
+    const store = getStore({ name: STORE_NAME, consistency: 'strong' });
+    await store.setJSON(key, data);
+    return;
+  }
+
+  // FS fallback (local dev) — atomic temp-write + rename
+  if (!existsSync(DATA_DIR)) {
+    await mkdir(DATA_DIR, { recursive: true });
+  }
+  const filePath = FS_PATHS[key];
   const tmpPath = `${filePath}.tmp.${Date.now()}`;
   try {
     await writeFile(tmpPath, JSON.stringify(data, null, 2), 'utf-8');
     await rename(tmpPath, filePath);
   } catch (err) {
-    // Clean up temp file if rename fails
     try {
-      const { unlink } = await import('fs/promises');
       await unlink(tmpPath);
     } catch {
       // best effort
@@ -97,7 +109,7 @@ export async function listLeads(opts?: {
   due?: boolean;
   search?: string;
 }): Promise<Lead[]> {
-  let leads = await readJson<Lead[]>(LEADS_FILE, []);
+  let leads = await readJson<Lead[]>('leads', []);
 
   if (opts?.stage) {
     const stageFilter = opts.stage;
@@ -133,12 +145,12 @@ export async function listLeads(opts?: {
 }
 
 export async function getLead(id: string): Promise<Lead | null> {
-  const leads = await readJson<Lead[]>(LEADS_FILE, []);
+  const leads = await readJson<Lead[]>('leads', []);
   return leads.find((l) => l.id === id) ?? null;
 }
 
 export async function createLead(input: CreateLeadBody): Promise<Lead> {
-  const leads = await readJson<Lead[]>(LEADS_FILE, []);
+  const leads = await readJson<Lead[]>('leads', []);
   const timestamp = now();
 
   const lead: Lead = {
@@ -178,7 +190,7 @@ export async function createLead(input: CreateLeadBody): Promise<Lead> {
   };
 
   leads.push(lead);
-  await writeJson(LEADS_FILE, leads);
+  await writeJson('leads', leads);
   return lead;
 }
 
@@ -186,7 +198,7 @@ export async function updateLead(
   id: string,
   patch: UpdateLeadBody
 ): Promise<Lead | null> {
-  const leads = await readJson<Lead[]>(LEADS_FILE, []);
+  const leads = await readJson<Lead[]>('leads', []);
   const idx = leads.findIndex((l) => l.id === id);
   if (idx === -1) return null;
 
@@ -220,16 +232,16 @@ export async function updateLead(
   };
 
   leads[idx] = updated;
-  await writeJson(LEADS_FILE, leads);
+  await writeJson('leads', leads);
   return updated;
 }
 
 export async function deleteLead(id: string): Promise<boolean> {
-  const leads = await readJson<Lead[]>(LEADS_FILE, []);
+  const leads = await readJson<Lead[]>('leads', []);
   const before = leads.length;
   const filtered = leads.filter((l) => l.id !== id);
   if (filtered.length === before) return false;
-  await writeJson(LEADS_FILE, filtered);
+  await writeJson('leads', filtered);
   return true;
 }
 
@@ -297,7 +309,7 @@ export async function bulkImportLeads(
   if (mode === 'replace') {
     result = withinBatch;
   } else {
-    const existing = await readJson<Lead[]>(LEADS_FILE, []);
+    const existing = await readJson<Lead[]>('leads', []);
     const existingIds = new Set(existing.map((l) => l.id));
     const existingKeys = new Set(existing.map(leadDedupKey));
     const toAdd: Lead[] = [];
@@ -311,7 +323,7 @@ export async function bulkImportLeads(
     result = [...existing, ...toAdd];
   }
 
-  await writeJson(LEADS_FILE, result);
+  await writeJson('leads', result);
 
   const added = mode === 'replace' ? withinBatch.length : withinBatch.length - skippedAgainstExisting;
   return {
@@ -326,16 +338,16 @@ export async function bulkImportLeads(
 // ---------------------------------------------------------------------------
 
 export async function listClients(): Promise<Client[]> {
-  return readJson<Client[]>(CLIENTS_FILE, []);
+  return readJson<Client[]>('clients', []);
 }
 
 export async function getClient(id: string): Promise<Client | null> {
-  const clients = await readJson<Client[]>(CLIENTS_FILE, []);
+  const clients = await readJson<Client[]>('clients', []);
   return clients.find((c) => c.id === id) ?? null;
 }
 
 export async function createClient(input: CreateClientBody): Promise<Client> {
-  const clients = await readJson<Client[]>(CLIENTS_FILE, []);
+  const clients = await readJson<Client[]>('clients', []);
   const timestamp = now();
 
   const client: Client = {
@@ -358,7 +370,7 @@ export async function createClient(input: CreateClientBody): Promise<Client> {
   };
 
   clients.push(client);
-  await writeJson(CLIENTS_FILE, clients);
+  await writeJson('clients', clients);
   return client;
 }
 
@@ -366,7 +378,7 @@ export async function updateClient(
   id: string,
   patch: UpdateClientBody
 ): Promise<Client | null> {
-  const clients = await readJson<Client[]>(CLIENTS_FILE, []);
+  const clients = await readJson<Client[]>('clients', []);
   const idx = clients.findIndex((c) => c.id === id);
   if (idx === -1) return null;
 
@@ -380,16 +392,16 @@ export async function updateClient(
   };
 
   clients[idx] = updated;
-  await writeJson(CLIENTS_FILE, clients);
+  await writeJson('clients', clients);
   return updated;
 }
 
 export async function deleteClient(id: string): Promise<boolean> {
-  const clients = await readJson<Client[]>(CLIENTS_FILE, []);
+  const clients = await readJson<Client[]>('clients', []);
   const before = clients.length;
   const filtered = clients.filter((c) => c.id !== id);
   if (filtered.length === before) return false;
-  await writeJson(CLIENTS_FILE, filtered);
+  await writeJson('clients', filtered);
   return true;
 }
 
@@ -406,7 +418,7 @@ export async function convertLeadToClient(
     startDate: string;
   }
 ): Promise<{ lead: Lead; client: Client } | { error: string; status: number }> {
-  const leads = await readJson<Lead[]>(LEADS_FILE, []);
+  const leads = await readJson<Lead[]>('leads', []);
   const leadIdx = leads.findIndex((l) => l.id === leadId);
 
   if (leadIdx === -1) {
@@ -442,11 +454,11 @@ export async function convertLeadToClient(
   };
 
   // Write client first
-  const clients = await readJson<Client[]>(CLIENTS_FILE, []);
+  const clients = await readJson<Client[]>('clients', []);
   const updatedClients = [...clients, newClient];
 
   try {
-    await writeJson(CLIENTS_FILE, updatedClients);
+    await writeJson('clients', updatedClients);
   } catch (err) {
     console.error('[db] convertLeadToClient: failed to write clients file', err);
     return { error: 'Failed to create client record', status: 500 };
@@ -463,15 +475,15 @@ export async function convertLeadToClient(
   const updatedLeads = leads.map((l) => (l.id === leadId ? updatedLead : l));
 
   try {
-    await writeJson(LEADS_FILE, updatedLeads);
+    await writeJson('leads', updatedLeads);
   } catch (err) {
     // Compensation: remove the client we just created
     console.error('[db] convertLeadToClient: failed to write leads file — compensating', err);
     try {
-      const compensated = (await readJson<Client[]>(CLIENTS_FILE, [])).filter(
+      const compensated = (await readJson<Client[]>('clients', [])).filter(
         (c) => c.id !== clientId
       );
-      await writeJson(CLIENTS_FILE, compensated);
+      await writeJson('clients', compensated);
       console.info('[db] convertLeadToClient: compensation succeeded');
     } catch (compErr) {
       console.error('[db] convertLeadToClient: compensation FAILED', compErr);
