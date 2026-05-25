@@ -36,7 +36,15 @@ import {
 // Storage backend
 // ---------------------------------------------------------------------------
 
-const USE_BLOBS = process.env.NETLIFY === 'true';
+// Netlify Functions run on AWS Lambda, which always sets LAMBDA_TASK_ROOT
+// (typically '/var/task'). Detecting this is more reliable than checking
+// `NETLIFY === 'true'` — that's set at build time but not always exposed to
+// the runtime. NETLIFY_BLOBS_CONTEXT is also a strong signal: it's injected
+// by @netlify/blobs auto-detection inside Functions.
+const USE_BLOBS =
+  process.env.NETLIFY === 'true' ||
+  !!process.env.LAMBDA_TASK_ROOT ||
+  !!process.env.NETLIFY_BLOBS_CONTEXT;
 const STORE_NAME = 'nrg-admin';
 
 type CollectionKey = 'leads' | 'clients';
