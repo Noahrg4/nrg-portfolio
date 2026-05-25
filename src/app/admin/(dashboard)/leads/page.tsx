@@ -2,7 +2,7 @@
  * src/app/admin/(dashboard)/leads/page.tsx
  *
  * /admin/leads — LEADS tab (server component shell).
- * Fetches initial data server-side, passes to client component.
+ * Container-content bounds the width; admin-section provides vertical rhythm.
  */
 
 export const dynamic = "force-dynamic";
@@ -10,5 +10,9 @@ export const dynamic = "force-dynamic";
 import LeadsTab from "@/components/admin/LeadsTab";
 
 export default function LeadsPage() {
-  return <LeadsTab />;
+  return (
+    <div className="container-content admin-section">
+      <LeadsTab />
+    </div>
+  );
 }

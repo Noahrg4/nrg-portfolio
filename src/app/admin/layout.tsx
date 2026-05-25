@@ -3,7 +3,9 @@
  *
  * Outer admin shell layout. Replaces the public site's Nav/Footer entirely.
  * This layout wraps ALL /admin/* routes (both auth and dashboard groups).
- * Fonts and globals.css tokens are inherited from the root layout.
+ * Fonts (Syne, DM Sans, DM Mono) and globals.css tokens are inherited from
+ * the root src/app/layout.tsx — no re-declaration needed here.
+ * The grain overlay (body::before) from globals.css applies site-wide.
  */
 
 export const metadata = {
@@ -16,8 +18,11 @@ export default function AdminLayout({
 }: {
   children: React.ReactNode;
 }) {
+  // No public Nav / Footer — admin has its own chrome via AdminShell.
+  // bg-canvas + text-ink ensure the dark theme holds even before
+  // AdminShell renders (avoids flash of white on slow connections).
   return (
-    <div className="min-h-screen bg-canvas text-ink">
+    <div className="min-h-screen bg-canvas text-ink antialiased">
       {children}
     </div>
   );

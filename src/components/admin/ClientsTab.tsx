@@ -4,12 +4,16 @@
  * src/components/admin/ClientsTab.tsx
  *
  * CLIENTS tab — paying roster.
- * Features:
- *  - Header: active count + MRR + churned count
- *  - Add Client button → modal
- *  - Client list with status chip, charges, LTV, dates
- *  - Click row → ClientDrawer
- *  - Sort by status / MRR / start date
+ *
+ * Data display improvements:
+ *  - Header: 3 big metrics — Active count, Total MRR, Churned count
+ *  - Status pill: green (active) / amber (paused) / red (churned)
+ *  - MRR contribution: small badge "$X/mo" per row
+ *  - Lifetime value: prominent "$X" per row (oneTimeValue + 12 × monthlyCharge)
+ *  - Last-verified: StalenessIndicator (green ≤30d / amber ≤60d / red >60d)
+ *  - Last-invoiced: StalenessIndicator (green ≤35d / amber ≤60d / red >60d)
+ *  - Row layout: name + contact (left) | status | MRR | one-time | LTV |
+ *               last verified | last invoiced
  */
 
 import { useState, useEffect, useCallback } from "react";
@@ -19,30 +23,32 @@ import { lifetimeValue } from "@/lib/admin/types";
 import ClientDrawer from "./ClientDrawer";
 import Modal from "./Modal";
 import AddClientForm from "./AddClientForm";
+import StalenessIndicator from "./StalenessIndicator";
+import { formatCurrency } from "@/lib/admin/format";
 
 type SortKey = "status" | "monthlyCharge" | "startDate" | "updatedAt";
 
-const STATUS_STYLES: Record<ClientStatus, string> = {
-  active:  "border border-[rgba(40,202,65,0.4)] bg-[rgba(40,202,65,0.1)] text-[#28CA41]",
-  paused:  "border border-[rgba(245,166,35,0.4)] bg-[rgba(245,166,35,0.08)] text-[#F5A623]",
-  churned: "border border-red-500/30 bg-red-500/10 text-red-400",
+// ── Status pill styles ────────────────────────────────────────────────────────
+// Active: green tint   Paused: amber tint   Churned: red tint
+const STATUS_STYLES: Record<ClientStatus, { pill: string; dot: string; label: string }> = {
+  active: {
+    pill: "border border-[rgba(40,202,65,0.4)] bg-[rgba(40,202,65,0.08)] text-[#28CA41]",
+    dot: "bg-[#28CA41]",
+    label: "Active",
+  },
+  paused: {
+    pill: "border border-[rgba(245,166,35,0.4)] bg-[rgba(245,166,35,0.08)] text-[#F5A623]",
+    dot: "bg-[#F5A623]",
+    label: "Paused",
+  },
+  churned: {
+    pill: "border border-red-500/30 bg-red-500/10 text-red-400",
+    dot: "bg-red-400",
+    label: "Churned",
+  },
 };
 
-const STATUS_ORDER: Record<ClientStatus, number> = {
-  active: 0,
-  paused: 1,
-  churned: 2,
-};
-
-function fmt(iso: string | null): string {
-  if (!iso) return "—";
-  const d = new Date(iso);
-  return d.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
-}
-
-function formatCurrency(n: number): string {
-  return n === 0 ? "—" : `$${n.toLocaleString()}`;
-}
+const STATUS_ORDER: Record<ClientStatus, number> = { active: 0, paused: 1, churned: 2 };
 
 export default function ClientsTab() {
   const reduce = useReducedMotion();
@@ -86,7 +92,7 @@ export default function ClientsTab() {
     setAddOpen(false);
   }
 
-  // Stats
+  // Header stats
   const activeClients = clients.filter((c) => c.status === "active");
   const totalMrr = activeClients.reduce((sum, c) => sum + c.monthlyCharge, 0);
   const churnedCount = clients.filter((c) => c.status === "churned").length;
@@ -129,31 +135,97 @@ export default function ClientsTab() {
 
   return (
     <div className="container-content py-8">
-      {/* ─── Header ────────────────────────────────────────────────────────── */}
-      <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
-        <div className="flex flex-wrap items-center gap-4">
+
+      {/* ─── Header: 3 big metrics ──────────────────────────────────────────── */}
+      <div className="mb-8">
+        <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
           <h1 className="text-display text-2xl text-ink">Clients</h1>
-          <div className="flex flex-wrap items-center gap-3 font-mono text-[11px]">
-            <span className="text-ink-subtle">
-              <span className="text-[#28CA41]">{activeClients.length}</span> active
-            </span>
-            {totalMrr > 0 && (
-              <span className="rounded-full border border-accent/30 bg-accent/10 px-2.5 py-0.5 text-accent">
-                MRR {formatCurrency(totalMrr)}
-              </span>
-            )}
-            {churnedCount > 0 && (
-              <span className="text-red-400">{churnedCount} churned</span>
-            )}
-          </div>
+          <button
+            onClick={() => setAddOpen(true)}
+            className="rounded-md bg-accent px-4 py-2 font-mono text-[11px] uppercase tracking-wider text-canvas transition-shadow hover:shadow-[0_0_20px_rgba(0,212,255,0.4)] active:scale-[0.98]"
+          >
+            + Add Client
+          </button>
         </div>
 
-        <button
-          onClick={() => setAddOpen(true)}
-          className="rounded-md bg-accent px-4 py-2 font-mono text-[11px] uppercase tracking-wider text-canvas transition-shadow hover:shadow-[0_0_20px_rgba(0,212,255,0.4)] active:scale-[0.98]"
-        >
-          + Add Client
-        </button>
+        {/* 3-column metric strip */}
+        <div className="grid grid-cols-3 gap-3">
+          {/* Active clients */}
+          <motion.div
+            initial={reduce ? { opacity: 0 } : { opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1], delay: 0 }}
+            className={[
+              "flex flex-col gap-2 rounded-xl border p-5 transition-all duration-200",
+              activeClients.length > 0
+                ? "border-[rgba(40,202,65,0.25)] bg-surface-1"
+                : "border-hairline bg-surface-1",
+            ].join(" ")}
+          >
+            <p className="font-mono text-[10px] uppercase tracking-wider text-ink-subtle">
+              Active clients
+            </p>
+            <p
+              className={[
+                "text-display text-3xl leading-none",
+                activeClients.length > 0 ? "text-[#28CA41]" : "text-ink",
+              ].join(" ")}
+            >
+              {activeClients.length}
+            </p>
+          </motion.div>
+
+          {/* Total MRR */}
+          <motion.div
+            initial={reduce ? { opacity: 0 } : { opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1], delay: 0.06 }}
+            className={[
+              "flex flex-col gap-2 rounded-xl border p-5 transition-all duration-200",
+              totalMrr > 0
+                ? "border-accent/30 bg-surface-1"
+                : "border-hairline bg-surface-1",
+            ].join(" ")}
+          >
+            <p className="font-mono text-[10px] uppercase tracking-wider text-ink-subtle">
+              Total MRR
+            </p>
+            <p
+              className={[
+                "text-display text-3xl leading-none",
+                totalMrr > 0 ? "text-accent" : "text-ink",
+              ].join(" ")}
+            >
+              {totalMrr > 0 ? formatCurrency(totalMrr) : "$0"}
+            </p>
+            <p className="font-mono text-[11px] text-ink-subtle">/mo</p>
+          </motion.div>
+
+          {/* Churned count */}
+          <motion.div
+            initial={reduce ? { opacity: 0 } : { opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1], delay: 0.12 }}
+            className={[
+              "flex flex-col gap-2 rounded-xl border p-5 transition-all duration-200",
+              churnedCount > 0
+                ? "border-red-500/20 bg-surface-1"
+                : "border-hairline bg-surface-1",
+            ].join(" ")}
+          >
+            <p className="font-mono text-[10px] uppercase tracking-wider text-ink-subtle">
+              Churned
+            </p>
+            <p
+              className={[
+                "text-display text-3xl leading-none",
+                churnedCount > 0 ? "text-red-400" : "text-ink",
+              ].join(" ")}
+            >
+              {churnedCount}
+            </p>
+          </motion.div>
+        </div>
       </div>
 
       {/* ─── Sort ──────────────────────────────────────────────────────────── */}
@@ -179,7 +251,7 @@ export default function ClientsTab() {
       {loading ? (
         <div className="flex flex-col gap-3">
           {[0, 1, 2].map((i) => (
-            <div key={i} className="h-20 rounded-xl border border-hairline bg-surface-1 animate-pulse" />
+            <div key={i} className="h-24 rounded-xl border border-hairline bg-surface-1 animate-pulse" />
           ))}
         </div>
       ) : error ? (
@@ -202,6 +274,8 @@ export default function ClientsTab() {
         <div className="flex flex-col gap-2">
           {sorted.map((client, i) => {
             const ltv = lifetimeValue(client);
+            const status = STATUS_STYLES[client.status];
+
             return (
               <motion.button
                 key={client.id}
@@ -212,64 +286,88 @@ export default function ClientsTab() {
                   setSelectedClient(client);
                   setDrawerOpen(true);
                 }}
-                className="group w-full rounded-xl border border-hairline bg-surface-1 p-4 text-left transition-all duration-200 hover:-translate-y-0.5 hover:border-hairline-strong"
+                className="group w-full rounded-xl border border-hairline bg-surface-1 p-4 text-left transition-all duration-200 hover:-translate-y-0.5 hover:border-hairline-strong hover:bg-surface-2/30"
               >
-                <div className="flex flex-wrap items-start justify-between gap-3">
-                  {/* Left */}
-                  <div className="flex flex-col gap-1.5 min-w-0">
+                {/* ── Main row ─────────────────────────────────────────────── */}
+                <div className="flex flex-wrap items-start justify-between gap-x-6 gap-y-3">
+
+                  {/* LEFT: name + contact info */}
+                  <div className="flex flex-col gap-1 min-w-0 flex-1">
                     <div className="flex flex-wrap items-center gap-2">
                       <span className="font-sans text-base font-medium text-ink group-hover:text-white truncate">
                         {client.businessName}
                       </span>
+                      {/* Status pill */}
                       <span
                         className={[
-                          "inline-flex items-center rounded-full border px-2 py-0.5 font-mono text-[9px] uppercase tracking-wider",
-                          STATUS_STYLES[client.status],
+                          "inline-flex items-center gap-1.5 rounded-full border px-2.5 py-0.5 font-mono text-[9px] uppercase tracking-wider",
+                          status.pill,
                         ].join(" ")}
                       >
-                        {client.status}
+                        <span className={["inline-block h-1.5 w-1.5 rounded-full", status.dot].join(" ")} aria-hidden />
+                        {status.label}
                       </span>
                     </div>
-                    <div className="flex flex-wrap items-center gap-2 font-mono text-[11px] text-ink-subtle">
+                    <div className="flex flex-wrap items-center gap-x-2 font-mono text-[11px] text-ink-subtle">
                       {client.contactName && <span>{client.contactName}</span>}
-                      {client.contactName && client.email && <span aria-hidden>·</span>}
+                      {client.contactName && client.email && (
+                        <span aria-hidden>·</span>
+                      )}
                       {client.email && (
                         <span className="truncate max-w-[200px]">{client.email}</span>
                       )}
                     </div>
                     {client.siteUrl && (
-                      <p className="font-mono text-[11px] text-accent/70 truncate max-w-xs">
+                      <p className="font-mono text-[11px] text-accent/60 truncate max-w-xs">
                         {client.siteUrl}
                       </p>
                     )}
                   </div>
 
-                  {/* Right: financials */}
-                  <div className="flex flex-col items-end gap-1 shrink-0 font-mono text-[11px]">
+                  {/* RIGHT: financials + staleness */}
+                  <div className="flex flex-col items-end gap-1.5 shrink-0">
+                    {/* MRR badge */}
                     {client.monthlyCharge > 0 && (
-                      <span className="text-ink-secondary">
+                      <span className="inline-flex items-center rounded-full border border-accent/30 bg-accent/10 px-2.5 py-0.5 font-mono text-[10px] text-accent">
                         {formatCurrency(client.monthlyCharge)}/mo
                       </span>
                     )}
+                    {/* One-time value */}
                     {client.oneTimeValue > 0 && (
-                      <span className="text-ink-subtle">
+                      <span className="font-mono text-[11px] text-ink-secondary">
                         {formatCurrency(client.oneTimeValue)} one-time
                       </span>
                     )}
+                    {/* Lifetime value — prominent */}
                     {ltv > 0 && (
-                      <span className="text-ink-subtle">
+                      <span className="font-mono text-[12px] font-medium text-ink">
                         LTV {formatCurrency(ltv)}
                       </span>
                     )}
-                    <span className="text-ink-subtle/60">
-                      since {fmt(client.startDate)}
+                    <span className="font-mono text-[10px] text-ink-subtle/60">
+                      since {client.startDate}
                     </span>
-                    {client.lastVerifiedAt && (
-                      <span className="text-[#28CA41]/80">
-                        ✓ {fmt(client.lastVerifiedAt)}
-                      </span>
-                    )}
                   </div>
+                </div>
+
+                {/* ── Staleness row ─────────────────────────────────────────── */}
+                <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1.5 border-t border-hairline/50 pt-2.5">
+                  {/* Last verified */}
+                  <StalenessIndicator
+                    iso={client.lastVerifiedAt}
+                    greenDays={30}
+                    amberDays={60}
+                    label="Verified"
+                    neverLabel="Never verified"
+                  />
+                  {/* Last invoiced */}
+                  <StalenessIndicator
+                    iso={client.lastInvoicedAt}
+                    greenDays={35}
+                    amberDays={60}
+                    label="Invoiced"
+                    neverLabel="Never invoiced"
+                  />
                 </div>
               </motion.button>
             );

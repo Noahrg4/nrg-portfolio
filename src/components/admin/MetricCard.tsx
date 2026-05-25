@@ -4,16 +4,22 @@
  * src/components/admin/MetricCard.tsx
  *
  * Stat card: big display number + mono label.
- * Optional subtext and accent highlight mode.
- * Replicates ServiceCard hover pattern.
+ * Optional hint text and accent highlight mode.
+ * Replicates ServiceCard hover pattern from the public site.
  */
 
 import { motion, useReducedMotion } from "framer-motion";
 
 interface MetricCardProps {
+  /** Mono uppercase label — what this number measures */
   label: string;
+  /** The primary value — large display font */
   value: string | number;
+  /** Small ink-subtle text below the value */
+  hint?: string;
+  /** @deprecated use hint — kept for backward compat */
   subtext?: string;
+  /** When true, value renders in accent cyan; border also accented */
   accent?: boolean;
   delay?: number;
 }
@@ -21,11 +27,13 @@ interface MetricCardProps {
 export default function MetricCard({
   label,
   value,
+  hint,
   subtext,
   accent = false,
   delay = 0,
 }: MetricCardProps) {
   const reduce = useReducedMotion();
+  const helpText = hint ?? subtext;
 
   return (
     <motion.div
@@ -52,8 +60,8 @@ export default function MetricCard({
       >
         {value}
       </p>
-      {subtext && (
-        <p className="font-mono text-[11px] text-ink-subtle">{subtext}</p>
+      {helpText && (
+        <p className="font-mono text-[11px] text-ink-subtle">{helpText}</p>
       )}
     </motion.div>
   );

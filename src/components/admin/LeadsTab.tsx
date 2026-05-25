@@ -4,14 +4,18 @@
  * src/components/admin/LeadsTab.tsx
  *
  * LEADS tab — the main working surface.
- * Features:
- *  - Follow-ups due/overdue banner (pinned, only shown when relevant)
- *  - Header: total count, due-now badge
- *  - Add Lead button → modal
- *  - Search + filter chips + sort
- *  - Lead list (card-based rows)
- *  - Click row → LeadDrawer
- *  - Import/Export actions
+ *
+ * Data display improvements:
+ *  - Follow-up banner (pinned at top) when any leads are overdue or due today
+ *  - ScoreBadge: cyan (hot ≥7) / amber (warm 4–6) / dim (cold <4)
+ *  - StageChip: color-coded per stage
+ *  - Touch count: visible on row as mono label
+ *  - Last contacted: relative time ("3 days ago") — "—" if never
+ *  - Follow-up date: colored by urgency (red=overdue, amber=today, dim=future)
+ *  - QuickActionsRow: email / call / follow-up date — Agent 4's component
+ *
+ * Row layout: business name + meta (left) | score | stage | touches |
+ *             last contacted | follow-up | quick actions
  */
 
 import { useState, useEffect, useRef, useCallback } from "react";
@@ -20,9 +24,12 @@ import type { Lead, PipelineStage } from "@/lib/admin/types";
 import { PIPELINE_STAGES, todayIso, TERMINAL_STAGES } from "@/lib/admin/types";
 import StageChip from "./StageChip";
 import ScoreBadge from "./ScoreBadge";
+import RelativeDate from "./RelativeDate";
+import QuickActionsRow from "./QuickActionsRow";
 import LeadDrawer from "./LeadDrawer";
-import Modal from "./Modal";
+import Drawer from "./Drawer";
 import AddLeadForm from "./AddLeadForm";
+import { formatRelativeDate, formatAbsoluteDate } from "@/lib/admin/format";
 
 type SortKey = "score" | "stage" | "followUpAt" | "updatedAt";
 type FilterMode = "all" | "due" | "hot" | PipelineStage;
@@ -38,15 +45,13 @@ const STAGE_ORDER: Record<PipelineStage, number> = {
   Lost: 7,
 };
 
-function fmt(iso: string | null): string {
-  if (!iso) return "—";
-  const d = new Date(iso);
-  return d.toLocaleDateString("en-US", { month: "short", day: "numeric" });
-}
-
-function fmtDate(iso: string): string {
-  const d = new Date(iso + "T00:00:00");
-  return d.toLocaleDateString("en-US", { month: "short", day: "numeric" });
+/** Whichever of emailedAt / calledAt is more recent — the "last contact" date */
+function lastContactedIso(lead: Lead): string | null {
+  const { emailedAt, calledAt } = lead;
+  if (!emailedAt && !calledAt) return null;
+  if (!emailedAt) return calledAt;
+  if (!calledAt) return emailedAt;
+  return emailedAt > calledAt ? emailedAt : calledAt;
 }
 
 export default function LeadsTab() {
@@ -88,6 +93,13 @@ export default function LeadsTab() {
     fetchLeads();
   }, [fetchLeads]);
 
+  // Wire keyboard shortcut: N dispatches "open-new-lead" from KeyboardShortcuts
+  useEffect(() => {
+    function handleOpenNew() { setAddOpen(true); }
+    window.addEventListener("open-new-lead", handleOpenNew);
+    return () => window.removeEventListener("open-new-lead", handleOpenNew);
+  }, []);
+
   function handleUpdated(updated: Lead) {
     setLeads((prev) => prev.map((l) => (l.id === updated.id ? updated : l)));
     setSelectedLead(updated);
@@ -106,18 +118,12 @@ export default function LeadsTab() {
     setAddOpen(false);
   }
 
-  // Derive overdue + today leads
+  // Derive overdue + today leads (non-terminal only)
   const overdueLeads = leads.filter(
-    (l) =>
-      l.followUpAt &&
-      l.followUpAt < today &&
-      !TERMINAL_STAGES.includes(l.stage)
+    (l) => l.followUpAt && l.followUpAt < today && !TERMINAL_STAGES.includes(l.stage)
   );
   const todayLeads = leads.filter(
-    (l) =>
-      l.followUpAt &&
-      l.followUpAt === today &&
-      !TERMINAL_STAGES.includes(l.stage)
+    (l) => l.followUpAt && l.followUpAt === today && !TERMINAL_STAGES.includes(l.stage)
   );
   const dueCount = overdueLeads.length + todayLeads.length;
 
@@ -201,13 +207,21 @@ export default function LeadsTab() {
   const sortLabel = (key: SortKey) => {
     const active = sort === key;
     const arrow = active ? (sortDir === "desc" ? " ↓" : " ↑") : "";
-    const labels: Record<SortKey, string> = { score: "Score", stage: "Stage", followUpAt: "Follow-up", updatedAt: "Updated" };
+    const labels: Record<SortKey, string> = {
+      score: "Score",
+      stage: "Stage",
+      followUpAt: "Follow-up",
+      updatedAt: "Updated",
+    };
     return labels[key] + arrow;
   };
 
   return (
     <div className="container-content py-8">
-      {/* ─── Follow-up banner ──────────────────────────────────────────────── */}
+
+      {/* ─── Follow-up banner ─────────────────────────────────────────────────
+           Pinned at top; only rendered when there are overdue or due-today
+           leads (and stage is not terminal). Shows a filter shortcut.         */}
       <AnimatePresence>
         {dueCount > 0 && (
           <motion.div
@@ -216,52 +230,36 @@ export default function LeadsTab() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.3 }}
-            className="mb-6 rounded-xl border border-accent/30 bg-accent/10 p-4"
+            className="mb-6 rounded-xl border border-accent/40 bg-accent/[0.06] px-5 py-4"
           >
-            <div className="flex flex-wrap items-start gap-4">
+            <div className="flex flex-wrap items-center justify-between gap-3">
               <div>
                 <p className="font-mono text-[11px] uppercase tracking-wider text-accent">
-                  ▸ {dueCount} follow-up{dueCount !== 1 ? "s" : ""} need attention
+                  ▸ Follow-ups need attention
                 </p>
-                <div className="mt-2 flex flex-col gap-1.5">
-                  {overdueLeads.map((l) => (
-                    <button
-                      key={l.id}
-                      onClick={() => {
-                        setSelectedLead(l);
-                        setDrawerOpen(true);
-                      }}
-                      className="flex items-center gap-2 text-left hover:text-ink transition-colors"
-                    >
-                      <span className="font-mono text-[10px] text-red-400 uppercase">
-                        overdue {l.followUpAt && fmtDate(l.followUpAt)}
-                      </span>
-                      <span className="text-sm text-ink-secondary">
-                        {l.businessName}
-                      </span>
-                      <StageChip stage={l.stage} size="sm" />
-                    </button>
-                  ))}
-                  {todayLeads.map((l) => (
-                    <button
-                      key={l.id}
-                      onClick={() => {
-                        setSelectedLead(l);
-                        setDrawerOpen(true);
-                      }}
-                      className="flex items-center gap-2 text-left hover:text-ink transition-colors"
-                    >
-                      <span className="font-mono text-[10px] text-accent uppercase">
-                        today
-                      </span>
-                      <span className="text-sm text-ink-secondary">
-                        {l.businessName}
-                      </span>
-                      <StageChip stage={l.stage} size="sm" />
-                    </button>
-                  ))}
-                </div>
+                <p className="mt-1 font-mono text-[11px] text-ink-subtle">
+                  {overdueLeads.length > 0 && (
+                    <span className="text-red-400">{overdueLeads.length} overdue</span>
+                  )}
+                  {overdueLeads.length > 0 && todayLeads.length > 0 && (
+                    <span className="mx-2 text-ink-subtle/40">·</span>
+                  )}
+                  {todayLeads.length > 0 && (
+                    <span className="text-accent/80">{todayLeads.length} due today</span>
+                  )}
+                </p>
               </div>
+              <button
+                onClick={() => setFilter("due")}
+                className={[
+                  "rounded-md border px-3 py-1.5 font-mono text-[10px] uppercase tracking-wider transition-colors",
+                  filter === "due"
+                    ? "border-accent bg-accent/10 text-accent"
+                    : "border-accent/40 text-accent hover:bg-accent/10",
+                ].join(" ")}
+              >
+                {filter === "due" ? "Showing due now" : "Filter to due now"}
+              </button>
             </div>
           </motion.div>
         )}
@@ -326,7 +324,6 @@ export default function LeadsTab() {
 
       {/* ─── Search + Filter + Sort ──────────────────────────────────────────── */}
       <div className="mb-5 flex flex-col gap-3">
-        {/* Search */}
         <input
           type="search"
           placeholder="Search leads…"
@@ -356,11 +353,9 @@ export default function LeadsTab() {
           })}
         </div>
 
-        {/* Sort buttons */}
+        {/* Sort */}
         <div className="flex flex-wrap gap-2 items-center">
-          <span className="font-mono text-[10px] uppercase tracking-wider text-ink-subtle">
-            Sort:
-          </span>
+          <span className="font-mono text-[10px] uppercase tracking-wider text-ink-subtle">Sort:</span>
           {(["score", "stage", "followUpAt", "updatedAt"] as SortKey[]).map((key) => (
             <button
               key={key}
@@ -384,7 +379,7 @@ export default function LeadsTab() {
           {[0, 1, 2].map((i) => (
             <div
               key={i}
-              className="h-20 rounded-xl border border-hairline bg-surface-1 animate-pulse"
+              className="h-24 rounded-xl border border-hairline bg-surface-1 animate-pulse"
             />
           ))}
         </div>
@@ -401,34 +396,42 @@ export default function LeadsTab() {
       ) : sorted.length === 0 ? (
         <div className="rounded-xl border border-hairline bg-surface-1 px-6 py-12 text-center">
           <p className="font-mono text-sm text-ink-subtle">
-            {leads.length === 0 ? "No leads yet. Add one to get started." : "No leads match your filters."}
+            {leads.length === 0
+              ? "No leads yet. Add one to get started."
+              : "No leads match your filters."}
           </p>
         </div>
       ) : (
         <div className="flex flex-col gap-2">
           {sorted.map((lead, i) => {
             const isOverdue =
-              lead.followUpAt &&
+              !!lead.followUpAt &&
               lead.followUpAt < today &&
               !TERMINAL_STAGES.includes(lead.stage);
             const isDueToday =
-              lead.followUpAt &&
+              !!lead.followUpAt &&
               lead.followUpAt === today &&
               !TERMINAL_STAGES.includes(lead.stage);
 
+            const lastContact = lastContactedIso(lead);
+
+            // Follow-up date display
+            const followUpRelative = lead.followUpAt
+              ? formatRelativeDate(lead.followUpAt)
+              : null;
+            const followUpAbsolute = lead.followUpAt
+              ? formatAbsoluteDate(lead.followUpAt)
+              : null;
+
             return (
-              <motion.button
+              <motion.div
                 key={lead.id}
                 initial={reduce ? { opacity: 0 } : { opacity: 0, y: 12 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1], delay: i * 0.04 }}
-                onClick={() => {
-                  setSelectedLead(lead);
-                  setDrawerOpen(true);
-                }}
                 className={[
-                  "group w-full rounded-xl border p-4 text-left transition-all duration-200",
-                  "hover:-translate-y-0.5 hover:border-hairline-strong hover:bg-surface-1",
+                  "group rounded-xl border transition-all duration-200",
+                  "hover:border-hairline-strong hover:bg-surface-1",
                   isOverdue
                     ? "border-red-500/20 bg-surface-1"
                     : isDueToday
@@ -436,57 +439,98 @@ export default function LeadsTab() {
                     : "border-hairline bg-surface-1",
                 ].join(" ")}
               >
-                <div className="flex flex-wrap items-start justify-between gap-3">
-                  {/* Left: name + meta */}
-                  <div className="flex flex-col gap-1.5 min-w-0">
-                    <div className="flex flex-wrap items-center gap-2">
+                {/* ── Main row: click to open drawer ─────────────────────── */}
+                <button
+                  onClick={() => {
+                    setSelectedLead(lead);
+                    setDrawerOpen(true);
+                  }}
+                  className="w-full p-4 text-left"
+                >
+                  {/* Row layout: name/meta (flex-1) + chips/dates */}
+                  <div className="flex flex-wrap items-start gap-x-4 gap-y-2">
+
+                    {/* LEFT: business name + meta tags */}
+                    <div className="flex flex-col gap-1 min-w-0 flex-1">
                       <span className="font-sans text-base font-medium text-ink group-hover:text-white truncate">
                         {lead.businessName}
                       </span>
-                      <StageChip stage={lead.stage} size="sm" />
-                    </div>
-                    <div className="flex flex-wrap items-center gap-2 font-mono text-[11px] text-ink-subtle">
-                      {lead.niche && <span>{lead.niche}</span>}
-                      {lead.neighborhood && (
-                        <>
+                      <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5 font-mono text-[11px] text-ink-subtle">
+                        {lead.niche && <span>{lead.niche}</span>}
+                        {lead.niche && lead.neighborhood && (
                           <span aria-hidden>·</span>
-                          <span>{lead.neighborhood}</span>
-                        </>
-                      )}
-                      {lead.touchCount > 0 && (
-                        <>
-                          <span aria-hidden>·</span>
-                          <span>{lead.touchCount} touch{lead.touchCount !== 1 ? "es" : ""}</span>
-                        </>
-                      )}
+                        )}
+                        {lead.neighborhood && <span>{lead.neighborhood}</span>}
+                        {lead.nextActionNote && (
+                          <>
+                            <span aria-hidden>·</span>
+                            <span className="truncate max-w-[200px] text-ink-subtle/70">
+                              {lead.nextActionNote}
+                            </span>
+                          </>
+                        )}
+                      </div>
                     </div>
-                    {lead.nextActionNote && (
-                      <p className="font-mono text-[11px] text-ink-subtle truncate max-w-xs">
-                        → {lead.nextActionNote}
-                      </p>
-                    )}
-                  </div>
 
-                  {/* Right: score + follow-up */}
-                  <div className="flex flex-col items-end gap-1.5 shrink-0">
-                    <ScoreBadge score={lead.score} size="sm" />
-                    {lead.followUpAt && (
-                      <span
-                        className={[
-                          "font-mono text-[10px]",
-                          isOverdue ? "text-red-400" : isDueToday ? "text-accent" : "text-ink-subtle",
-                        ].join(" ")}
-                      >
-                        {isOverdue ? "overdue " : isDueToday ? "today " : ""}
-                        {fmtDate(lead.followUpAt)}
+                    {/* RIGHT: score + stage + touches + last contacted + follow-up */}
+                    <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5 shrink-0">
+                      {/* Score badge — color-coded hot/warm/cold */}
+                      <ScoreBadge score={lead.score} size="sm" />
+
+                      {/* Stage chip — color-coded per new rules */}
+                      <StageChip stage={lead.stage} size="sm" />
+
+                      {/* Touch count — always visible, even at 0 */}
+                      <span className="font-mono text-[10px] text-ink-subtle whitespace-nowrap">
+                        {lead.touchCount} touch{lead.touchCount !== 1 ? "es" : ""}
                       </span>
-                    )}
-                    <span className="font-mono text-[10px] text-ink-subtle">
-                      {fmt(lead.updatedAt)}
-                    </span>
+
+                      {/* Last contacted — relative time */}
+                      <RelativeDate
+                        iso={lastContact}
+                        className="font-mono text-[10px] text-ink-subtle whitespace-nowrap"
+                        emptyText="—"
+                      />
+
+                      {/* Follow-up date — color-coded by urgency */}
+                      {lead.followUpAt ? (
+                        <time
+                          dateTime={lead.followUpAt}
+                          title={followUpAbsolute ?? undefined}
+                          className={[
+                            "font-mono text-[10px] whitespace-nowrap",
+                            isOverdue
+                              ? "text-red-400"
+                              : isDueToday
+                              ? "text-[#F5A623]"
+                              : "text-ink-subtle",
+                          ].join(" ")}
+                        >
+                          {isOverdue ? "overdue · " : isDueToday ? "today · " : ""}
+                          {followUpRelative}
+                        </time>
+                      ) : (
+                        <span className="font-mono text-[10px] text-ink-subtle/40">—</span>
+                      )}
+                    </div>
                   </div>
+                </button>
+
+                {/* ── Quick actions row — rendered below the main row ──────── */}
+                <div className="flex items-center justify-between px-4 pb-3 gap-2 border-t border-hairline/50 pt-2.5">
+                  <span className="font-mono text-[10px] text-ink-subtle/50">
+                    {lead.contactName || lead.email || lead.phone || ""}
+                  </span>
+                  <QuickActionsRow
+                    leadId={lead.id}
+                    onUpdated={(updated) =>
+                      setLeads((prev) =>
+                        prev.map((l) => (l.id === updated.id ? updated : l))
+                      )
+                    }
+                  />
                 </div>
-              </motion.button>
+              </motion.div>
             );
           })}
         </div>
@@ -504,18 +548,18 @@ export default function LeadsTab() {
         onConverted={handleConverted}
       />
 
-      {/* ─── Add Lead modal ───────────────────────────────────────────────────── */}
-      <Modal
+      {/* ─── Add Lead drawer ─────────────────────────────────────────────────── */}
+      <Drawer
         open={addOpen}
         onClose={() => setAddOpen(false)}
-        title="Add new lead"
-        width="max-w-2xl"
+        title="New lead"
+        width="max-w-lg"
       >
         <AddLeadForm
           onCreated={handleCreated}
           onCancel={() => setAddOpen(false)}
         />
-      </Modal>
+      </Drawer>
     </div>
   );
 }

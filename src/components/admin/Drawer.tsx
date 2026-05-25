@@ -5,10 +5,21 @@
  *
  * Generic slide-in right drawer. Used for lead/client detail/edit views.
  * Slides in from the right, darkened backdrop.
+ *
+ * Accessibility:
+ *   - ESC closes
+ *   - Backdrop click closes
+ *   - Focus is trapped inside (Tab / Shift+Tab cycle within the drawer)
+ *   - First focusable element receives focus on open
+ *   - Scroll lock on body while open
+ *   - prefers-reduced-motion: no x-slide, opacity only
  */
 
-import { useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { useEffect, useRef } from "react";
+import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
+
+const FOCUSABLE_SELECTORS =
+  'button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), a[href], [tabindex]:not([tabindex="-1"])';
 
 interface DrawerProps {
   open: boolean;
@@ -28,6 +39,9 @@ export default function Drawer({
   children,
   width = "max-w-xl",
 }: DrawerProps) {
+  const reduce = useReducedMotion();
+  const panelRef = useRef<HTMLElement>(null);
+
   // Close on Escape
   useEffect(() => {
     if (!open) return;
@@ -50,6 +64,42 @@ export default function Drawer({
     };
   }, [open]);
 
+  // Focus trap — Tab / Shift+Tab cycle inside drawer
+  useEffect(() => {
+    if (!open) return;
+    const panel = panelRef.current;
+    if (!panel) return;
+
+    // Focus first focusable element on open
+    const firstFocusable = panel.querySelector<HTMLElement>(FOCUSABLE_SELECTORS);
+    firstFocusable?.focus();
+
+    function handleTab(e: KeyboardEvent) {
+      if (e.key !== "Tab") return;
+      const focusable = Array.from(
+        panel!.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTORS)
+      ).filter((el) => el.offsetParent !== null);
+      if (focusable.length === 0) return;
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+
+      if (e.shiftKey) {
+        if (document.activeElement === first) {
+          e.preventDefault();
+          last.focus();
+        }
+      } else {
+        if (document.activeElement === last) {
+          e.preventDefault();
+          first.focus();
+        }
+      }
+    }
+
+    panel.addEventListener("keydown", handleTab);
+    return () => panel.removeEventListener("keydown", handleTab);
+  }, [open]);
+
   return (
     <AnimatePresence>
       {open && (
@@ -69,9 +119,10 @@ export default function Drawer({
           {/* Drawer panel */}
           <motion.aside
             key="drawer-panel"
-            initial={{ x: "100%" }}
-            animate={{ x: 0 }}
-            exit={{ x: "100%" }}
+            ref={panelRef}
+            initial={reduce ? { opacity: 0 } : { x: "100%" }}
+            animate={reduce ? { opacity: 1 } : { x: 0 }}
+            exit={reduce ? { opacity: 0 } : { x: "100%" }}
             transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
             className={[
               "fixed right-0 top-0 bottom-0 z-50 flex flex-col",

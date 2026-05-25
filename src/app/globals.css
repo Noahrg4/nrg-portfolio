@@ -166,3 +166,53 @@ textarea:focus-visible {
 .page-top {
   padding-top: clamp(6rem, 14vw, 10rem);
 }
+
+/* ────────────────────────────────────────────────────────────
+   Admin panel
+   All rules below are admin-specific. Never touch public-site
+   rules above this line.
+   ──────────────────────────────────────────────────────────── */
+
+/* Admin uses a slightly tighter section rhythm than the public site.
+   Applied to the container-content wrapper in each dashboard page. */
+.admin-section {
+  padding-top: clamp(2rem, 4vw, 3rem);
+  padding-bottom: clamp(2rem, 4vw, 3rem);
+}
+
+/* Admin page heading — slightly looser tracking than .text-display
+   (which is -0.04em) because admin numbers and mono labels sit alongside */
+.admin-page-title {
+  font-family: var(--font-syne), system-ui, sans-serif;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  line-height: 1;
+}
+
+/* Glow anchor — used on stat cards or metric highlights.
+   Wrapping element gets position: relative; this pseudo adds
+   a radial glow in the top-right corner. */
+.admin-glow-anchor {
+  position: relative;
+}
+.admin-glow-anchor::before {
+  content: "";
+  position: absolute;
+  inset: -40px -40px auto auto;
+  width: 280px;
+  height: 280px;
+  background: radial-gradient(circle, rgba(0, 212, 255, 0.10), transparent 70%);
+  filter: blur(60px);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Admin select — remove default OS chrome. The custom chevron SVG is
+   injected inline via style= in the component (Tailwind can't access
+   dynamic SVG in a utility class without a plugin). This rule ensures
+   the appearance reset is consistent across browsers. */
+select.admin-select {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+}

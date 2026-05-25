@@ -3,25 +3,38 @@
 /**
  * src/components/admin/StageChip.tsx
  *
- * Pill badge for pipeline stage. Color-coded:
- *   - Early stages (Found, Researched)  → ink-subtle
- *   - Mid stages (Emailed, Called)       → ink-secondary / yellow-ish
- *   - Late stages (Follow-up, Proposal)  → accent tint
- *   - Won                                → status-green tint
- *   - Lost                               → red tint
+ * Pill badge for pipeline stage. Color-coded by stage group:
+ *
+ *   Won        → cyan fill (bg-accent text-canvas) — strongest signal
+ *   Proposal   → cyan outline (border-accent text-accent)
+ *   Follow-up  → amber outline
+ *   Lost       → dim hairline outline, ink-subtle text — de-emphasized
+ *   Found / Researched / Emailed / Called
+ *              → neutral pill (bg-surface-2, border-hairline, ink-secondary)
+ *
+ * Size variants: "sm" (tight) | "md" (default)
  */
 
 import type { PipelineStage } from "@/lib/admin/types";
 
 const STAGE_STYLES: Record<PipelineStage, string> = {
-  Found:       "bg-surface-3 text-ink-subtle border-hairline",
-  Researched:  "bg-surface-3 text-ink-secondary border-hairline",
-  Emailed:     "bg-surface-2 text-ink-secondary border-hairline-strong",
-  Called:      "border border-[rgba(245,166,35,0.3)] bg-[rgba(245,166,35,0.08)] text-[#F5A623]",
-  "Follow-up": "border border-accent/30 bg-accent/10 text-accent",
-  Proposal:    "border border-accent/50 bg-accent/15 text-accent",
-  Won:         "border border-[rgba(40,202,65,0.4)] bg-[rgba(40,202,65,0.1)] text-[#28CA41]",
-  Lost:        "border border-red-500/30 bg-red-500/10 text-red-400",
+  // Terminal — won: most prominent
+  Won:         "bg-accent text-canvas border-accent",
+
+  // Late active — proposal: cyan outline
+  Proposal:    "border border-accent text-accent bg-transparent",
+
+  // Mid active — follow-up: amber outline
+  "Follow-up": "border border-[rgba(245,166,35,0.5)] bg-[rgba(245,166,35,0.08)] text-[#F5A623]",
+
+  // Early-mid active: neutral
+  Called:      "border border-hairline bg-surface-2 text-ink-secondary",
+  Emailed:     "border border-hairline bg-surface-2 text-ink-secondary",
+  Researched:  "border border-hairline bg-surface-2 text-ink-secondary",
+  Found:       "border border-hairline bg-surface-2 text-ink-secondary",
+
+  // Terminal — lost: de-emphasized
+  Lost:        "border border-hairline text-ink-subtle bg-transparent",
 };
 
 interface StageChipProps {
@@ -38,7 +51,7 @@ export default function StageChip({ stage, size = "md" }: StageChipProps) {
   return (
     <span
       className={[
-        "inline-flex items-center rounded-full border font-mono uppercase tracking-wider whitespace-nowrap",
+        "inline-flex items-center rounded-full font-mono uppercase tracking-wider whitespace-nowrap",
         sizeClass,
         STAGE_STYLES[stage],
       ].join(" ")}

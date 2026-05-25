@@ -2,11 +2,15 @@
  * POST /api/admin/auth/login
  *
  * Accepts { username, password }, verifies credentials, and seals the session.
- * Returns 204 on success, 401 on failure, 503 if env vars are missing.
+ * Returns 204 on success, 401 on failure, 429 if rate-limited, 503 if env vars are missing.
+ *
+ * Rate limiting: max 5 failed attempts per IP per 15-minute window.
+ * Only failed attempts increment the counter; a successful login resets it.
  */
 
 import { NextRequest, NextResponse } from 'next/server';
 import { getAdminSession, verifyCredentials, requireAdminEnv } from '@/lib/admin/auth';
+import { checkRateLimit, recordFailure, resetFailures, getClientIp } from '@/lib/admin/rate-limit';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -17,8 +21,22 @@ export async function POST(req: NextRequest) {
     requireAdminEnv();
   } catch {
     return NextResponse.json(
-      { error: 'Service unavailable — admin panel is not configured.' },
+      { error: 'Admin not configured.' },
       { status: 503 }
+    );
+  }
+
+  // Rate-limit check — before parsing body to save work on hammered endpoints
+  const ip = getClientIp(req);
+  const rateCheck = checkRateLimit(ip);
+  if (rateCheck.limited) {
+    const minutes = Math.ceil(rateCheck.retryAfterSeconds / 60);
+    return NextResponse.json(
+      { error: `Too many attempts. Try again in ${minutes} minute${minutes !== 1 ? 's' : ''}.` },
+      {
+        status: 429,
+        headers: { 'Retry-After': String(rateCheck.retryAfterSeconds) },
+      }
     );
   }
 
@@ -45,12 +63,14 @@ export async function POST(req: NextRequest) {
   } catch (err) {
     console.error('[admin/login] credential verification error:', err);
     return NextResponse.json(
-      { error: 'Service unavailable.' },
+      { error: 'Admin not configured.' },
       { status: 503 }
     );
   }
 
   if (!valid) {
+    // Record failure for rate limiting before returning
+    recordFailure(ip);
     // Same message regardless of which field was wrong — no username enumeration
     return NextResponse.json(
       { error: 'Invalid credentials.' },
@@ -58,7 +78,8 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  // Seal the session
+  // Successful login — reset failure counter, then seal the session
+  resetFailures(ip);
   const session = await getAdminSession();
   session.ownerId = 'noah';
   await session.save();

@@ -16,9 +16,9 @@ interface AddClientFormProps {
 }
 
 const inputClass =
-  "w-full rounded-md border border-hairline bg-surface-2 px-4 py-3 text-base text-ink placeholder:text-ink-subtle transition-colors focus:border-accent focus:outline-none";
+  "w-full rounded-md border border-hairline bg-surface-2 px-4 py-3 text-base text-ink placeholder:text-ink-subtle transition-colors duration-200 focus:border-accent focus:outline-none";
 
-const labelClass = "font-mono text-[10px] uppercase tracking-wider text-ink-subtle";
+const labelClass = "font-mono text-[11px] uppercase tracking-wider text-ink-secondary block mb-1.5";
 
 export default function AddClientForm({ onCreated, onCancel }: AddClientFormProps) {
   const [saving, setSaving] = useState(false);
@@ -79,101 +79,125 @@ export default function AddClientForm({ onCreated, onCancel }: AddClientFormProp
   }
 
   return (
-    <form onSubmit={handleSubmit} className="flex flex-col gap-4" noValidate>
-      {/* Business name */}
-      <div className="flex flex-col gap-1.5">
-        <label className={labelClass}>
-          Business name <span className="text-accent">*</span>
-        </label>
-        <input
-          type="text"
-          value={businessName}
-          onChange={(e) => setBusinessName(e.target.value)}
-          placeholder="e.g. Martinez HVAC"
-          required
-          className={inputClass}
-        />
-      </div>
+    <form onSubmit={handleSubmit} className="flex flex-col gap-0" noValidate>
 
-      <div className="grid grid-cols-2 gap-3">
+      {/* ─── Business ─────────────────────────────────────────────────────── */}
+      <div className="pb-6">
+        <p className="font-mono text-[11px] uppercase tracking-wider text-ink-subtle mb-4">
+          Business
+        </p>
         <div className="flex flex-col gap-1.5">
-          <label className={labelClass}>Contact name</label>
+          <label className={labelClass}>
+            Business name <span className="text-accent">*</span>
+          </label>
           <input
             type="text"
-            value={contactName}
-            onChange={(e) => setContactName(e.target.value)}
-            placeholder="Owner's name"
-            className={inputClass}
-          />
-        </div>
-        <div className="flex flex-col gap-1.5">
-          <label className={labelClass}>Phone</label>
-          <input
-            type="tel"
-            value={phone}
-            onChange={(e) => setPhone(e.target.value)}
-            placeholder="713-555-0123"
+            value={businessName}
+            onChange={(e) => setBusinessName(e.target.value)}
+            placeholder="e.g. Martinez HVAC"
+            required
+            autoFocus
             className={inputClass}
           />
         </div>
       </div>
 
-      <div className="flex flex-col gap-1.5">
-        <label className={labelClass}>Email</label>
-        <input
-          type="email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          placeholder="owner@business.com"
-          className={inputClass}
-        />
+      {/* ─── Contact ──────────────────────────────────────────────────────── */}
+      <div className="border-t border-hairline pt-5 pb-6">
+        <p className="font-mono text-[11px] uppercase tracking-wider text-ink-subtle mb-4">
+          Contact
+        </p>
+        <div className="flex flex-col gap-4">
+          <div className="grid grid-cols-2 gap-3">
+            <div className="flex flex-col gap-1.5">
+              <label className={labelClass}>Contact name</label>
+              <input
+                type="text"
+                value={contactName}
+                onChange={(e) => setContactName(e.target.value)}
+                placeholder="Owner's name"
+                className={inputClass}
+              />
+            </div>
+            <div className="flex flex-col gap-1.5">
+              <label className={labelClass}>Phone</label>
+              <input
+                type="tel"
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
+                placeholder="713-555-0123"
+                className={inputClass}
+              />
+            </div>
+          </div>
+
+          <div className="flex flex-col gap-1.5">
+            <label className={labelClass}>Email</label>
+            <input
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="owner@business.com"
+              className={inputClass}
+            />
+          </div>
+
+          <div className="flex flex-col gap-1.5">
+            <label className={labelClass}>Site URL</label>
+            <input
+              type="url"
+              value={siteUrl}
+              onChange={(e) => setSiteUrl(e.target.value)}
+              placeholder="https://example.com"
+              className={inputClass}
+            />
+          </div>
+        </div>
       </div>
 
-      <div className="flex flex-col gap-1.5">
-        <label className={labelClass}>Site URL</label>
-        <input
-          type="url"
-          value={siteUrl}
-          onChange={(e) => setSiteUrl(e.target.value)}
-          placeholder="https://example.com"
-          className={inputClass}
-        />
-      </div>
-
-      <div className="grid grid-cols-3 gap-3">
-        <div className="flex flex-col gap-1.5">
-          <label className={labelClass}>One-time ($)</label>
-          <input
-            type="number"
-            min={0}
-            value={oneTimeValue}
-            onChange={(e) => setOneTimeValue(e.target.value)}
-            className={inputClass}
-          />
-        </div>
-        <div className="flex flex-col gap-1.5">
-          <label className={labelClass}>Monthly ($)</label>
-          <input
-            type="number"
-            min={0}
-            value={monthlyCharge}
-            onChange={(e) => setMonthlyCharge(e.target.value)}
-            className={inputClass}
-          />
-        </div>
-        <div className="flex flex-col gap-1.5">
-          <label className={labelClass}>Start date</label>
-          <input
-            type="date"
-            value={startDate}
-            onChange={(e) => setStartDate(e.target.value)}
-            className={inputClass}
-          />
+      {/* ─── Billing ──────────────────────────────────────────────────────── */}
+      <div className="border-t border-hairline pt-5 pb-6">
+        <p className="font-mono text-[11px] uppercase tracking-wider text-ink-subtle mb-4">
+          Billing
+        </p>
+        <div className="grid grid-cols-3 gap-3">
+          <div className="flex flex-col gap-1.5">
+            <label className={labelClass}>One-time ($)</label>
+            <input
+              type="number"
+              min={0}
+              value={oneTimeValue}
+              onChange={(e) => setOneTimeValue(e.target.value)}
+              className={inputClass}
+            />
+          </div>
+          <div className="flex flex-col gap-1.5">
+            <label className={labelClass}>Monthly ($)</label>
+            <input
+              type="number"
+              min={0}
+              value={monthlyCharge}
+              onChange={(e) => setMonthlyCharge(e.target.value)}
+              className={inputClass}
+            />
+          </div>
+          <div className="flex flex-col gap-1.5">
+            <label className={labelClass}>Start date</label>
+            <input
+              type="date"
+              value={startDate}
+              onChange={(e) => setStartDate(e.target.value)}
+              className={inputClass}
+            />
+          </div>
         </div>
       </div>
 
-      <div className="flex flex-col gap-1.5">
-        <label className={labelClass}>Notes</label>
+      {/* ─── Notes ────────────────────────────────────────────────────────── */}
+      <div className="border-t border-hairline pt-5 pb-6">
+        <p className="font-mono text-[11px] uppercase tracking-wider text-ink-subtle mb-4">
+          Notes
+        </p>
         <textarea
           value={notes}
           onChange={(e) => setNotes(e.target.value)}
@@ -184,24 +208,25 @@ export default function AddClientForm({ onCreated, onCancel }: AddClientFormProp
       </div>
 
       {error && (
-        <p className="rounded-md border border-red-500/40 bg-red-500/10 px-4 py-3 font-mono text-sm text-red-300">
+        <div className="mb-4 rounded-md border border-red-500/40 bg-red-500/10 px-4 py-3 font-mono text-sm text-red-300">
           {error}
-        </p>
+        </div>
       )}
 
-      <div className="flex gap-3 pt-1">
+      {/* ─── Actions ──────────────────────────────────────────────────────── */}
+      <div className="border-t border-hairline pt-5 flex gap-3">
         <button
           type="button"
           onClick={onCancel}
           disabled={saving}
-          className="flex-1 rounded-md border border-hairline-strong px-4 py-3 font-mono text-sm uppercase tracking-wider text-ink-secondary hover:border-accent hover:text-accent transition-colors disabled:opacity-50"
+          className="flex-1 rounded-md border border-hairline-strong px-4 py-3 font-mono text-sm uppercase tracking-wider text-ink-secondary transition-colors duration-200 hover:border-accent hover:text-accent disabled:opacity-50"
         >
           Cancel
         </button>
         <button
           type="submit"
           disabled={saving}
-          className="flex-1 flex items-center justify-center gap-2 rounded-md bg-accent px-4 py-3 font-mono text-sm uppercase tracking-wider text-canvas transition-shadow hover:shadow-[0_0_30px_rgba(0,212,255,0.4)] active:scale-[0.98] disabled:opacity-60"
+          className="flex-1 flex items-center justify-center gap-2 rounded-md bg-accent px-4 py-3 font-mono text-sm uppercase tracking-wider text-canvas transition-all duration-200 hover:shadow-[0_0_30px_rgba(0,212,255,0.4)] active:scale-[0.98] disabled:opacity-60"
         >
           {saving ? (
             <>

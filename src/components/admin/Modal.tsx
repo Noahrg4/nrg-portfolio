@@ -8,7 +8,10 @@
  */
 
 import { useEffect, useRef } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
+
+const FOCUSABLE_SELECTORS =
+  'button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), a[href], [tabindex]:not([tabindex="-1"])';
 
 interface ModalProps {
   open: boolean;
@@ -27,6 +30,7 @@ export default function Modal({
   width = "max-w-xl",
 }: ModalProps) {
   const dialogRef = useRef<HTMLDivElement>(null);
+  const reduce = useReducedMotion();
 
   // Close on Escape
   useEffect(() => {
@@ -50,14 +54,42 @@ export default function Modal({
     };
   }, [open]);
 
-  // Auto-focus first focusable element
+  // Auto-focus first focusable element + focus trap
   useEffect(() => {
-    if (open && dialogRef.current) {
-      const focusable = dialogRef.current.querySelector<HTMLElement>(
-        'input, select, textarea, button:not([data-close])'
-      );
-      focusable?.focus();
+    if (!open || !dialogRef.current) return;
+    const container = dialogRef.current;
+
+    // Focus first input (skipping the close button)
+    const focusable = container.querySelector<HTMLElement>(
+      'input, select, textarea, button:not([data-close])'
+    );
+    focusable?.focus();
+
+    // Trap Tab / Shift+Tab inside modal
+    function handleTab(e: KeyboardEvent) {
+      if (e.key !== "Tab") return;
+      const allFocusable = Array.from(
+        container.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTORS)
+      ).filter((el) => el.offsetParent !== null);
+      if (allFocusable.length === 0) return;
+      const first = allFocusable[0];
+      const last = allFocusable[allFocusable.length - 1];
+
+      if (e.shiftKey) {
+        if (document.activeElement === first) {
+          e.preventDefault();
+          last.focus();
+        }
+      } else {
+        if (document.activeElement === last) {
+          e.preventDefault();
+          first.focus();
+        }
+      }
     }
+
+    container.addEventListener("keydown", handleTab);
+    return () => container.removeEventListener("keydown", handleTab);
   }, [open]);
 
   return (
@@ -79,9 +111,9 @@ export default function Modal({
           {/* Dialog */}
           <motion.div
             key="dialog"
-            initial={{ opacity: 0, scale: 0.96, y: 8 }}
+            initial={reduce ? { opacity: 0 } : { opacity: 0, scale: 0.96, y: 8 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.96, y: 8 }}
+            exit={reduce ? { opacity: 0 } : { opacity: 0, scale: 0.96, y: 8 }}
             transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
             className="fixed inset-0 z-50 flex items-center justify-center p-4"
             role="dialog"

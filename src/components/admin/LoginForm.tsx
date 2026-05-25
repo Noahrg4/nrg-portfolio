@@ -19,7 +19,7 @@ export default function LoginForm() {
   const [loading, setLoading] = useState(false);
 
   const inputClass =
-    "w-full rounded-md border border-hairline bg-surface-2 px-4 py-3.5 text-base text-ink placeholder:text-ink-subtle transition-colors focus:border-accent focus:outline-none";
+    "w-full rounded-md border border-hairline bg-surface-2 px-4 py-3.5 text-base text-ink placeholder:text-ink-subtle transition-colors duration-200 focus:border-accent focus:outline-none";
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -67,7 +67,7 @@ export default function LoginForm() {
     >
       <form
         onSubmit={handleSubmit}
-        className="flex flex-col gap-5 rounded-xl border border-hairline bg-surface-1 p-8"
+        className="flex flex-col gap-5 rounded-xl border border-hairline bg-surface-1 p-8 shadow-[0_24px_64px_rgba(0,0,0,0.5)]"
         noValidate
       >
         <div className="flex flex-col gap-2">
@@ -125,7 +125,7 @@ export default function LoginForm() {
         <button
           type="submit"
           disabled={loading}
-          className="mt-1 flex w-full items-center justify-center gap-2 rounded-md bg-accent px-6 py-3.5 font-mono text-sm uppercase tracking-wider text-canvas transition-shadow hover:shadow-[0_0_30px_rgba(0,212,255,0.4)] active:scale-[0.98] disabled:opacity-60"
+          className="mt-1 flex w-full items-center justify-center gap-2 rounded-md bg-accent px-6 py-3.5 font-mono text-sm uppercase tracking-wider text-canvas transition-all duration-200 hover:shadow-[0_0_40px_rgba(0,212,255,0.5)] active:scale-[0.98] disabled:opacity-60"
         >
           {loading ? (
             <>
