@@ -26,7 +26,7 @@
 import { useState, useCallback, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import type { Lead, PipelineStage, ConvertLeadBody } from "@/lib/admin/types";
-import { SCORE_WEIGHTS, computeScore, TERMINAL_STAGES, PIPELINE_STAGES } from "@/lib/admin/types";
+import { SCORE_WEIGHTS, computeScore, TERMINAL_STAGES } from "@/lib/admin/types";
 import Drawer from "./Drawer";
 import StageChip from "./StageChip";
 import ScoreBadge from "./ScoreBadge";
@@ -208,6 +208,20 @@ export default function LeadDrawer({
     syncedForRef.current = null;
   }
 
+  // Wire Cmd+S: KeyboardShortcuts dispatches "admin-save" when drawer is open.
+  // Use a ref so the listener always calls the latest handleSave closure.
+  // IMPORTANT: these hooks must be called unconditionally (above any early
+  // return) per the rules of hooks. handleSave is assigned to the ref later.
+  const handleSaveRef = useRef<() => void>(() => {});
+  useEffect(() => {
+    if (!open) return;
+    function onAdminSave() {
+      handleSaveRef.current();
+    }
+    window.addEventListener("admin-save", onAdminSave);
+    return () => window.removeEventListener("admin-save", onAdminSave);
+  }, [open]);
+
   if (!lead) return null;
 
   const currentScore = computeScore(scoreFactors);
@@ -276,16 +290,9 @@ export default function LeadDrawer({
     }
   }
 
-  // Wire Cmd+S: KeyboardShortcuts dispatches "admin-save" when drawer is open.
-  // Use a ref so the listener always calls the latest handleSave closure.
-  const handleSaveRef = useRef(handleSave);
+  // Keep the ref pointed at the latest handleSave closure (assignment only —
+  // no hook call here; the useRef + useEffect live above the early return).
   handleSaveRef.current = handleSave;
-  useEffect(() => {
-    if (!open) return;
-    function onAdminSave() { handleSaveRef.current(); }
-    window.addEventListener("admin-save", onAdminSave);
-    return () => window.removeEventListener("admin-save", onAdminSave);
-  }, [open]);
 
   // ── Action buttons ──────────────────────────────────────────────────────
   async function handleAction(type: "email" | "call") {

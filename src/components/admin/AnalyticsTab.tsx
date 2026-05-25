@@ -26,7 +26,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { motion, useReducedMotion } from "framer-motion";
 import type { AnalyticsPayload } from "@/lib/admin/types";
-import { PIPELINE_STAGES, STAGE_CLOSE_PROBABILITY, AVG_PROJECT_VALUE, ACTIVE_STAGES } from "@/lib/admin/types";
+import { STAGE_CLOSE_PROBABILITY, AVG_PROJECT_VALUE, ACTIVE_STAGES } from "@/lib/admin/types";
 import MetricCard from "./MetricCard";
 import PipelineFunnel from "./PipelineFunnel";
 import { formatCurrency, formatPercent } from "@/lib/admin/format";
