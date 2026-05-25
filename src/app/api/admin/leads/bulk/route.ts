@@ -63,15 +63,23 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  const result = await bulkImportLeads(body.leads as Lead[], mode);
-
-  return NextResponse.json(
-    {
-      count: result.added, // backward-compat alias
-      added: result.added,
-      skipped: result.skipped,
-      leads: result.leads,
-    },
-    { status: 200 }
-  );
+  try {
+    const result = await bulkImportLeads(body.leads as Lead[], mode);
+    return NextResponse.json(
+      {
+        count: result.added, // backward-compat alias
+        added: result.added,
+        skipped: result.skipped,
+        leads: result.leads,
+      },
+      { status: 200 }
+    );
+  } catch (err: unknown) {
+    const msg = err instanceof Error ? err.message : String(err);
+    console.error('[bulk-import] failed:', err);
+    return NextResponse.json(
+      { error: `Import failed at storage layer: ${msg}` },
+      { status: 500 }
+    );
+  }
 }

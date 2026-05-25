@@ -49,7 +49,7 @@ const FS_PATHS: Record<CollectionKey, string> = {
 
 async function readJson<T>(key: CollectionKey, defaultValue: T): Promise<T> {
   if (USE_BLOBS) {
-    const store = getStore({ name: STORE_NAME, consistency: 'strong' });
+    const store = getStore({ name: STORE_NAME });
     const v = (await store.get(key, { type: 'json' })) as T | null;
     return v ?? defaultValue;
   }
@@ -68,7 +68,7 @@ async function readJson<T>(key: CollectionKey, defaultValue: T): Promise<T> {
 
 async function writeJson<T>(key: CollectionKey, data: T): Promise<void> {
   if (USE_BLOBS) {
-    const store = getStore({ name: STORE_NAME, consistency: 'strong' });
+    const store = getStore({ name: STORE_NAME });
     await store.setJSON(key, data);
     return;
   }
