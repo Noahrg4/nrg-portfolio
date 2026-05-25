@@ -55,7 +55,7 @@ export function ServicesPage({ location = "root" }: Props) {
               pricing.
             </SectionHeading>
             <p className="text-base leading-relaxed text-ink-secondary md:text-lg">
-              Tell me what you&apos;re after and I&apos;ll give you a real number — not a range that balloons later. Most complete websites land between $100 and $300. Automation setups typically add another $100–$200. Reach out for a straight quote on yours.
+              Tell me what you&apos;re after and I&apos;ll give you a real number — not a range that balloons later. Most complete websites land between $300 and $900. Automation setups typically add another $200–$500. Reach out for a straight quote on yours.
             </p>
           </div>
         </section>

@@ -66,7 +66,7 @@ export function AboutPage({ location = "root" }: Props) {
               </SectionHeading>
               <div className="flex flex-col gap-5 text-base leading-relaxed text-ink-secondary md:text-lg">
                 <p>{content.aboutBioParagraph1}</p>
-                <p>Before starting NRG, I spent two years building and running technology systems inside a Fortune 100 company — whether it&apos;s a $100 site for a local plumber or a full automation setup for a growing service business, that standard comes with me.</p>
+                <p>Before starting NRG, I spent two years building and running technology systems inside a Fortune 100 company — whether it&apos;s a $300 site for a local plumber or a full automation setup for a growing service business, that standard comes with me.</p>
                 <p>I have a degree in Computer Science and Cybersecurity, so your website and your customers&apos; information are in careful hands.</p>
                 <p>{content.aboutBioClosingLine}</p>
               </div>
