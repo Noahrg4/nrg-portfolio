@@ -233,13 +233,30 @@ export async function deleteLead(id: string): Promise<boolean> {
   return true;
 }
 
+/**
+ * Normalized dedup key for a lead: lowercased trimmed businessName + digits-
+ * only phone. Two leads with the same key are treated as the same lead.
+ *
+ *   "El Rey Restaurant" + "(713) 555-1234"  →  "el rey restaurant|7135551234"
+ *   "El Rey Restaurant" + "713-555-1234"    →  "el rey restaurant|7135551234"
+ *   "El Rey Restaurant" + ""                →  "el rey restaurant|"
+ *
+ * Trade-off: two genuinely different businesses with the same name AND no
+ * phone collide. Acceptable for a solo operator's CRM; rare in practice.
+ */
+export function leadDedupKey(l: { businessName: string; phone: string }): string {
+  const name = (l.businessName || '').trim().toLowerCase();
+  const digits = (l.phone || '').replace(/\D/g, '');
+  return `${name}|${digits}`;
+}
+
 export async function bulkImportLeads(
   incoming: Lead[],
   mode: 'replace' | 'append' = 'append'
-): Promise<{ count: number; leads: Lead[] }> {
+): Promise<{ added: number; skipped: number; leads: Lead[] }> {
   const timestamp = now();
 
-  // Normalize incoming leads — ensure required fields have defaults
+  // 1. Normalize incoming leads — fill in defaults the API caller may have omitted
   const normalized: Lead[] = incoming.map((l) => ({
     ...l,
     id: l.id ?? crypto.randomUUID(),
@@ -258,19 +275,50 @@ export async function bulkImportLeads(
     updatedAt: l.updatedAt ?? timestamp,
   }));
 
+  // 2. Dedup within the batch (keep first occurrence)
+  const seenKeys = new Set<string>();
+  const seenIds = new Set<string>();
+  const withinBatch: Lead[] = [];
+  let skippedWithinBatch = 0;
+  for (const lead of normalized) {
+    const key = leadDedupKey(lead);
+    if (seenKeys.has(key) || seenIds.has(lead.id)) {
+      skippedWithinBatch++;
+      continue;
+    }
+    seenKeys.add(key);
+    seenIds.add(lead.id);
+    withinBatch.push(lead);
+  }
+
+  // 3. Apply dedup against existing DB (append mode only)
   let result: Lead[];
+  let skippedAgainstExisting = 0;
   if (mode === 'replace') {
-    result = normalized;
+    result = withinBatch;
   } else {
     const existing = await readJson<Lead[]>(LEADS_FILE, []);
-    // Append, deduplicating by id
     const existingIds = new Set(existing.map((l) => l.id));
-    const newLeads = normalized.filter((l) => !existingIds.has(l.id));
-    result = [...existing, ...newLeads];
+    const existingKeys = new Set(existing.map(leadDedupKey));
+    const toAdd: Lead[] = [];
+    for (const lead of withinBatch) {
+      if (existingIds.has(lead.id) || existingKeys.has(leadDedupKey(lead))) {
+        skippedAgainstExisting++;
+        continue;
+      }
+      toAdd.push(lead);
+    }
+    result = [...existing, ...toAdd];
   }
 
   await writeJson(LEADS_FILE, result);
-  return { count: normalized.length, leads: result };
+
+  const added = mode === 'replace' ? withinBatch.length : withinBatch.length - skippedAgainstExisting;
+  return {
+    added,
+    skipped: skippedWithinBatch + skippedAgainstExisting,
+    leads: result,
+  };
 }
 
 // ---------------------------------------------------------------------------

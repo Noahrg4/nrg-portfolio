@@ -5,10 +5,19 @@
  *
  * Query param: ?mode=replace|append (default: append)
  *   - replace: replaces the entire leads dataset with the imported data
- *   - append: adds new leads (deduplicates by id)
+ *   - append: adds new leads, skipping duplicates
+ *
+ * Dedup (applied in both modes within the batch; also against existing DB
+ * in append mode): two leads collapse to one if their normalized
+ * `businessName + phone-digits` match. See leadDedupKey in src/lib/admin/db.ts.
  *
  * Request body: { leads: Lead[] }
- * Response: { count: number, leads: Lead[] }
+ * Response: {
+ *   count: number,    // number of leads actually added to the DB (= added)
+ *   added: number,    // same as count, named more clearly
+ *   skipped: number,  // number of incoming leads dropped as duplicates
+ *   leads: Lead[]     // full updated leads dataset
+ * }
  *
  * WARNING: ?mode=replace is destructive. No undo.
  */
@@ -57,7 +66,12 @@ export async function POST(req: NextRequest) {
   const result = await bulkImportLeads(body.leads as Lead[], mode);
 
   return NextResponse.json(
-    { count: result.count, leads: result.leads },
+    {
+      count: result.added, // backward-compat alias
+      added: result.added,
+      skipped: result.skipped,
+      leads: result.leads,
+    },
     { status: 200 }
   );
 }
