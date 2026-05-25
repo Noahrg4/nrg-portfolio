@@ -37,3 +37,10 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# admin data store
+# data/leads.json and data/clients.json are committed as empty seeds ([]).
+# Netlify serverless containers are ephemeral — production writes do not persist
+# across deploys. Use GET /api/admin/export to download a backup periodically.
+# To prevent accidentally committing live data locally, you can run:
+#   git update-index --assume-unchanged data/leads.json data/clients.json
