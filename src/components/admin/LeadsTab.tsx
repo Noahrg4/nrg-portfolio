@@ -179,25 +179,102 @@ export default function LeadsTab() {
     }
   }
 
-  // Import JSON
+  // Import JSON — accepts both shapes:
+  //   1) { "leads": [ ... ] }   (canonical, per docs/CRM-IMPORT-SPEC.md)
+  //   2) [ ... ]                 (bare array, for convenience)
   async function handleImportFile(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (!file) return;
     setImportLoading(true);
     try {
       const text = await file.text();
-      const parsed = JSON.parse(text) as Lead[];
-      if (!Array.isArray(parsed)) throw new Error("Expected array");
+      let parsed: unknown;
+      try {
+        parsed = JSON.parse(text);
+      } catch {
+        window.dispatchEvent(
+          new CustomEvent("admin-toast", {
+            detail: { message: "Import failed — file isn't valid JSON.", kind: "error" },
+          })
+        );
+        return;
+      }
+
+      // Accept either shape; normalize to an array of leads
+      let leads: unknown;
+      if (Array.isArray(parsed)) {
+        leads = parsed;
+      } else if (parsed && typeof parsed === "object" && Array.isArray((parsed as Record<string, unknown>).leads)) {
+        leads = (parsed as Record<string, unknown>).leads;
+      } else {
+        window.dispatchEvent(
+          new CustomEvent("admin-toast", {
+            detail: {
+              message: 'Import failed — expected an array of leads, or { "leads": [...] }.',
+              kind: "error",
+            },
+          })
+        );
+        return;
+      }
+
       const res = await fetch("/api/admin/leads/bulk?mode=append", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ leads: parsed }),
+        body: JSON.stringify({ leads }),
       });
-      if (res.ok) {
-        await fetchLeads();
+
+      if (!res.ok) {
+        let serverMsg = "Import failed.";
+        try {
+          const body = await res.json();
+          if (typeof body?.error === "string") serverMsg = `Import failed — ${body.error}`;
+        } catch {
+          // body wasn't JSON; fall back to status text
+          serverMsg = `Import failed — ${res.status} ${res.statusText}`;
+        }
+        window.dispatchEvent(
+          new CustomEvent("admin-toast", {
+            detail: { message: serverMsg, kind: "error" },
+          })
+        );
+        return;
       }
-    } catch {
-      // silent
+
+      // Success — show counts so the user knows exactly what happened
+      let added = 0;
+      let skipped = 0;
+      try {
+        const body = await res.json();
+        if (typeof body?.added === "number") added = body.added;
+        if (typeof body?.skipped === "number") skipped = body.skipped;
+      } catch {
+        // ignore — counts default to 0
+      }
+
+      const msg =
+        added > 0 && skipped > 0
+          ? `Imported ${added} lead${added === 1 ? "" : "s"} (${skipped} duplicate${skipped === 1 ? "" : "s"} skipped).`
+          : added > 0
+            ? `Imported ${added} lead${added === 1 ? "" : "s"}.`
+            : skipped > 0
+              ? `No new leads — ${skipped} duplicate${skipped === 1 ? "" : "s"} skipped.`
+              : "No leads found in file.";
+
+      window.dispatchEvent(
+        new CustomEvent("admin-toast", {
+          detail: { message: msg, kind: added > 0 ? "success" : "info" },
+        })
+      );
+
+      await fetchLeads();
+    } catch (err) {
+      console.error("[import] unexpected error", err);
+      window.dispatchEvent(
+        new CustomEvent("admin-toast", {
+          detail: { message: "Import failed — check your connection.", kind: "error" },
+        })
+      );
     } finally {
       setImportLoading(false);
       if (importRef.current) importRef.current.value = "";

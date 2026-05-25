@@ -322,12 +322,16 @@ real history. For brand-new prospects, omit those.
 - Markdown commentary around the JSON. Just the JSON object.
 - Trailing commas (JSON doesn't allow them).
 - Comments (`//` or `/* */`) — JSON doesn't allow them.
-- A bare array. Always wrap in `{ "leads": [ ... ] }`.
 - Lowercase or alt-cased stage values like `"found"`, `"won"`, `"followup"`.
   Use the exact strings from the enum list.
 - Made-up phone numbers or emails for real businesses. Either find the real
   contact info or leave the fields as empty strings.
 - Pre-filled `score`. The server computes it from `scoreFactors`.
+
+**Shape note:** The upload UI accepts EITHER `{ "leads": [...] }` (canonical,
+matches the API) OR a bare `[...]` array (a shortcut the UI accepts for
+convenience). Prefer the wrapped object — it's the canonical shape and lets
+the file's purpose self-describe.
 
 ---
 
