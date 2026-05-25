@@ -17,7 +17,7 @@ export const testimonialsByLocation: Record<LocationSlug, LocationTestimonials> 
       quote:
         "I had a Facebook page and nothing else. Noah built me a real site in two weeks. I've had 3 new customers call me directly from Google since it went live.",
       author: "Marcus Williams",
-      business: "Williams HVAC · Houston, TX",
+      business: "Houston, TX",
     },
     others: [
       {
@@ -39,7 +39,7 @@ export const testimonialsByLocation: Record<LocationSlug, LocationTestimonials> 
       quote:
         "I had a Facebook page and nothing else. Noah built me a real site in two weeks. I've had 3 new customers call me directly from Google since it went live.",
       author: "Marcus Williams",
-      business: "Williams HVAC · Houston, TX",
+      business: "Houston, TX",
     },
     others: [
       {
@@ -61,7 +61,7 @@ export const testimonialsByLocation: Record<LocationSlug, LocationTestimonials> 
       quote:
         "I had a Facebook page and nothing else. Noah built me a real site in two weeks. I've had 3 new customers call me directly from Google since it went live.",
       author: "Marcus Williams",
-      business: "Williams HVAC · Houston, TX",
+      business: "Houston, TX",
     },
     others: [
       {
@@ -83,7 +83,7 @@ export const testimonialsByLocation: Record<LocationSlug, LocationTestimonials> 
       quote:
         "I had a Facebook page and nothing else. Noah built me a real site in two weeks. I've had 3 new customers call me directly from Google since it went live.",
       author: "Marcus Williams",
-      business: "Williams HVAC · Bay City, MI",
+      business: "Bay City, MI",
     },
     others: [
       {
