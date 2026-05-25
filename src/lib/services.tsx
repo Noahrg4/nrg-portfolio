@@ -48,7 +48,7 @@ export const services: Service[] = [
     name: "Google & Local SEO",
     short:
       "Show up when local customers search for what you do.",
-    long: "You show up when someone nearby searches for what you do. Your Google Business Profile gets set up and optimized. The technical work that makes Google trust your site — handled.",
+    long: "You show up when someone nearby searches for what you do. Your Google Business Profile gets set up and optimized. I take care of the technical work that makes Google trust your site.",
     startingFrom: "Starting from $50",
     includes: [
       "Google Business Profile",
@@ -62,8 +62,8 @@ export const services: Service[] = [
     icon: <IconSecurity />,
     name: "Monthly Support",
     short:
-      "Updates, changes, and a developer you can actually reach by text.",
-    long: "A developer in your corner every month. Updates, changes, security patches, and someone you can text when something looks off.",
+      "Updates, changes, and security patches. When something looks off, you've got someone to call.",
+    long: "A developer in your corner every month. Updates, changes, security patches, and priority response when something needs attention.",
     startingFrom: "Starting from $20/month",
     includes: [
       "Monthly updates",

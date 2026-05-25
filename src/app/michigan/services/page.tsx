@@ -3,7 +3,7 @@ import { ServicesPage } from "@/components/pages/ServicesPage";
 
 export const metadata: Metadata = {
   title: "Services — NRG Michigan",
-  description: "Web design and automation for Michigan small businesses.",
+  description: "Web design, automation, and local SEO for Michigan small businesses. Flat pricing, no monthly retainer required.",
   alternates: { canonical: "https://nrgwebsites.com/michigan/services" },
 };
 

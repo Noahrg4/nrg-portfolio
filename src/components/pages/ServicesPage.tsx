@@ -50,12 +50,12 @@ export function ServicesPage({ location = "root" }: Props) {
         <section className="border-t border-hairline">
           <div className="container-content grid grid-cols-1 items-start gap-10 py-section md:grid-cols-2">
             <SectionHeading className="text-display text-3xl md:text-5xl">
-              Straight answers
+              No mystery
               <br />
-              on cost.
+              pricing.
             </SectionHeading>
             <p className="text-base leading-relaxed text-ink-secondary md:text-lg">
-              Every project is different. These are starting points. Most complete websites are $100–$300. Automation setups typically add $50–$150. Reach out and I&apos;ll give you a straight answer on what your project actually costs.
+              Tell me what you&apos;re after and I&apos;ll give you a real number — not a range that balloons later. Most complete websites land between $100 and $300. Automation setups typically add another $100–$200. Reach out for a straight quote on yours.
             </p>
           </div>
         </section>
@@ -76,7 +76,7 @@ export function ServicesPage({ location = "root" }: Props) {
               started?
             </SectionHeading>
             <p className="max-w-2xl text-base text-ink-secondary md:text-lg">
-              Most projects are live in 1–2 weeks. Let&apos;s talk about yours.
+              Most projects are live in about two weeks. Let&apos;s talk about yours.
             </p>
             <Link
               href={`${linkPrefix}/contact`}

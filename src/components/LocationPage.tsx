@@ -9,7 +9,7 @@ import TestimonialCard from "@/components/TestimonialCard";
 import SectionHeading from "@/components/SectionHeading";
 import { projects } from "@/lib/projects";
 import { services } from "@/lib/services";
-import { featuredTestimonial, testimonials } from "@/lib/testimonials";
+import { testimonialsByLocation } from "@/lib/testimonials";
 import { locationContent, type LocationSlug } from "@/lib/locationContent";
 
 type Props = {
@@ -27,6 +27,7 @@ const slugToCardKey: Record<string, keyof typeof locationContent.root.cardTitles
 export function LocationPage({ location }: Props) {
   const content = locationContent[location]
   const linkPrefix = location === "root" ? "" : `/${location}`
+  const testimonials = testimonialsByLocation[location]
 
   return (
     <>
@@ -95,9 +96,9 @@ export function LocationPage({ location }: Props) {
             </div>
             <div className="mx-auto max-w-4xl">
               <TestimonialCard
-                quote={featuredTestimonial.quote}
-                author={featuredTestimonial.author}
-                business={featuredTestimonial.business}
+                quote={testimonials.featured.quote}
+                author={testimonials.featured.author}
+                business={testimonials.featured.business}
                 featured
               />
             </div>
@@ -153,12 +154,12 @@ export function LocationPage({ location }: Props) {
           <div className="container-content">
             <div className="mb-12 flex flex-col gap-4">
               <SectionHeading className="text-display text-4xl md:text-6xl">
-                Everything your business
+                Pick one piece,
                 <br />
-                needs to get online.
+                or the whole thing.
               </SectionHeading>
               <p className="max-w-2xl text-base text-ink-secondary">
-                Outcomes, no matter what you are looking for. Pick one piece or the whole system, all priced for small businesses, not agencies.
+                Need just a website? Done. Want the site, the automation, and your Google listing all working together? Also done — and priced for a small business, not an agency.
               </p>
             </div>
             <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
@@ -198,7 +199,7 @@ export function LocationPage({ location }: Props) {
                 },
                 {
                   title: "You get customers.",
-                  body: "Your site goes live, your automations run, and you start showing up where your customers are looking.",
+                  body: "Your site goes live, the automation runs, and you start showing up on Google when people nearby search for what you do.",
                 },
               ].map((step, i) => (
                 <li
@@ -230,7 +231,7 @@ export function LocationPage({ location }: Props) {
               <span className="h-px flex-1 bg-hairline" aria-hidden />
             </div>
             <div className="grid grid-cols-1 gap-8 md:gap-12 md:grid-cols-2">
-              {testimonials.map((t, i) => (
+              {testimonials.others.map((t, i) => (
                 <TestimonialCard
                   key={i}
                   quote={t.quote}

@@ -3,7 +3,7 @@ import { AboutPage } from "@/components/pages/AboutPage";
 
 export const metadata: Metadata = {
   title: "About — NRG Texas",
-  description: "Texas web designer and automation builder.",
+  description: "Noah Reuter-Gushow builds websites and automation for Texas small businesses. Houston-based, solo, and direct — no agency in the middle.",
   alternates: { canonical: "https://nrgwebsites.com/texas/about" },
 };
 

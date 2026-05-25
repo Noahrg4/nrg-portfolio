@@ -3,7 +3,7 @@ import { AboutPage } from "@/components/pages/AboutPage";
 
 export const metadata: Metadata = {
   title: "About — NRG Michigan",
-  description: "Michigan web designer and automation builder.",
+  description: "Noah Reuter-Gushow builds websites and automation for Michigan small businesses. Grew up here, works direct — no agency in the middle.",
   alternates: { canonical: "https://nrgwebsites.com/michigan/about" },
 };
 

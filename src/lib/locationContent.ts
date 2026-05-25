@@ -36,24 +36,31 @@ export type LocationContent = {
 export const locationContent: Record<LocationSlug, LocationContent> = {
   root: {
     heroLocationLine: null,
-    heroSub: "I build professional websites and the automations that keep your business running. I handle website development, contact alerts, booking confirmations, review requests, and more. All in one package.",
+    // G7 — tightened hero sub
+    heroSub: "I build professional websites for small businesses — and the automation behind them that texts you the second a customer reaches out, so no lead slips through.",
     workSectionHeading: "Websites built for real businesses.",
-    aboutTeaserHeadline: "Built to be reached. By someone you can talk to.",
+    // R2 — about teaser headline
+    aboutTeaserHeadline: "You'll always know who's building your site. It's me.",
+    // location-specific first line: root keeps generic opener (no local sentence prepended)
     aboutOpener: "I build websites for small businesses — the kind that show up on Google, look great on a phone, and bring in real customers.",
-    aboutParagraph2: "Before starting NRG, I spent two years inside the technology infrastructure of one of the largest companies in the world. I bring that same standard of reliability to every project, regardless of size.",
+    // G2 — Fortune 100 replacement, G3 — cut Squarespace + corporate-speak
+    aboutParagraph2: "Before starting NRG, I spent two years building and running technology systems inside a Fortune 100 company. Your site stays up, loads fast, and when you call, a real person picks up.",
     ctaBandHeadline: "Ready to get online?",
-    ctaBandSub: "Most projects are live in 1–2 weeks.",
+    // G5 — standardize on "live in about two weeks"
+    ctaBandSub: "Most projects are live in about two weeks.",
     footerLocation: "Texas + Michigan",
     metaTitle: "NRG — Web Design + Automation",
-    metaDescription: "Professional websites and automation for small businesses. Built fast. Wired to bring in customers.",
+    // R5 — rewrite meta description
+    metaDescription: "Custom websites and automation for small businesses. Fast to launch, easy to update, built to bring in customers.",
     navLogoHref: "/",
     aboutPageHeadline: "I build websites for small businesses.",
+    // R6 — keep one strong anti-agency line here
     aboutBioParagraph1: "I build websites and automation for small businesses — restaurants, trades companies, law offices, salons, and anyone else who deserves a professional web presence without the agency price tag.",
     aboutBioClosingLine: "Available for projects now.",
     aboutLocationBadge: "Independent",
     aboutSeoSkillBody: "Google Business Profile, local search optimization. Show up when customers in your area search for you.",
     aboutHeadshotAlt: "Noah Reuter-Gushow — NRG web designer",
-    contactSidebarBlurb: "Currently taking on new projects. If you'd rather meet in person than trade emails, I'm happy to come to you.",
+    contactSidebarBlurb: "Currently taking on new projects. Tell me what you need and I'll tell you what it costs — no pressure.",
     contactBasedIn: "Independent operator",
     contactServiceArea: "Serving small businesses across the US.",
     cardTitles: {
@@ -66,16 +73,22 @@ export const locationContent: Record<LocationSlug, LocationContent> = {
   },
   houston: {
     heroLocationLine: "for Houston small businesses.",
-    heroSub: "I build professional websites and the automations that keep your Houston business running — contact alerts, booking confirmations, review requests. All handled.",
+    // G7 — tightened hero sub
+    heroSub: "I build professional websites for Houston small businesses — and the automation behind them that texts you the second a customer reaches out, so no lead slips through.",
     workSectionHeading: "Websites built for real Houston businesses.",
-    aboutTeaserHeadline: "Built for Houston. By someone you can reach.",
-    aboutOpener: "I build websites for Houston small businesses — the kind that show up on Google, look great on a phone, and bring in real customers from your neighborhood.",
-    aboutParagraph2: "Before starting NRG, I spent two years inside the technology infrastructure of one of the largest companies in the world. I'm now based in Houston, bringing that same standard of reliability to local businesses who deserve better than a Squarespace template.",
+    // R2 — about teaser headline
+    aboutTeaserHeadline: "You'll always know who's building your site. That's me — and I'm based here in Houston.",
+    // location-specific first line: houston — G4 local sentence prepended
+    aboutOpener: "I live here in Houston, so when you hire me you're hiring a neighbor, not a call center three time zones away. I build websites for Houston small businesses — the kind that show up on Google, look great on a phone, and bring in real customers from your neighborhood.",
+    // G2 — Fortune 100 replacement, G3 — cut Squarespace; G4 — keep "real person picks up"
+    aboutParagraph2: "Before starting NRG, I spent two years building and running technology systems inside a Fortune 100 company. I'm now based in Houston, and that means your site stays up, loads fast, and when you call, a real person picks up.",
     ctaBandHeadline: "Ready to get online, Houston?",
-    ctaBandSub: "Most Houston projects are live in 1–2 weeks.",
+    // G5 — standardize on "live in about two weeks"
+    ctaBandSub: "Most Houston projects are live in about two weeks.",
     footerLocation: "Houston, TX",
     metaTitle: "NRG — Web Design + Automation for Houston Small Businesses",
-    metaDescription: "Professional websites and automation for Houston small businesses. Local operator. Fast delivery. Wired to bring in customers.",
+    // R5 — rewrite meta description
+    metaDescription: "Custom websites and automation for Houston small businesses. Live in about two weeks. Built by someone local.",
     navLogoHref: "/houston",
     aboutPageHeadline: "I build the web for Houston's small businesses.",
     aboutBioParagraph1: "I build websites and automation for Houston small businesses — restaurants, trades companies, law offices, salons, and anyone else who deserves a professional web presence without the agency price tag.",
@@ -96,16 +109,22 @@ export const locationContent: Record<LocationSlug, LocationContent> = {
   },
   texas: {
     heroLocationLine: "for Texas small businesses.",
-    heroSub: "I build professional websites and the automations that keep your Texas business running — contact alerts, booking confirmations, review requests. All handled.",
+    // G7 — tightened hero sub
+    heroSub: "I build professional websites for Texas small businesses — and the automation behind them that texts you the second a customer reaches out, so no lead slips through.",
     workSectionHeading: "Websites built for real Texas businesses.",
-    aboutTeaserHeadline: "Built for Texas. By someone you can reach.",
-    aboutOpener: "I build websites for Texas small businesses — the kind that show up on Google, look great on a phone, and bring in real customers.",
-    aboutParagraph2: "Based in Houston and working across Texas. Before starting NRG, I spent two years inside the technology infrastructure of one of the largest companies in the world. I bring that same standard of reliability to Texas businesses who are ready to get online and get found.",
+    // R2 — about teaser headline
+    aboutTeaserHeadline: "You'll always know who's building your site. That's me — local to Texas.",
+    // location-specific first line: texas — G4 local sentence prepended
+    aboutOpener: "I live here in Texas, so when you hire me you're hiring a neighbor, not a call center three time zones away. I build websites for Texas small businesses — the kind that show up on Google, look great on a phone, and bring in real customers.",
+    // G2 — Fortune 100 replacement; G3 — cut Squarespace
+    aboutParagraph2: "Before starting NRG, I spent two years building and running technology systems inside a Fortune 100 company. Based in Houston, working across Texas. Your site stays up, loads fast, and when you call, a real person picks up.",
     ctaBandHeadline: "Ready to get your Texas business online?",
-    ctaBandSub: "Most projects are live in 1–2 weeks.",
+    // G5 — standardize on "live in about two weeks"
+    ctaBandSub: "Most projects are live in about two weeks.",
     footerLocation: "Texas",
     metaTitle: "NRG — Web Design + Automation for Texas Small Businesses",
-    metaDescription: "Professional websites and automation for Texas small businesses. Houston-based operator. Fast delivery. Built to bring in customers.",
+    // R5 — rewrite meta description
+    metaDescription: "Custom websites and automation for Texas small businesses. Live in about two weeks. Houston-based, working across Texas.",
     navLogoHref: "/texas",
     aboutPageHeadline: "I build websites for Texas small businesses.",
     aboutBioParagraph1: "I build websites and automation for Texas small businesses — restaurants, trades companies, law offices, salons, and anyone else who deserves a professional web presence without the agency price tag.",
@@ -126,25 +145,34 @@ export const locationContent: Record<LocationSlug, LocationContent> = {
   },
   michigan: {
     heroLocationLine: "for Michigan small businesses.",
-    heroSub: "I build professional websites and the automations that keep your Michigan business running — contact alerts, booking confirmations, review requests. All handled.",
+    // G7 — tightened hero sub
+    heroSub: "I build professional websites for Michigan small businesses — and the automation behind them that texts you the second a customer reaches out, so no lead slips through.",
     workSectionHeading: "Websites built for real Michigan businesses.",
-    aboutTeaserHeadline: "Built for Michigan. By someone you can reach.",
-    aboutOpener: "I build websites for Michigan small businesses — the kind that show up on Google, look great on a phone, and bring in real customers.",
-    aboutParagraph2: "I grew up in Michigan and understand the market. Before starting NRG, I spent two years inside the technology infrastructure of one of the largest companies in the world — including work for Michigan-based enterprise teams. I bring that same reliability to Michigan small businesses who are ready to stop relying on a Facebook page.",
+    // R2 — about teaser headline
+    aboutTeaserHeadline: "You'll always know who's building your site. That's me — and I'm from here.",
+    // location-specific first line: michigan — G4 local sentence prepended
+    aboutOpener: "I grew up in Michigan, so I know this market — and the businesses in it. I build websites for Michigan small businesses — the kind that show up on Google, look great on a phone, and bring in real customers.",
+    // G2 — Fortune 100 replacement; G3 — cut Squarespace; G5 — "live in about two weeks"
+    aboutParagraph2: "Before starting NRG, I spent two years building and running technology systems inside a Fortune 100 company — including work for Michigan-based enterprise teams. Your site stays up, loads fast, and when you call, a real person picks up.",
     ctaBandHeadline: "Ready to get your Michigan business online?",
-    ctaBandSub: "Most projects are live in 1–2 weeks.",
+    // G5 — standardize on "live in about two weeks"
+    ctaBandSub: "Most projects are live in about two weeks.",
     footerLocation: "Michigan",
     metaTitle: "NRG — Web Design + Automation for Michigan Small Businesses",
-    metaDescription: "Professional websites and automation for Michigan small businesses. Built fast. Wired to bring in customers. Michigan roots.",
+    // R5 — rewrite meta description; G5 — remove "Michigan roots"
+    metaDescription: "Custom websites and automation for Michigan small businesses. Live in about two weeks. Built by someone from here.",
     navLogoHref: "/michigan",
     aboutPageHeadline: "I build websites for Michigan small businesses.",
     aboutBioParagraph1: "I build websites and automation for Michigan small businesses — restaurants, trades companies, law offices, salons, and anyone else who deserves a professional web presence without the agency price tag.",
-    aboutBioClosingLine: "Michigan roots. Available for projects now.",
-    aboutLocationBadge: "Michigan roots",
+    // G5 — replace "Michigan roots" with "Michigan-based"
+    aboutBioClosingLine: "Michigan-based. Available for projects now.",
+    // G5 — replace "Michigan roots" badge
+    aboutLocationBadge: "Michigan-based",
     aboutSeoSkillBody: "Google Business Profile, local search optimization. Show up when Michigan customers search for you.",
     aboutHeadshotAlt: "Noah Reuter-Gushow — NRG web designer serving Michigan",
     contactSidebarBlurb: "Currently taking on new projects across Michigan. If you'd rather meet in person than trade emails, that can be arranged.",
-    contactBasedIn: "Mid-Michigan / Remote",
+    // G5 — fix "Mid-Michigan / Remote"
+    contactBasedIn: "Michigan",
     contactServiceArea: "Serving small businesses across Michigan.",
     cardTitles: {
       gushow: "Full Web Presence — Excavating Company",

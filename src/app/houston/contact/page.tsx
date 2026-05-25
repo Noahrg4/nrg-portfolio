@@ -3,7 +3,7 @@ import { ContactPage } from "@/components/pages/ContactPage";
 
 export const metadata: Metadata = {
   title: "Contact — NRG Houston",
-  description: "Start a web design project with NRG in Houston.",
+  description: "Start a web design or automation project with NRG. Houston-based. Usually responds same day.",
   alternates: { canonical: "https://nrgwebsites.com/houston/contact" },
 };
 

@@ -150,7 +150,7 @@ export default function ContactForm() {
           type="tel"
           required
           autoComplete="tel"
-          placeholder="(989) 488-7309"
+          placeholder="(555) 123-4567"
           value={phone}
           onChange={(e) => setPhone(e.target.value)}
           aria-invalid={!!errors.phone}

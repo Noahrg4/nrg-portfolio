@@ -3,7 +3,7 @@ import { WorkPage } from "@/components/pages/WorkPage";
 
 export const metadata: Metadata = {
   title: "Work — NRG Texas",
-  description: "Web design projects for Texas businesses.",
+  description: "Portfolio of websites built for Texas small businesses — restaurants, HVAC, law offices, and more. Houston-based, working statewide.",
   alternates: { canonical: "https://nrgwebsites.com/texas/work" },
 };
 
