@@ -41,14 +41,14 @@ export const locationContent: Record<LocationSlug, LocationContent> = {
     workSectionHeading: "Websites built for real businesses.",
     // R2 — about teaser headline
     aboutTeaserHeadline: "You'll always know who's building your site. It's me.",
-    // location-specific first line: root keeps generic opener (no local sentence prepended)
-    aboutOpener: "I build websites for small businesses — the kind that show up on Google, look great on a phone, and bring in real customers.",
+    // location-specific first line: root — Michigan roots opener
+    aboutOpener: "I grew up in Michigan, and I build websites for small businesses — the kind that show up on Google, look great on a phone, and bring in real customers.",
     // G2 — Fortune 100 replacement, G3 — cut Squarespace + corporate-speak
     aboutParagraph2: "Before starting NRG, I spent two years building and running technology systems inside a Fortune 100 company. Your site stays up, loads fast, and when you call, a real person picks up.",
     ctaBandHeadline: "Ready to get online?",
     // G5 — standardize on "live in about two weeks"
     ctaBandSub: "Most projects are live in about two weeks.",
-    footerLocation: "Texas + Michigan",
+    footerLocation: "Michigan",
     metaTitle: "NRG — Web Design + Automation",
     // R5 — rewrite meta description
     metaDescription: "Custom websites and automation for small businesses. Fast to launch, easy to update, built to bring in customers.",
