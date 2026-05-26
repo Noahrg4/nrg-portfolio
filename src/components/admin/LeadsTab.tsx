@@ -707,6 +707,25 @@ export default function LeadsTab() {
                         return null;
                       })()}
 
+                      {/* Hotness indicator — only shown when rated */}
+                      {lead.hotness != null && (
+                        <span
+                          title={`Hotness: ${lead.hotness}/5 — post-contact close likelihood`}
+                          className={[
+                            "rounded-full border px-2 py-0.5 font-mono text-[10px] font-semibold whitespace-nowrap",
+                            lead.hotness <= 2
+                              ? "border-ink-subtle/40 text-ink-subtle"
+                              : lead.hotness === 3
+                              ? "border-[rgba(245,166,35,0.5)] text-[#F5A623]"
+                              : lead.hotness === 4
+                              ? "border-[rgba(255,122,0,0.5)] text-[#FF7A00]"
+                              : "border-red-400/50 text-red-400",
+                          ].join(" ")}
+                        >
+                          🔥 {lead.hotness}/5
+                        </span>
+                      )}
+
                       {/* Touch count — always visible, even at 0 */}
                       <span className="font-mono text-[10px] text-ink-subtle whitespace-nowrap">
                         {lead.touchCount} touch{lead.touchCount !== 1 ? "es" : ""}

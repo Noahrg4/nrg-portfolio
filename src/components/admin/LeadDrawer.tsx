@@ -167,6 +167,7 @@ export default function LeadDrawer({
   const [followUpAt, setFollowUpAt] = useState("");
   const [nextActionNote, setNextActionNote] = useState("");
   const [existingSiteStatus, setExistingSiteStatus] = useState<ExistingSiteStatus>("unknown");
+  const [hotness, setHotness] = useState<number | null>(null);
 
   // ── Inline validation errors ────────────────────────────────────────────
   const [emailError, setEmailError] = useState<string | null>(null);
@@ -199,6 +200,7 @@ export default function LeadDrawer({
     setNotes(l.notes);
     setNextActionNote(l.nextActionNote);
     setExistingSiteStatus(getExistingSiteStatus(l));
+    setHotness(l.hotness ?? null);
     setScoreFactors({ ...l.scoreFactors });
     setEmailError(null);
     setPhoneError(null);
@@ -281,6 +283,7 @@ export default function LeadDrawer({
         notes,
         nextActionNote,
         existingSiteStatus,
+        hotness,
         scoreFactors,
       });
       if (updated) {
@@ -770,6 +773,58 @@ export default function LeadDrawer({
                   disabled={saving}
                 />
               ))}
+            </div>
+
+            {/* ── Hotness rating — manual post-contact signal ─────────────── */}
+            <div className="flex flex-col gap-1.5">
+              <div className="flex items-center justify-between">
+                <label className={labelClass}>Hotness after response</label>
+                {hotness !== null && (
+                  <button
+                    type="button"
+                    onClick={() => setHotness(null)}
+                    disabled={saving}
+                    className="font-mono text-[10px] text-ink-subtle hover:text-ink transition-colors"
+                  >
+                    Clear
+                  </button>
+                )}
+              </div>
+              <p className="font-mono text-[10px] text-ink-subtle -mt-0.5">
+                How likely to close after they responded (1 = lukewarm · 5 = almost certain)
+              </p>
+              <div className="flex gap-2 pt-0.5" role="radiogroup" aria-label="Hotness rating">
+                {[1, 2, 3, 4, 5].map((n) => {
+                  const active = hotness === n;
+                  // Color scale: 1-2 dim → 3 amber → 4 orange → 5 red
+                  const activeColor =
+                    n <= 2
+                      ? "border-ink-secondary/50 bg-ink-subtle/10 text-ink-secondary"
+                      : n === 3
+                      ? "border-[#F5A623]/60 bg-[rgba(245,166,35,0.12)] text-[#F5A623]"
+                      : n === 4
+                      ? "border-[#FF7A00]/60 bg-[rgba(255,122,0,0.12)] text-[#FF7A00]"
+                      : "border-red-400/60 bg-red-400/10 text-red-400";
+                  return (
+                    <button
+                      key={n}
+                      type="button"
+                      role="radio"
+                      aria-checked={active}
+                      onClick={() => setHotness(active ? null : n)}
+                      disabled={saving}
+                      className={[
+                        "flex h-10 flex-1 items-center justify-center rounded-md border font-mono text-sm font-semibold transition-all duration-150 disabled:opacity-50",
+                        active
+                          ? activeColor
+                          : "border-hairline bg-surface-2 text-ink-subtle hover:border-hairline-strong hover:text-ink",
+                      ].join(" ")}
+                    >
+                      {n}
+                    </button>
+                  );
+                })}
+              </div>
             </div>
           </div>
 

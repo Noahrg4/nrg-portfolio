@@ -275,6 +275,18 @@ export type Lead = {
   nextActionNote: string;
 
   /**
+   * Manual hotness rating — how likely this lead is to close, set after they
+   * have responded to an email or call. Integer 1–5 (1 = lukewarm interest,
+   * 5 = almost certain). Null means not yet rated.
+   *
+   * Distinct from the computed `score` (which is based on boolean research
+   * factors). This is a subjective, post-contact signal.
+   *
+   * Optional for back-compat: existing leads without this field render as null.
+   */
+  hotness?: number | null;
+
+  /**
    * Set to the Client.id after successful convert-to-client operation.
    * Null while lead is in pre-Won stages.
    * A non-null value does NOT mean the lead stage is Won — check stage too.

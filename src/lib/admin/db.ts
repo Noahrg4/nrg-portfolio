@@ -188,6 +188,7 @@ export async function createLead(input: CreateLeadBody): Promise<Lead> {
       }
     ),
     touchCount: 0,
+    hotness: input.hotness ?? null,
     emailedAt: input.emailedAt ?? null,
     calledAt: input.calledAt ?? null,
     followUpAt: input.followUpAt ?? null,
