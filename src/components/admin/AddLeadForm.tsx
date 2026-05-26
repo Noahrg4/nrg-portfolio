@@ -13,7 +13,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import type { Lead } from "@/lib/admin/types";
+import type { Lead, ExistingSiteStatus } from "@/lib/admin/types";
 import { PIPELINE_STAGES, SCORE_WEIGHTS, computeScore } from "@/lib/admin/types";
 import StageSegmentedControl from "./StageSegmentedControl";
 import ScoreToggleSwitch from "./ScoreToggleSwitch";
@@ -110,6 +110,7 @@ export default function AddLeadForm({ onCreated, onCancel }: AddLeadFormProps) {
   const [needsFollowUp, setNeedsFollowUp] = useState(false);
   const [followUpAt, setFollowUpAt] = useState("");
   const [nextActionNote, setNextActionNote] = useState("");
+  const [existingSiteStatus, setExistingSiteStatus] = useState<ExistingSiteStatus>("unknown");
 
   // ── Validation errors ───────────────────────────────────────────────────
   const [businessNameError, setBusinessNameError] = useState<string | null>(null);
@@ -184,6 +185,7 @@ export default function AddLeadForm({ onCreated, onCancel }: AddLeadFormProps) {
           followUpAt: needsFollowUp ? (followUpAt || null) : null,
           emailedAt: null,
           calledAt: null,
+          existingSiteStatus,
           scoreFactors,
         }),
       });
@@ -436,6 +438,37 @@ export default function AddLeadForm({ onCreated, onCancel }: AddLeadFormProps) {
             value={stage}
             onChange={setStage}
           />
+        </div>
+
+        {/* Existing website */}
+        <div className="flex flex-col gap-1.5">
+          <label className={labelClass}>Existing website</label>
+          <div className="inline-flex rounded-md border border-hairline bg-surface-2 p-1" role="radiogroup" aria-label="Existing website status">
+            {([
+              { value: "unknown", label: "Unknown" },
+              { value: "hasSite", label: "Has site — upgrade" },
+              { value: "noSite", label: "No site" },
+            ] as { value: ExistingSiteStatus; label: string }[]).map((opt) => {
+              const active = existingSiteStatus === opt.value;
+              return (
+                <button
+                  key={opt.value}
+                  type="button"
+                  role="radio"
+                  aria-checked={active}
+                  onClick={() => setExistingSiteStatus(opt.value)}
+                  className={[
+                    "flex-1 rounded px-3 py-2 font-mono text-[11px] uppercase tracking-wider transition-colors duration-150",
+                    active
+                      ? "bg-accent/10 text-accent"
+                      : "text-ink-subtle hover:bg-surface-3 hover:text-ink",
+                  ].join(" ")}
+                >
+                  {opt.label}
+                </button>
+              );
+            })}
+          </div>
         </div>
       </div>
 

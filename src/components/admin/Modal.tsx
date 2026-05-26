@@ -7,7 +7,8 @@
  * Traps focus, closes on Escape, closes on backdrop click.
  */
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 
 const FOCUSABLE_SELECTORS =
@@ -31,6 +32,8 @@ export default function Modal({
 }: ModalProps) {
   const dialogRef = useRef<HTMLDivElement>(null);
   const reduce = useReducedMotion();
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
 
   // Close on Escape
   useEffect(() => {
@@ -92,7 +95,9 @@ export default function Modal({
     return () => container.removeEventListener("keydown", handleTab);
   }, [open]);
 
-  return (
+  if (!mounted) return null;
+
+  return createPortal(
     <AnimatePresence>
       {open && (
         <>
@@ -155,6 +160,7 @@ export default function Modal({
           </motion.div>
         </>
       )}
-    </AnimatePresence>
+    </AnimatePresence>,
+    document.body,
   );
 }

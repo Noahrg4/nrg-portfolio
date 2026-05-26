@@ -129,6 +129,23 @@ export function getScoreTier(score: number): ScoreTier {
 }
 
 // ---------------------------------------------------------------------------
+// Existing-website marker
+// ---------------------------------------------------------------------------
+
+export const EXISTING_SITE_STATUSES = ["unknown", "hasSite", "noSite"] as const;
+export type ExistingSiteStatus = (typeof EXISTING_SITE_STATUSES)[number];
+
+export const EXISTING_SITE_DEFAULT: ExistingSiteStatus = "unknown";
+
+/**
+ * Read a lead's existing-site marker, defaulting to "unknown" for legacy
+ * records that don't have the field set.
+ */
+export function getExistingSiteStatus(lead: { existingSiteStatus?: ExistingSiteStatus }): ExistingSiteStatus {
+  return lead.existingSiteStatus ?? EXISTING_SITE_DEFAULT;
+}
+
+// ---------------------------------------------------------------------------
 // Stage history
 // ---------------------------------------------------------------------------
 
@@ -239,6 +256,17 @@ export type Lead = {
    * - undefined (existing leads) → infer from followUpAt !== null for back-compat
    */
   needsFollowUp?: boolean;
+
+  /**
+   * Web presence marker — separate from scoring.
+   *   "hasSite" → has an existing website (upgrade/replacement opportunity)
+   *   "noSite"  → confirmed no website (greenfield)
+   *   "unknown" → haven't checked yet (default for new + legacy leads)
+   *
+   * Optional for back-compat: existing leads without this field render as
+   * "unknown" via the EXISTING_SITE_DEFAULT helper.
+   */
+  existingSiteStatus?: ExistingSiteStatus;
 
   /**
    * Short description of the next action to take.

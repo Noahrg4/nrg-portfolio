@@ -192,6 +192,7 @@ export async function createLead(input: CreateLeadBody): Promise<Lead> {
     calledAt: input.calledAt ?? null,
     followUpAt: input.followUpAt ?? null,
     nextActionNote: input.nextActionNote ?? '',
+    existingSiteStatus: input.existingSiteStatus ?? 'unknown',
     convertedClientId: null,
     createdAt: timestamp,
     updatedAt: timestamp,

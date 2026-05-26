@@ -25,14 +25,15 @@
 
 import { useState, useCallback, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import type { Lead, PipelineStage, ConvertLeadBody } from "@/lib/admin/types";
-import { SCORE_WEIGHTS, computeScore, TERMINAL_STAGES, isFollowUpNeeded } from "@/lib/admin/types";
+import type { Lead, PipelineStage, ConvertLeadBody, ExistingSiteStatus } from "@/lib/admin/types";
+import { SCORE_WEIGHTS, computeScore, TERMINAL_STAGES, isFollowUpNeeded, getExistingSiteStatus } from "@/lib/admin/types";
 import Drawer from "./Drawer";
 import StageChip from "./StageChip";
 import ScoreBadge from "./ScoreBadge";
 import Modal from "./Modal";
 import StageSegmentedControl from "./StageSegmentedControl";
 import ScoreToggleSwitch from "./ScoreToggleSwitch";
+import ConfirmInline from "./ConfirmInline";
 
 interface LeadDrawerProps {
   lead: Lead | null;
@@ -40,6 +41,7 @@ interface LeadDrawerProps {
   onClose: () => void;
   onUpdated: (updated: Lead) => void;
   onConverted: (leadId: string) => void;
+  onDeleted?: (leadId: string) => void;
 }
 
 // ─── Niche / Source options ─────────────────────────────────────────────────
@@ -136,12 +138,14 @@ export default function LeadDrawer({
   onClose,
   onUpdated,
   onConverted,
+  onDeleted,
 }: LeadDrawerProps) {
   const drawerBodyRef = useRef<HTMLDivElement>(null);
   useFocusTrap(drawerBodyRef, open);
 
   const [saving, setSaving] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
+  const [deleting, setDeleting] = useState(false);
 
   // ── Editable field state ────────────────────────────────────────────────
   const [businessName, setBusinessName] = useState("");
@@ -162,6 +166,7 @@ export default function LeadDrawer({
   const [needsFollowUp, setNeedsFollowUp] = useState(false);
   const [followUpAt, setFollowUpAt] = useState("");
   const [nextActionNote, setNextActionNote] = useState("");
+  const [existingSiteStatus, setExistingSiteStatus] = useState<ExistingSiteStatus>("unknown");
 
   // ── Inline validation errors ────────────────────────────────────────────
   const [emailError, setEmailError] = useState<string | null>(null);
@@ -193,6 +198,7 @@ export default function LeadDrawer({
     setFollowUpAt(l.followUpAt ?? "");
     setNotes(l.notes);
     setNextActionNote(l.nextActionNote);
+    setExistingSiteStatus(getExistingSiteStatus(l));
     setScoreFactors({ ...l.scoreFactors });
     setEmailError(null);
     setPhoneError(null);
@@ -274,6 +280,7 @@ export default function LeadDrawer({
         followUpAt: needsFollowUp ? (followUpAt || null) : null,
         notes,
         nextActionNote,
+        existingSiteStatus,
         scoreFactors,
       });
       if (updated) {
@@ -359,6 +366,41 @@ export default function LeadDrawer({
 
   function toggleFactor(key: keyof typeof scoreFactors) {
     setScoreFactors((prev) => ({ ...prev, [key]: !prev[key] }));
+  }
+
+  // ── Delete ──────────────────────────────────────────────────────────────
+  async function handleDelete() {
+    if (!lead) return;
+    const leadId = lead.id;
+    const leadName = lead.businessName;
+    setDeleting(true);
+    try {
+      const res = await fetch(`/api/admin/leads/${leadId}`, { method: "DELETE" });
+      if (res.ok || res.status === 204) {
+        onDeleted?.(leadId);
+        window.dispatchEvent(
+          new CustomEvent("admin-toast", {
+            detail: { message: `${leadName} deleted`, kind: "success" },
+          })
+        );
+        syncedForRef.current = null;
+        onClose();
+      } else {
+        window.dispatchEvent(
+          new CustomEvent("admin-toast", {
+            detail: { message: "Delete failed — check your connection.", kind: "error" },
+          })
+        );
+      }
+    } catch {
+      window.dispatchEvent(
+        new CustomEvent("admin-toast", {
+          detail: { message: "Delete failed — check your connection.", kind: "error" },
+        })
+      );
+    } finally {
+      setDeleting(false);
+    }
   }
 
   // ════════════════════════════════════════════════════════════════════════
@@ -649,6 +691,38 @@ export default function LeadDrawer({
                 </p>
               )}
             </div>
+
+            {/* Existing website — segmented control */}
+            <div className="flex flex-col gap-1.5">
+              <label className={labelClass}>Existing website</label>
+              <div className="inline-flex rounded-md border border-hairline bg-surface-2 p-1" role="radiogroup" aria-label="Existing website status">
+                {([
+                  { value: "unknown", label: "Unknown" },
+                  { value: "hasSite", label: "Has site — upgrade" },
+                  { value: "noSite", label: "No site" },
+                ] as { value: ExistingSiteStatus; label: string }[]).map((opt) => {
+                  const active = existingSiteStatus === opt.value;
+                  return (
+                    <button
+                      key={opt.value}
+                      type="button"
+                      role="radio"
+                      aria-checked={active}
+                      onClick={() => setExistingSiteStatus(opt.value)}
+                      disabled={saving}
+                      className={[
+                        "flex-1 rounded px-3 py-2 font-mono text-[11px] uppercase tracking-wider transition-colors duration-150",
+                        active
+                          ? "bg-accent/10 text-accent"
+                          : "text-ink-subtle hover:bg-surface-3 hover:text-ink",
+                      ].join(" ")}
+                    >
+                      {opt.label}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
           </div>
 
           {/* Divider */}
@@ -848,6 +922,28 @@ export default function LeadDrawer({
             </div>
           )}
 
+          {/* ═══════════════════════════════════════════════════════════════
+              SECTION: Danger zone
+          ════════════════════════════════════════════════════════════════ */}
+          <div className="mb-6 flex items-center justify-between rounded-lg border border-red-500/20 bg-red-500/[0.04] px-4 py-3">
+            <div className="flex flex-col gap-0.5">
+              <p className="font-mono text-[11px] uppercase tracking-wider text-red-400">
+                Delete lead
+              </p>
+              <p className="font-mono text-[10px] text-ink-subtle">
+                Permanent — cannot be undone.
+              </p>
+            </div>
+            <ConfirmInline
+              label="Delete"
+              confirmLabel="Confirm delete"
+              onConfirm={handleDelete}
+              loading={deleting}
+              disabled={saving}
+              className="border border-red-500/40 px-3 py-1.5 text-red-400 hover:border-red-500 hover:bg-red-500/10"
+            />
+          </div>
+
           {/* ─── Save error ───────────────────────────────────────────────── */}
           <AnimatePresence>
             {saveError && (
@@ -871,7 +967,7 @@ export default function LeadDrawer({
                 syncedForRef.current = null;
                 onClose();
               }}
-              disabled={saving}
+              disabled={saving || deleting}
               className="flex-1 rounded-md border border-hairline-strong px-4 py-3.5 font-mono text-sm uppercase tracking-wider text-ink-secondary hover:border-accent hover:text-accent transition-colors duration-200 disabled:opacity-50"
             >
               Cancel
@@ -879,7 +975,7 @@ export default function LeadDrawer({
             <button
               type="button"
               onClick={handleSave}
-              disabled={saving}
+              disabled={saving || deleting}
               className="flex-1 flex items-center justify-center gap-2 rounded-md bg-accent px-6 py-3.5 font-mono text-sm font-medium uppercase tracking-wider text-canvas transition-shadow duration-200 hover:shadow-[0_0_30px_rgba(0,212,255,0.4)] active:scale-[0.98] disabled:opacity-60"
             >
               {saving ? (

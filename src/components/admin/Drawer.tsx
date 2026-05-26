@@ -15,7 +15,8 @@
  *   - prefers-reduced-motion: no x-slide, opacity only
  */
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 
 const FOCUSABLE_SELECTORS =
@@ -41,6 +42,8 @@ export default function Drawer({
 }: DrawerProps) {
   const reduce = useReducedMotion();
   const panelRef = useRef<HTMLElement>(null);
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
 
   // Close on Escape
   useEffect(() => {
@@ -100,7 +103,9 @@ export default function Drawer({
     return () => panel.removeEventListener("keydown", handleTab);
   }, [open]);
 
-  return (
+  if (!mounted) return null;
+
+  return createPortal(
     <AnimatePresence>
       {open && (
         <>
@@ -165,6 +170,7 @@ export default function Drawer({
           </motion.aside>
         </>
       )}
-    </AnimatePresence>
+    </AnimatePresence>,
+    document.body,
   );
 }

@@ -21,7 +21,7 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { motion, useReducedMotion, AnimatePresence } from "framer-motion";
 import type { Lead, PipelineStage } from "@/lib/admin/types";
-import { PIPELINE_STAGES, todayIso, TERMINAL_STAGES, isFollowUpNeeded } from "@/lib/admin/types";
+import { PIPELINE_STAGES, todayIso, TERMINAL_STAGES, isFollowUpNeeded, getExistingSiteStatus } from "@/lib/admin/types";
 import StageChip from "./StageChip";
 import ScoreBadge from "./ScoreBadge";
 import RelativeDate from "./RelativeDate";
@@ -32,7 +32,7 @@ import AddLeadForm from "./AddLeadForm";
 import { formatRelativeDate, formatAbsoluteDate } from "@/lib/admin/format";
 
 type SortKey = "score" | "stage" | "followUpAt" | "updatedAt" | "createdAt" | "touchCount" | "name";
-type FilterKey = "due" | "followUpNeeded" | "hot" | "hasEmail" | "hasPhone" | PipelineStage;
+type FilterKey = "due" | "followUpNeeded" | "hot" | "hasEmail" | "hasPhone" | "hasSite" | "noSite" | PipelineStage;
 
 const STAGE_ORDER: Record<PipelineStage, number> = {
   Found: 0,
@@ -113,6 +113,12 @@ export default function LeadsTab() {
     setSelectedLead(null);
   }
 
+  function handleDeleted(leadId: string) {
+    setLeads((prev) => prev.filter((l) => l.id !== leadId));
+    setDrawerOpen(false);
+    setSelectedLead(null);
+  }
+
   function handleCreated(lead: Lead) {
     setLeads((prev) => [lead, ...prev]);
     setAddOpen(false);
@@ -172,6 +178,10 @@ export default function LeadsTab() {
         return !!l.email.trim();
       } else if (f === "hasPhone") {
         return !!l.phone.trim();
+      } else if (f === "hasSite") {
+        return getExistingSiteStatus(l) === "hasSite";
+      } else if (f === "noSite") {
+        return getExistingSiteStatus(l) === "noSite";
       } else if (PIPELINE_STAGES.includes(f as PipelineStage)) {
         return l.stage === f;
       }
@@ -498,8 +508,14 @@ export default function LeadsTab() {
           {/* Contact info chips — small gap before stage chips */}
           <span className="border-l border-hairline-strong mx-1" aria-hidden />
 
-          {(["hasEmail", "hasPhone"] as FilterKey[]).map((f) => {
+          {(["hasEmail", "hasPhone", "hasSite", "noSite"] as FilterKey[]).map((f) => {
             const active = activeFilters.has(f);
+            const labels: Record<string, string> = {
+              hasEmail: "Has email",
+              hasPhone: "Has phone",
+              hasSite: "Has site",
+              noSite: "No site",
+            };
             return (
               <button
                 key={f}
@@ -511,7 +527,7 @@ export default function LeadsTab() {
                     : "border-hairline text-ink-subtle hover:border-hairline-strong hover:text-ink",
                 ].join(" ")}
               >
-                {f === "hasEmail" ? "Has email" : "Has phone"}
+                {labels[f as string]}
               </button>
             );
           })}
@@ -665,6 +681,32 @@ export default function LeadsTab() {
                       {/* Stage chip — color-coded per new rules */}
                       <StageChip stage={lead.stage} size="sm" />
 
+                      {/* Existing-website marker — only render when set */}
+                      {(() => {
+                        const siteStatus = getExistingSiteStatus(lead);
+                        if (siteStatus === "hasSite") {
+                          return (
+                            <span
+                              title="Has existing website — upgrade opportunity"
+                              className="rounded-full border border-accent/30 bg-accent/5 px-2 py-0.5 font-mono text-[10px] uppercase tracking-wider text-accent whitespace-nowrap"
+                            >
+                              ↑ Upgrade
+                            </span>
+                          );
+                        }
+                        if (siteStatus === "noSite") {
+                          return (
+                            <span
+                              title="No existing website — greenfield"
+                              className="rounded-full border border-hairline-strong px-2 py-0.5 font-mono text-[10px] uppercase tracking-wider text-ink-subtle whitespace-nowrap"
+                            >
+                              No site
+                            </span>
+                          );
+                        }
+                        return null;
+                      })()}
+
                       {/* Touch count — always visible, even at 0 */}
                       <span className="font-mono text-[10px] text-ink-subtle whitespace-nowrap">
                         {lead.touchCount} touch{lead.touchCount !== 1 ? "es" : ""}
@@ -735,6 +777,7 @@ export default function LeadsTab() {
         }}
         onUpdated={handleUpdated}
         onConverted={handleConverted}
+        onDeleted={handleDeleted}
       />
 
       {/* ─── Add Lead drawer ─────────────────────────────────────────────────── */}
