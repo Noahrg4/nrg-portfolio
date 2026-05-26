@@ -107,6 +107,7 @@ export default function AddLeadForm({ onCreated, onCancel }: AddLeadFormProps) {
     goodNicheFit: false,
   });
   const [notes, setNotes] = useState("");
+  const [needsFollowUp, setNeedsFollowUp] = useState(false);
   const [followUpAt, setFollowUpAt] = useState("");
   const [nextActionNote, setNextActionNote] = useState("");
 
@@ -179,7 +180,8 @@ export default function AddLeadForm({ onCreated, onCancel }: AddLeadFormProps) {
           stage,
           notes: notes.trim(),
           nextActionNote: nextActionNote.trim(),
-          followUpAt: followUpAt || null,
+          needsFollowUp,
+          followUpAt: needsFollowUp ? (followUpAt || null) : null,
           emailedAt: null,
           calledAt: null,
           scoreFactors,
@@ -508,18 +510,83 @@ export default function AddLeadForm({ onCreated, onCancel }: AddLeadFormProps) {
           />
         </div>
 
-        {/* Follow-up date */}
-        <div className="flex flex-col gap-1.5">
-          <label htmlFor="new-followup" className={labelClass}>Follow-up date</label>
-          <input
-            id="new-followup"
-            type="date"
-            value={followUpAt}
-            onChange={(e) => setFollowUpAt(e.target.value)}
-            onKeyDown={(e) => onEnterNext(e, "new-next-action")}
-            className={`${inputClass} font-mono`}
-          />
+        {/* Needs follow-up toggle */}
+        <div>
+          <label
+            htmlFor="new-needs-followup"
+            className={[
+              "flex items-center justify-between gap-3 rounded-lg border px-3 py-2.5",
+              "transition-colors duration-150 cursor-pointer",
+              needsFollowUp
+                ? "border-accent/40 bg-accent/5"
+                : "border-hairline bg-surface-2 hover:border-hairline-strong",
+            ].join(" ")}
+          >
+            <span className={[
+              "font-mono text-[11px] transition-colors duration-150 select-none",
+              needsFollowUp ? "text-ink" : "text-ink-secondary",
+            ].join(" ")}>
+              Needs follow-up
+            </span>
+            <div className="relative shrink-0">
+              <input
+                id="new-needs-followup"
+                type="checkbox"
+                checked={needsFollowUp}
+                onChange={() => {
+                  const next = !needsFollowUp;
+                  setNeedsFollowUp(next);
+                  if (!next) setFollowUpAt("");
+                }}
+                className="sr-only"
+                aria-checked={needsFollowUp}
+              />
+              <div
+                className={[
+                  "h-6 w-10 rounded-full transition-colors duration-200",
+                  needsFollowUp ? "bg-accent" : "bg-surface-3 border border-hairline-strong",
+                ].join(" ")}
+                aria-hidden="true"
+              >
+                <motion.div
+                  layout
+                  transition={{ duration: 0.18, ease: [0.16, 1, 0.3, 1] }}
+                  className={[
+                    "absolute top-[3px] h-[18px] w-[18px] rounded-full shadow-sm",
+                    needsFollowUp ? "bg-canvas" : "bg-ink-subtle",
+                  ].join(" ")}
+                  style={{ left: needsFollowUp ? "19px" : "3px" }}
+                />
+              </div>
+            </div>
+          </label>
         </div>
+
+        {/* Follow-up date — only visible when follow-up is needed */}
+        <AnimatePresence>
+          {needsFollowUp && (
+            <motion.div
+              key="new-followup-date"
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: "auto" }}
+              exit={{ opacity: 0, height: 0 }}
+              transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
+              className="overflow-hidden"
+            >
+              <div className="flex flex-col gap-1.5">
+                <label htmlFor="new-followup" className={labelClass}>Follow-up date</label>
+                <input
+                  id="new-followup"
+                  type="date"
+                  value={followUpAt}
+                  onChange={(e) => setFollowUpAt(e.target.value)}
+                  onKeyDown={(e) => onEnterNext(e, "new-next-action")}
+                  className={`${inputClass} font-mono`}
+                />
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
 
         {/* Next action */}
         <div className="flex flex-col gap-1.5">

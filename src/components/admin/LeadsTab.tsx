@@ -21,7 +21,7 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { motion, useReducedMotion, AnimatePresence } from "framer-motion";
 import type { Lead, PipelineStage } from "@/lib/admin/types";
-import { PIPELINE_STAGES, todayIso, TERMINAL_STAGES } from "@/lib/admin/types";
+import { PIPELINE_STAGES, todayIso, TERMINAL_STAGES, isFollowUpNeeded } from "@/lib/admin/types";
 import StageChip from "./StageChip";
 import ScoreBadge from "./ScoreBadge";
 import RelativeDate from "./RelativeDate";
@@ -31,8 +31,8 @@ import Drawer from "./Drawer";
 import AddLeadForm from "./AddLeadForm";
 import { formatRelativeDate, formatAbsoluteDate } from "@/lib/admin/format";
 
-type SortKey = "score" | "stage" | "followUpAt" | "updatedAt";
-type FilterMode = "all" | "due" | "hot" | PipelineStage;
+type SortKey = "score" | "stage" | "followUpAt" | "updatedAt" | "createdAt" | "touchCount" | "name";
+type FilterKey = "due" | "followUpNeeded" | "hot" | "hasEmail" | "hasPhone" | PipelineStage;
 
 const STAGE_ORDER: Record<PipelineStage, number> = {
   Found: 0,
@@ -61,7 +61,7 @@ export default function LeadsTab() {
   const [error, setError] = useState<string | null>(null);
 
   const [search, setSearch] = useState("");
-  const [filter, setFilter] = useState<FilterMode>("all");
+  const [activeFilters, setActiveFilters] = useState<Set<FilterKey>>(new Set());
   const [sort, setSort] = useState<SortKey>("score");
   const [sortDir, setSortDir] = useState<"asc" | "desc">("desc");
 
@@ -127,7 +127,24 @@ export default function LeadsTab() {
   );
   const dueCount = overdueLeads.length + todayLeads.length;
 
-  // Filter
+  // Toggle a filter chip. "all" clears all active filters.
+  function toggleFilter(key: FilterKey) {
+    setActiveFilters((prev) => {
+      const next = new Set(prev);
+      if (next.has(key)) {
+        next.delete(key);
+      } else {
+        next.add(key);
+      }
+      return next;
+    });
+  }
+
+  function clearAllFilters() {
+    setActiveFilters(new Set());
+  }
+
+  // Filter — AND logic: lead must satisfy ALL active filters
   const filtered = leads.filter((l) => {
     const q = search.toLowerCase();
     const matchesSearch =
@@ -138,19 +155,28 @@ export default function LeadsTab() {
       l.notes.toLowerCase().includes(q) ||
       l.niche.toLowerCase().includes(q);
 
-    let matchesFilter = true;
-    if (filter === "due") {
-      matchesFilter =
-        !!l.followUpAt &&
-        l.followUpAt <= today &&
-        !TERMINAL_STAGES.includes(l.stage);
-    } else if (filter === "hot") {
-      matchesFilter = l.score >= 7;
-    } else if (filter !== "all" && PIPELINE_STAGES.includes(filter as PipelineStage)) {
-      matchesFilter = l.stage === filter;
-    }
+    if (!matchesSearch) return false;
 
-    return matchesSearch && matchesFilter;
+    // No active filters → show all
+    if (activeFilters.size === 0) return true;
+
+    // AND: every active filter must match
+    return Array.from(activeFilters).every((f) => {
+      if (f === "due") {
+        return !!l.followUpAt && l.followUpAt <= today && !TERMINAL_STAGES.includes(l.stage);
+      } else if (f === "followUpNeeded") {
+        return isFollowUpNeeded(l);
+      } else if (f === "hot") {
+        return l.score >= 7;
+      } else if (f === "hasEmail") {
+        return !!l.email.trim();
+      } else if (f === "hasPhone") {
+        return !!l.phone.trim();
+      } else if (PIPELINE_STAGES.includes(f as PipelineStage)) {
+        return l.stage === f;
+      }
+      return true;
+    });
   });
 
   // Sort
@@ -164,8 +190,14 @@ export default function LeadsTab() {
       const aVal = a.followUpAt ?? "9999-99-99";
       const bVal = b.followUpAt ?? "9999-99-99";
       cmp = aVal.localeCompare(bVal);
-    } else {
+    } else if (sort === "updatedAt") {
       cmp = a.updatedAt.localeCompare(b.updatedAt);
+    } else if (sort === "createdAt") {
+      cmp = a.createdAt.localeCompare(b.createdAt);
+    } else if (sort === "touchCount") {
+      cmp = a.touchCount - b.touchCount;
+    } else if (sort === "name") {
+      cmp = a.businessName.toLowerCase().localeCompare(b.businessName.toLowerCase());
     }
     return sortDir === "desc" ? -cmp : cmp;
   });
@@ -289,6 +321,9 @@ export default function LeadsTab() {
       stage: "Stage",
       followUpAt: "Follow-up",
       updatedAt: "Updated",
+      createdAt: "Created",
+      touchCount: "Touches",
+      name: "Name",
     };
     return labels[key] + arrow;
   };
@@ -327,15 +362,19 @@ export default function LeadsTab() {
                 </p>
               </div>
               <button
-                onClick={() => setFilter("due")}
+                onClick={() => {
+                  if (!activeFilters.has("due")) {
+                    toggleFilter("due");
+                  }
+                }}
                 className={[
                   "rounded-md border px-3 py-1.5 font-mono text-[10px] uppercase tracking-wider transition-colors",
-                  filter === "due"
+                  activeFilters.has("due")
                     ? "border-accent bg-accent/10 text-accent"
                     : "border-accent/40 text-accent hover:bg-accent/10",
                 ].join(" ")}
               >
-                {filter === "due" ? "Showing due now" : "Filter to due now"}
+                {activeFilters.has("due") ? "Showing due now" : "Filter to due now"}
               </button>
             </div>
           </motion.div>
@@ -409,14 +448,28 @@ export default function LeadsTab() {
           className="w-full rounded-md border border-hairline bg-surface-2 px-4 py-3 text-base text-ink placeholder:text-ink-subtle transition-colors focus:border-accent focus:outline-none"
         />
 
-        {/* Filter chips */}
+        {/* Filter chips — multi-select, AND logic */}
         <div className="flex flex-wrap gap-2">
-          {(["all", "due", "hot", ...PIPELINE_STAGES] as const).map((f) => {
-            const active = filter === f;
+          {/* "All" chip — clears all active filters */}
+          <button
+            onClick={clearAllFilters}
+            className={[
+              "rounded-full border px-3 py-1 font-mono text-[10px] uppercase tracking-wider transition-colors",
+              activeFilters.size === 0
+                ? "border-accent bg-accent/10 text-accent"
+                : "border-hairline text-ink-subtle hover:border-hairline-strong hover:text-ink",
+            ].join(" ")}
+          >
+            All
+          </button>
+
+          {/* Special chips: Due now / Follow-up needed */}
+          {(["due", "followUpNeeded"] as FilterKey[]).map((f) => {
+            const active = activeFilters.has(f);
             return (
               <button
                 key={f}
-                onClick={() => setFilter(f as FilterMode)}
+                onClick={() => toggleFilter(f)}
                 className={[
                   "rounded-full border px-3 py-1 font-mono text-[10px] uppercase tracking-wider transition-colors",
                   active
@@ -424,7 +477,62 @@ export default function LeadsTab() {
                     : "border-hairline text-ink-subtle hover:border-hairline-strong hover:text-ink",
                 ].join(" ")}
               >
-                {f === "all" ? "All" : f === "due" ? "Due now" : f === "hot" ? "Hot ≥7" : f}
+                {f === "due" ? "Due now" : "Follow-up needed"}
+              </button>
+            );
+          })}
+
+          {/* Hot chip */}
+          <button
+            onClick={() => toggleFilter("hot")}
+            className={[
+              "rounded-full border px-3 py-1 font-mono text-[10px] uppercase tracking-wider transition-colors",
+              activeFilters.has("hot")
+                ? "border-accent bg-accent/10 text-accent"
+                : "border-hairline text-ink-subtle hover:border-hairline-strong hover:text-ink",
+            ].join(" ")}
+          >
+            Hot ≥7
+          </button>
+
+          {/* Contact info chips — small gap before stage chips */}
+          <span className="border-l border-hairline-strong mx-1" aria-hidden />
+
+          {(["hasEmail", "hasPhone"] as FilterKey[]).map((f) => {
+            const active = activeFilters.has(f);
+            return (
+              <button
+                key={f}
+                onClick={() => toggleFilter(f)}
+                className={[
+                  "rounded-full border px-3 py-1 font-mono text-[10px] uppercase tracking-wider transition-colors",
+                  active
+                    ? "border-accent bg-accent/10 text-accent"
+                    : "border-hairline text-ink-subtle hover:border-hairline-strong hover:text-ink",
+                ].join(" ")}
+              >
+                {f === "hasEmail" ? "Has email" : "Has phone"}
+              </button>
+            );
+          })}
+
+          {/* Stage chips — separated by a thin divider */}
+          <span className="border-l border-hairline-strong mx-1" aria-hidden />
+
+          {PIPELINE_STAGES.map((f) => {
+            const active = activeFilters.has(f);
+            return (
+              <button
+                key={f}
+                onClick={() => toggleFilter(f)}
+                className={[
+                  "rounded-full border px-3 py-1 font-mono text-[10px] uppercase tracking-wider transition-colors",
+                  active
+                    ? "border-accent bg-accent/10 text-accent"
+                    : "border-hairline text-ink-subtle hover:border-hairline-strong hover:text-ink",
+                ].join(" ")}
+              >
+                {f}
               </button>
             );
           })}
@@ -433,7 +541,7 @@ export default function LeadsTab() {
         {/* Sort */}
         <div className="flex flex-wrap gap-2 items-center">
           <span className="font-mono text-[10px] uppercase tracking-wider text-ink-subtle">Sort:</span>
-          {(["score", "stage", "followUpAt", "updatedAt"] as SortKey[]).map((key) => (
+          {(["score", "stage", "followUpAt", "updatedAt", "createdAt", "touchCount", "name"] as SortKey[]).map((key) => (
             <button
               key={key}
               onClick={() => toggleSort(key)}
@@ -586,6 +694,10 @@ export default function LeadsTab() {
                           {isOverdue ? "overdue · " : isDueToday ? "today · " : ""}
                           {followUpRelative}
                         </time>
+                      ) : isFollowUpNeeded(lead) ? (
+                        <span className="font-mono text-[10px] text-accent whitespace-nowrap">
+                          Follow-up needed
+                        </span>
                       ) : (
                         <span className="font-mono text-[10px] text-ink-subtle/40">—</span>
                       )}

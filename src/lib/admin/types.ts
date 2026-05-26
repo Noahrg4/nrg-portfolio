@@ -233,6 +233,14 @@ export type Lead = {
   followUpAt: string | null;
 
   /**
+   * Explicit follow-up needed flag. Independent of a specific date.
+   * - true  → follow-up needed (with or without a date)
+   * - false → no follow-up needed (followUpAt should also be null)
+   * - undefined (existing leads) → infer from followUpAt !== null for back-compat
+   */
+  needsFollowUp?: boolean;
+
+  /**
    * Short description of the next action to take.
    * E.g. "Send follow-up email", "Call back Tuesday", "Send proposal PDF".
    */
@@ -487,6 +495,15 @@ export type ApiError = {
  */
 export function lifetimeValue(client: Client): number {
   return client.oneTimeValue + client.monthlyCharge * 12;
+}
+
+/**
+ * Returns true when a lead has an active follow-up requirement.
+ * Respects the explicit `needsFollowUp` flag when set; otherwise infers
+ * from `followUpAt !== null` for backward compatibility with existing leads.
+ */
+export function isFollowUpNeeded(lead: Lead): boolean {
+  return lead.needsFollowUp ?? (lead.followUpAt !== null);
 }
 
 /**
