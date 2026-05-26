@@ -57,7 +57,11 @@ const FS_PATHS: Record<CollectionKey, string> = {
 
 async function readJson<T>(key: CollectionKey, defaultValue: T): Promise<T> {
   if (USE_BLOBS) {
-    const store = getStore({ name: STORE_NAME });
+    // consistency: 'strong' routes reads through the uncached origin URL,
+    // bypassing Netlify's CDN edge cache. Without this, the default
+    // 'eventual' consistency can serve stale data immediately after a write
+    // (e.g. delete a lead, refresh the page, lead reappears).
+    const store = getStore({ name: STORE_NAME, consistency: 'strong' });
     const v = (await store.get(key, { type: 'json' })) as T | null;
     return v ?? defaultValue;
   }

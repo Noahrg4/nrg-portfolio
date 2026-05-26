@@ -32,7 +32,9 @@ export async function GET(req: NextRequest) {
   const search = searchParams.get('search') ?? undefined;
 
   const leads = await listLeads({ stage, due: due || undefined, search });
-  return NextResponse.json(leads);
+  return NextResponse.json(leads, {
+    headers: { 'Cache-Control': 'no-store' },
+  });
 }
 
 // ---------------------------------------------------------------------------

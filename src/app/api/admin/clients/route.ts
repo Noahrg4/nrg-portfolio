@@ -29,7 +29,9 @@ export async function GET() {
     lifetimeValue: lifetimeValue(c),
   }));
 
-  return NextResponse.json(withLtv);
+  return NextResponse.json(withLtv, {
+    headers: { 'Cache-Control': 'no-store' },
+  });
 }
 
 // ---------------------------------------------------------------------------

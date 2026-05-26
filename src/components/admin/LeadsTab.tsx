@@ -78,7 +78,7 @@ export default function LeadsTab() {
     setLoading(true);
     setError(null);
     try {
-      const res = await fetch("/api/admin/leads");
+      const res = await fetch("/api/admin/leads", { cache: "no-store" });
       if (!res.ok) throw new Error("Failed to load leads");
       const data = (await res.json()) as Lead[];
       setLeads(data);
