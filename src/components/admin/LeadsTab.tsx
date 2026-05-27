@@ -21,7 +21,7 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { motion, useReducedMotion, AnimatePresence } from "framer-motion";
 import type { Lead, PipelineStage, LeadOwner } from "@/lib/admin/types";
-import { PIPELINE_STAGES, todayIso, TERMINAL_STAGES, isFollowUpNeeded, getExistingSiteStatus, NICHE_OPTIONS, LEAD_OWNERS } from "@/lib/admin/types";
+import { PIPELINE_STAGES, todayIso, TERMINAL_STAGES, isFollowUpNeeded, getExistingSiteStatus, NICHE_OPTIONS, LEAD_OWNERS, getNicheTier } from "@/lib/admin/types";
 import StageChip from "./StageChip";
 import ScoreBadge from "./ScoreBadge";
 import RelativeDate from "./RelativeDate";
@@ -783,6 +783,18 @@ export default function LeadsTab() {
                     <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5 shrink-0">
                       {/* Score badge — color-coded hot/warm/cold */}
                       <ScoreBadge score={lead.score} size="sm" />
+
+                      {/* Niche-gate indicator — distinguishes a capped-by-gate
+                          score from a genuinely cold lead. Without this,
+                          Shaw-at-3.0-gated looks identical to a cold 3.0. */}
+                      {getNicheTier(lead.niche) === "low" && (
+                        <span
+                          title={`Niche "${lead.niche}" is LOW-fit — score gated at ${3.0.toFixed(1)}`}
+                          className="rounded-full border border-red-500/40 bg-red-500/[0.06] px-2 py-0.5 font-mono text-[10px] uppercase tracking-wider text-red-400 whitespace-nowrap"
+                        >
+                          Gated
+                        </span>
+                      )}
 
                       {/* Stage chip — color-coded per new rules */}
                       <StageChip stage={lead.stage} size="sm" />
