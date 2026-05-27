@@ -20,8 +20,8 @@
 
 import { useState, useEffect, useRef, useCallback } from "react";
 import { motion, useReducedMotion, AnimatePresence } from "framer-motion";
-import type { Lead, PipelineStage } from "@/lib/admin/types";
-import { PIPELINE_STAGES, todayIso, TERMINAL_STAGES, isFollowUpNeeded, getExistingSiteStatus } from "@/lib/admin/types";
+import type { Lead, PipelineStage, LeadOwner } from "@/lib/admin/types";
+import { PIPELINE_STAGES, todayIso, TERMINAL_STAGES, isFollowUpNeeded, getExistingSiteStatus, NICHE_OPTIONS, LEAD_OWNERS } from "@/lib/admin/types";
 import StageChip from "./StageChip";
 import ScoreBadge from "./ScoreBadge";
 import RelativeDate from "./RelativeDate";
@@ -31,7 +31,7 @@ import Drawer from "./Drawer";
 import AddLeadForm from "./AddLeadForm";
 import { formatRelativeDate, formatAbsoluteDate } from "@/lib/admin/format";
 
-type SortKey = "score" | "stage" | "followUpAt" | "updatedAt" | "createdAt" | "touchCount" | "name";
+type SortKey = "score" | "hotness" | "stage" | "followUpAt" | "updatedAt" | "createdAt" | "touchCount" | "name" | "owner";
 type FilterKey = "due" | "followUpNeeded" | "hot" | "hasEmail" | "hasPhone" | "hasSite" | "noSite" | PipelineStage;
 
 const STAGE_ORDER: Record<PipelineStage, number> = {
@@ -62,6 +62,8 @@ export default function LeadsTab() {
 
   const [search, setSearch] = useState("");
   const [activeFilters, setActiveFilters] = useState<Set<FilterKey>>(new Set());
+  const [activeNiches, setActiveNiches] = useState<Set<string>>(new Set());
+  const [activeOwners, setActiveOwners] = useState<Set<LeadOwner | "unassigned">>(new Set());
   const [sort, setSort] = useState<SortKey>("score");
   const [sortDir, setSortDir] = useState<"asc" | "desc">("desc");
 
@@ -146,8 +148,34 @@ export default function LeadsTab() {
     });
   }
 
+  function toggleNiche(niche: string) {
+    setActiveNiches((prev) => {
+      const next = new Set(prev);
+      if (next.has(niche)) {
+        next.delete(niche);
+      } else {
+        next.add(niche);
+      }
+      return next;
+    });
+  }
+
+  function toggleOwner(key: LeadOwner | "unassigned") {
+    setActiveOwners((prev) => {
+      const next = new Set(prev);
+      if (next.has(key)) {
+        next.delete(key);
+      } else {
+        next.add(key);
+      }
+      return next;
+    });
+  }
+
   function clearAllFilters() {
     setActiveFilters(new Set());
+    setActiveNiches(new Set());
+    setActiveOwners(new Set());
   }
 
   // Filter — AND logic: lead must satisfy ALL active filters
@@ -163,7 +191,16 @@ export default function LeadsTab() {
 
     if (!matchesSearch) return false;
 
-    // No active filters → show all
+    // Niche group — OR within group: if any niches selected, lead must match one
+    if (activeNiches.size > 0 && !activeNiches.has(l.niche)) return false;
+
+    // Owner group — OR within group; "unassigned" sentinel matches null owner
+    if (activeOwners.size > 0) {
+      const ownerKey: LeadOwner | "unassigned" = l.owner ?? "unassigned";
+      if (!activeOwners.has(ownerKey)) return false;
+    }
+
+    // No active filters → show all (niches/owners already passed above)
     if (activeFilters.size === 0) return true;
 
     // AND: every active filter must match
@@ -190,27 +227,49 @@ export default function LeadsTab() {
   });
 
   // Sort
-  const sorted = [...filtered].sort((a, b) => {
-    let cmp = 0;
-    if (sort === "score") {
-      cmp = a.score - b.score;
-    } else if (sort === "stage") {
-      cmp = STAGE_ORDER[a.stage] - STAGE_ORDER[b.stage];
-    } else if (sort === "followUpAt") {
-      const aVal = a.followUpAt ?? "9999-99-99";
-      const bVal = b.followUpAt ?? "9999-99-99";
-      cmp = aVal.localeCompare(bVal);
-    } else if (sort === "updatedAt") {
-      cmp = a.updatedAt.localeCompare(b.updatedAt);
-    } else if (sort === "createdAt") {
-      cmp = a.createdAt.localeCompare(b.createdAt);
-    } else if (sort === "touchCount") {
-      cmp = a.touchCount - b.touchCount;
-    } else if (sort === "name") {
-      cmp = a.businessName.toLowerCase().localeCompare(b.businessName.toLowerCase());
-    }
-    return sortDir === "desc" ? -cmp : cmp;
-  });
+  // For hotness + owner, we split nulls/unassigned out and append them at the
+  // end in BOTH sort directions — unrated/unassigned have no signal, so they
+  // shouldn't beat a low-rated lead or sit above a high-rated one.
+  let sorted: Lead[];
+  if (sort === "hotness") {
+    const rated = filtered.filter((l) => l.hotness != null);
+    const unrated = filtered.filter((l) => l.hotness == null);
+    rated.sort((a, b) => {
+      const cmp = (a.hotness ?? 0) - (b.hotness ?? 0);
+      return sortDir === "desc" ? -cmp : cmp;
+    });
+    sorted = [...rated, ...unrated];
+  } else if (sort === "owner") {
+    const owned = filtered.filter((l) => !!l.owner);
+    const unassigned = filtered.filter((l) => !l.owner);
+    owned.sort((a, b) => {
+      const cmp = (a.owner ?? "").localeCompare(b.owner ?? "");
+      return sortDir === "desc" ? -cmp : cmp;
+    });
+    sorted = [...owned, ...unassigned];
+  } else {
+    sorted = [...filtered].sort((a, b) => {
+      let cmp = 0;
+      if (sort === "score") {
+        cmp = a.score - b.score;
+      } else if (sort === "stage") {
+        cmp = STAGE_ORDER[a.stage] - STAGE_ORDER[b.stage];
+      } else if (sort === "followUpAt") {
+        const aVal = a.followUpAt ?? "9999-99-99";
+        const bVal = b.followUpAt ?? "9999-99-99";
+        cmp = aVal.localeCompare(bVal);
+      } else if (sort === "updatedAt") {
+        cmp = a.updatedAt.localeCompare(b.updatedAt);
+      } else if (sort === "createdAt") {
+        cmp = a.createdAt.localeCompare(b.createdAt);
+      } else if (sort === "touchCount") {
+        cmp = a.touchCount - b.touchCount;
+      } else if (sort === "name") {
+        cmp = a.businessName.toLowerCase().localeCompare(b.businessName.toLowerCase());
+      }
+      return sortDir === "desc" ? -cmp : cmp;
+    });
+  }
 
   function toggleSort(key: SortKey) {
     if (sort === key) {
@@ -328,12 +387,14 @@ export default function LeadsTab() {
     const arrow = active ? (sortDir === "desc" ? " ↓" : " ↑") : "";
     const labels: Record<SortKey, string> = {
       score: "Score",
+      hotness: "Hotness",
       stage: "Stage",
       followUpAt: "Follow-up",
       updatedAt: "Updated",
       createdAt: "Created",
       touchCount: "Touches",
       name: "Name",
+      owner: "Owner",
     };
     return labels[key] + arrow;
   };
@@ -465,7 +526,7 @@ export default function LeadsTab() {
             onClick={clearAllFilters}
             className={[
               "rounded-full border px-3 py-1 font-mono text-[10px] uppercase tracking-wider transition-colors",
-              activeFilters.size === 0
+              activeFilters.size === 0 && activeNiches.size === 0 && activeOwners.size === 0
                 ? "border-accent bg-accent/10 text-accent"
                 : "border-hairline text-ink-subtle hover:border-hairline-strong hover:text-ink",
             ].join(" ")}
@@ -552,12 +613,57 @@ export default function LeadsTab() {
               </button>
             );
           })}
+
+          {/* Niche chips — separated by a thin divider */}
+          <span className="border-l border-hairline-strong mx-1" aria-hidden />
+
+          {NICHE_OPTIONS.map((n) => {
+            const active = activeNiches.has(n);
+            return (
+              <button
+                key={n}
+                onClick={() => toggleNiche(n)}
+                className={[
+                  "rounded-full border px-3 py-1 font-mono text-[10px] uppercase tracking-wider transition-colors",
+                  active
+                    ? "border-accent bg-accent/10 text-accent"
+                    : "border-hairline text-ink-subtle hover:border-hairline-strong hover:text-ink",
+                ].join(" ")}
+              >
+                {n}
+              </button>
+            );
+          })}
+
+          {/* Owner chips — separated by a thin divider */}
+          <span className="border-l border-hairline-strong mx-1" aria-hidden />
+
+          {([
+            ...LEAD_OWNERS.map((o) => ({ key: o, label: `${o} lead` })),
+            { key: "unassigned" as const, label: "Unassigned" },
+          ] as { key: LeadOwner | "unassigned"; label: string }[]).map((opt) => {
+            const active = activeOwners.has(opt.key);
+            return (
+              <button
+                key={opt.key}
+                onClick={() => toggleOwner(opt.key)}
+                className={[
+                  "rounded-full border px-3 py-1 font-mono text-[10px] uppercase tracking-wider transition-colors",
+                  active
+                    ? "border-accent bg-accent/10 text-accent"
+                    : "border-hairline text-ink-subtle hover:border-hairline-strong hover:text-ink",
+                ].join(" ")}
+              >
+                {opt.label}
+              </button>
+            );
+          })}
         </div>
 
         {/* Sort */}
         <div className="flex flex-wrap gap-2 items-center">
           <span className="font-mono text-[10px] uppercase tracking-wider text-ink-subtle">Sort:</span>
-          {(["score", "stage", "followUpAt", "updatedAt", "createdAt", "touchCount", "name"] as SortKey[]).map((key) => (
+          {(["score", "hotness", "stage", "followUpAt", "updatedAt", "createdAt", "touchCount", "name", "owner"] as SortKey[]).map((key) => (
             <button
               key={key}
               onClick={() => toggleSort(key)}
@@ -722,7 +828,22 @@ export default function LeadsTab() {
                               : "border-red-400/50 text-red-400",
                           ].join(" ")}
                         >
-                          🔥 {lead.hotness}/5
+                          {lead.hotness}/5
+                        </span>
+                      )}
+
+                      {/* Owner pill — only shown when assigned */}
+                      {lead.owner && (
+                        <span
+                          title={`Owner: ${lead.owner}`}
+                          className={[
+                            "rounded-full border px-2 py-0.5 font-mono text-[10px] uppercase tracking-wider whitespace-nowrap",
+                            lead.owner === "Noah"
+                              ? "border-accent/40 bg-accent/5 text-accent"
+                              : "border-[#A78BFA]/40 bg-[#A78BFA]/5 text-[#A78BFA]",
+                          ].join(" ")}
+                        >
+                          {lead.owner}
                         </span>
                       )}
 

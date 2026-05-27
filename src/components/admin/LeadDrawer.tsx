@@ -25,14 +25,28 @@
 
 import { useState, useCallback, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import type { Lead, PipelineStage, ConvertLeadBody, ExistingSiteStatus } from "@/lib/admin/types";
-import { SCORE_WEIGHTS, computeScore, TERMINAL_STAGES, isFollowUpNeeded, getExistingSiteStatus } from "@/lib/admin/types";
+import type { Lead, PipelineStage, ConvertLeadBody, ExistingSiteStatus, ScoreFactor, ScoreFactors, LeadOwner } from "@/lib/admin/types";
+import {
+  SCORE_WEIGHTS,
+  SCORE_LABELS,
+  SCORE_ANCHORS,
+  DEFAULT_SCORE_FACTORS,
+  computeScore,
+  migrateScoreFactors,
+  isScoreCappedByNiche,
+  getNicheFitFromNiche,
+  getNicheTier,
+  NICHE_TIER_LABEL,
+  TERMINAL_STAGES,
+  isFollowUpNeeded,
+  getExistingSiteStatus,
+  NICHE_OPTIONS,
+} from "@/lib/admin/types";
 import Drawer from "./Drawer";
 import StageChip from "./StageChip";
 import ScoreBadge from "./ScoreBadge";
 import Modal from "./Modal";
 import StageSegmentedControl from "./StageSegmentedControl";
-import ScoreToggleSwitch from "./ScoreToggleSwitch";
 import ConfirmInline from "./ConfirmInline";
 
 interface LeadDrawerProps {
@@ -43,18 +57,6 @@ interface LeadDrawerProps {
   onConverted: (leadId: string) => void;
   onDeleted?: (leadId: string) => void;
 }
-
-// ─── Niche / Source options ─────────────────────────────────────────────────
-const NICHE_OPTIONS = ["Restaurant", "HVAC", "Law", "Salon", "Trades", "Retail", "Other"];
-const SOURCE_OPTIONS = ["Google Maps cold", "Walk-in", "Referral", "Inbound", "Other"];
-
-// ─── Score factor display labels ────────────────────────────────────────────
-const FACTOR_LABELS: Record<keyof typeof SCORE_WEIGHTS, string> = {
-  badOrNoWebsite: "Bad/no website",
-  clearlyMakingMoney: "Clearly making money",
-  easyToReach: "Easy to reach",
-  goodNicheFit: "Good niche fit",
-};
 
 // ─── Styling ─────────────────────────────────────────────────────────────────
 const inputClass =
@@ -154,20 +156,15 @@ export default function LeadDrawer({
   const [contactName, setContactName] = useState("");
   const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
-  const [source, setSource] = useState("");
   const [stage, setStage] = useState<PipelineStage>("Found");
-  const [scoreFactors, setScoreFactors] = useState({
-    badOrNoWebsite: false,
-    clearlyMakingMoney: false,
-    easyToReach: false,
-    goodNicheFit: false,
-  });
+  const [scoreFactors, setScoreFactors] = useState<ScoreFactors>({ ...DEFAULT_SCORE_FACTORS });
   const [notes, setNotes] = useState("");
   const [needsFollowUp, setNeedsFollowUp] = useState(false);
   const [followUpAt, setFollowUpAt] = useState("");
   const [nextActionNote, setNextActionNote] = useState("");
   const [existingSiteStatus, setExistingSiteStatus] = useState<ExistingSiteStatus>("unknown");
   const [hotness, setHotness] = useState<number | null>(null);
+  const [owner, setOwner] = useState<LeadOwner | null>(null);
 
   // ── Inline validation errors ────────────────────────────────────────────
   const [emailError, setEmailError] = useState<string | null>(null);
@@ -193,7 +190,6 @@ export default function LeadDrawer({
     setContactName(l.contactName);
     setPhone(l.phone);
     setEmail(l.email);
-    setSource(l.source);
     setStage(l.stage);
     setNeedsFollowUp(isFollowUpNeeded(l));
     setFollowUpAt(l.followUpAt ?? "");
@@ -201,7 +197,8 @@ export default function LeadDrawer({
     setNextActionNote(l.nextActionNote);
     setExistingSiteStatus(getExistingSiteStatus(l));
     setHotness(l.hotness ?? null);
-    setScoreFactors({ ...l.scoreFactors });
+    setOwner(l.owner ?? null);
+    setScoreFactors(migrateScoreFactors(l.scoreFactors));
     setEmailError(null);
     setPhoneError(null);
     setSaveError(null);
@@ -234,7 +231,10 @@ export default function LeadDrawer({
 
   if (!lead) return null;
 
-  const currentScore = computeScore(scoreFactors);
+  const currentScore = computeScore(scoreFactors, niche);
+  const scoreCapped = isScoreCappedByNiche(scoreFactors, niche);
+  const nicheFitValue = getNicheFitFromNiche(niche);
+  const nicheTier = getNicheTier(niche);
   const isTerminal = TERMINAL_STAGES.includes(lead.stage);
 
   // ── Enter-to-next-field ─────────────────────────────────────────────────
@@ -276,7 +276,6 @@ export default function LeadDrawer({
         contactName: contactName.trim(),
         phone: phone.trim(),
         email: email.trim(),
-        source: source.trim(),
         stage,
         needsFollowUp,
         followUpAt: needsFollowUp ? (followUpAt || null) : null,
@@ -284,6 +283,7 @@ export default function LeadDrawer({
         nextActionNote,
         existingSiteStatus,
         hotness,
+        owner,
         scoreFactors,
       });
       if (updated) {
@@ -367,8 +367,8 @@ export default function LeadDrawer({
     }
   }
 
-  function toggleFactor(key: keyof typeof scoreFactors) {
-    setScoreFactors((prev) => ({ ...prev, [key]: !prev[key] }));
+  function setFactor(key: keyof ScoreFactors, value: ScoreFactor) {
+    setScoreFactors((prev) => ({ ...prev, [key]: value }));
   }
 
   // ── Delete ──────────────────────────────────────────────────────────────
@@ -514,7 +514,7 @@ export default function LeadDrawer({
                 <label htmlFor="edit-niche" className={labelClass}>Niche</label>
                 <select
                   id="edit-niche"
-                  value={NICHE_OPTIONS.includes(niche) ? niche : niche ? "Other" : ""}
+                  value={(NICHE_OPTIONS as readonly string[]).includes(niche) ? niche : niche ? "Other" : ""}
                   onChange={(e) => setNiche(e.target.value)}
                   disabled={saving}
                   className="w-full rounded-md border border-hairline bg-surface-2 px-4 py-3.5 text-base text-ink transition-colors duration-200 focus:border-accent focus:outline-none disabled:opacity-50"
@@ -525,7 +525,7 @@ export default function LeadDrawer({
                   ))}
                 </select>
                 {/* If stored niche isn't in dropdown options, show it as free-text */}
-                {niche && !NICHE_OPTIONS.includes(niche) && (
+                {niche && !(NICHE_OPTIONS as readonly string[]).includes(niche) && (
                   <input
                     type="text"
                     value={niche}
@@ -617,7 +617,6 @@ export default function LeadDrawer({
                     if (emailError) setEmailError(validateEmail(e.target.value));
                   }}
                   onBlur={(e) => setEmailError(validateEmail(e.target.value))}
-                  onKeyDown={(e) => onEnterNext(e, "edit-source")}
                   placeholder="owner@business.com"
                   disabled={saving}
                   aria-invalid={!!emailError}
@@ -652,34 +651,6 @@ export default function LeadDrawer({
           <div className="flex flex-col gap-4 pb-6">
             <p className={sectionLabelClass}>Pipeline</p>
 
-            {/* Source */}
-            <div className="flex flex-col gap-1.5">
-              <label htmlFor="edit-source" className={labelClass}>Source</label>
-              <select
-                id="edit-source"
-                value={SOURCE_OPTIONS.includes(source) ? source : source ? "Other" : ""}
-                onChange={(e) => setSource(e.target.value)}
-                disabled={saving}
-                className="w-full rounded-md border border-hairline bg-surface-2 px-4 py-3.5 text-base text-ink transition-colors duration-200 focus:border-accent focus:outline-none disabled:opacity-50"
-              >
-                <option value="">Select source…</option>
-                {SOURCE_OPTIONS.map((s) => (
-                  <option key={s} value={s}>{s}</option>
-                ))}
-              </select>
-              {/* Show free-text if stored source doesn't match options */}
-              {source && !SOURCE_OPTIONS.includes(source) && (
-                <input
-                  type="text"
-                  value={source}
-                  onChange={(e) => setSource(e.target.value)}
-                  placeholder="Source"
-                  disabled={saving}
-                  className={`${inputClass} mt-1.5`}
-                />
-              )}
-            </div>
-
             {/* Stage — segmented control */}
             <div className="flex flex-col gap-1.5">
               <label className={labelClass}>Stage</label>
@@ -693,6 +664,42 @@ export default function LeadDrawer({
                   Stage locked — lead is in a terminal state.
                 </p>
               )}
+            </div>
+
+            {/* Owner — Unassigned / Noah / Bela */}
+            <div className="flex flex-col gap-1.5">
+              <label className={labelClass}>Owner</label>
+              <div
+                className="inline-flex rounded-md border border-hairline bg-surface-2 p-1"
+                role="radiogroup"
+                aria-label="Lead owner"
+              >
+                {([
+                  { value: null,   label: "Unassigned" },
+                  { value: "Noah", label: "Noah" },
+                  { value: "Bela", label: "Bela" },
+                ] as { value: LeadOwner | null; label: string }[]).map((opt) => {
+                  const active = owner === opt.value;
+                  return (
+                    <button
+                      key={opt.label}
+                      type="button"
+                      role="radio"
+                      aria-checked={active}
+                      onClick={() => setOwner(opt.value)}
+                      disabled={saving}
+                      className={[
+                        "flex-1 rounded px-3 py-2 font-mono text-[11px] uppercase tracking-wider transition-colors duration-150",
+                        active
+                          ? "bg-accent/10 text-accent"
+                          : "text-ink-subtle hover:bg-surface-3 hover:text-ink",
+                      ].join(" ")}
+                    >
+                      {opt.label}
+                    </button>
+                  );
+                })}
+              </div>
             </div>
 
             {/* Existing website — segmented control */}
@@ -738,16 +745,21 @@ export default function LeadDrawer({
             <div className="flex items-center justify-between">
               <p className={sectionLabelClass} style={{ marginBottom: 0 }}>Scoring</p>
               <div className="flex items-center gap-2">
+                {scoreCapped && (
+                  <span className="font-mono text-[10px] uppercase tracking-wider text-red-400">
+                    Low niche fit — capped at 3
+                  </span>
+                )}
                 <span className="font-mono text-[10px] uppercase tracking-wider text-ink-subtle">Score</span>
                 <AnimatePresence mode="wait">
                   <motion.span
-                    key={currentScore}
+                    key={currentScore.toFixed(1)}
                     initial={{ scale: 0.7, opacity: 0 }}
                     animate={{ scale: 1, opacity: 1 }}
                     exit={{ scale: 0.7, opacity: 0 }}
                     transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
                     className={[
-                      "inline-flex h-8 w-8 items-center justify-center rounded-full font-mono text-sm font-semibold ring-2",
+                      "inline-flex h-8 w-10 items-center justify-center rounded-full font-mono text-sm font-semibold ring-2",
                       currentScore >= 7
                         ? "bg-accent/10 text-accent ring-accent/60"
                         : currentScore >= 4
@@ -755,24 +767,83 @@ export default function LeadDrawer({
                         : "bg-surface-3 text-ink-subtle ring-hairline",
                     ].join(" ")}
                   >
-                    {currentScore % 1 === 0 ? currentScore : currentScore.toFixed(1)}
+                    {currentScore.toFixed(1)}
                   </motion.span>
                 </AnimatePresence>
               </div>
             </div>
 
-            <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
-              {(Object.keys(SCORE_WEIGHTS) as Array<keyof typeof SCORE_WEIGHTS>).map((key) => (
-                <ScoreToggleSwitch
-                  key={key}
-                  id={`edit-factor-${key}`}
-                  checked={scoreFactors[key]}
-                  onChange={() => toggleFactor(key)}
-                  label={FACTOR_LABELS[key]}
-                  weight={SCORE_WEIGHTS[key]}
-                  disabled={saving}
-                />
-              ))}
+            {/* Three user-input factors as 0–3 segmented controls */}
+            <div className="flex flex-col gap-3">
+              {(Object.keys(SCORE_LABELS) as Array<keyof ScoreFactors>).map((key) => {
+                const value = scoreFactors[key];
+                return (
+                  <div key={key} className="flex flex-col gap-1.5">
+                    <div className="flex items-center justify-between">
+                      <label className={labelClass}>
+                        {SCORE_LABELS[key]}{" "}
+                        <span className="text-ink-subtle">· ×{SCORE_WEIGHTS[key]}</span>
+                      </label>
+                    </div>
+                    <div
+                      className="inline-flex rounded-md border border-hairline bg-surface-2 p-1"
+                      role="radiogroup"
+                      aria-label={SCORE_LABELS[key]}
+                    >
+                      {([0, 1, 2, 3] as ScoreFactor[]).map((n) => {
+                        const active = value === n;
+                        return (
+                          <button
+                            key={n}
+                            type="button"
+                            role="radio"
+                            aria-checked={active}
+                            onClick={() => setFactor(key, n)}
+                            disabled={saving}
+                            className={[
+                              "flex-1 rounded px-3 py-2 font-mono text-[11px] uppercase tracking-wider transition-colors duration-150",
+                              active
+                                ? "bg-accent/10 text-accent"
+                                : "text-ink-subtle hover:bg-surface-3 hover:text-ink",
+                            ].join(" ")}
+                          >
+                            {n}
+                          </button>
+                        );
+                      })}
+                    </div>
+                    <p className="font-mono text-[10px] text-ink-subtle">
+                      {SCORE_ANCHORS[key][value]}
+                    </p>
+                  </div>
+                );
+              })}
+
+              {/* Read-only niche-fit row — derived from niche selection */}
+              <div className="flex flex-col gap-1.5">
+                <label className={labelClass}>
+                  Niche Fit <span className="text-ink-subtle">· auto from niche · ×{SCORE_WEIGHTS.nicheFit}</span>
+                </label>
+                <div
+                  className={[
+                    "inline-flex items-center gap-2 rounded-md border px-3 py-2 font-mono text-[11px]",
+                    nicheTier === "low"
+                      ? "border-red-500/40 bg-red-500/5 text-red-400"
+                      : nicheTier === "high"
+                      ? "border-accent/30 bg-accent/5 text-accent"
+                      : "border-hairline bg-surface-2 text-ink-secondary",
+                  ].join(" ")}
+                >
+                  <span className="font-semibold">{nicheFitValue}</span>
+                  <span className="text-ink-subtle">/</span>
+                  <span>
+                    {niche || "no niche"} — {NICHE_TIER_LABEL[nicheTier]}
+                  </span>
+                  {nicheTier === "low" && (
+                    <span className="ml-auto uppercase tracking-wider">Gates score</span>
+                  )}
+                </div>
+              </div>
             </div>
 
             {/* ── Hotness rating — manual post-contact signal ─────────────── */}

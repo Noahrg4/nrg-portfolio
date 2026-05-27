@@ -13,35 +13,26 @@
 
 import { useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import type { Lead, ExistingSiteStatus } from "@/lib/admin/types";
-import { PIPELINE_STAGES, SCORE_WEIGHTS, computeScore } from "@/lib/admin/types";
+import type { Lead, ExistingSiteStatus, ScoreFactor, ScoreFactors, LeadOwner } from "@/lib/admin/types";
+import {
+  PIPELINE_STAGES,
+  SCORE_WEIGHTS,
+  SCORE_LABELS,
+  SCORE_ANCHORS,
+  DEFAULT_SCORE_FACTORS,
+  computeScore,
+  isScoreCappedByNiche,
+  getNicheFitFromNiche,
+  getNicheTier,
+  NICHE_TIER_LABEL,
+  NICHE_OPTIONS,
+} from "@/lib/admin/types";
 import StageSegmentedControl from "./StageSegmentedControl";
-import ScoreToggleSwitch from "./ScoreToggleSwitch";
 
 interface AddLeadFormProps {
   onCreated: (lead: Lead) => void;
   onCancel: () => void;
 }
-
-// ─── Niche options ─────────────────────────────────────────────────────────
-const NICHE_OPTIONS = [
-  "Restaurant",
-  "HVAC",
-  "Law",
-  "Salon",
-  "Trades",
-  "Retail",
-  "Other",
-];
-
-// ─── Source options ─────────────────────────────────────────────────────────
-const SOURCE_OPTIONS = [
-  "Google Maps cold",
-  "Walk-in",
-  "Referral",
-  "Inbound",
-  "Other",
-];
 
 // ─── Styling constants ──────────────────────────────────────────────────────
 const inputClass =
@@ -55,14 +46,6 @@ const labelClass =
 
 const sectionLabelClass =
   "font-mono text-[11px] uppercase tracking-wider text-ink-secondary mb-3";
-
-// ─── Score factor display labels ────────────────────────────────────────────
-const FACTOR_LABELS: Record<keyof typeof SCORE_WEIGHTS, string> = {
-  badOrNoWebsite: "Bad/no website",
-  clearlyMakingMoney: "Clearly making money",
-  easyToReach: "Easy to reach",
-  goodNicheFit: "Good niche fit",
-};
 
 // ─── Validation ─────────────────────────────────────────────────────────────
 function validateEmail(v: string): string | null {
@@ -98,19 +81,14 @@ export default function AddLeadForm({ onCreated, onCancel }: AddLeadFormProps) {
   const [contactName, setContactName] = useState("");
   const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
-  const [source, setSource] = useState("");
   const [stage, setStage] = useState<(typeof PIPELINE_STAGES)[number]>("Found");
-  const [scoreFactors, setScoreFactors] = useState({
-    badOrNoWebsite: false,
-    clearlyMakingMoney: false,
-    easyToReach: false,
-    goodNicheFit: false,
-  });
+  const [scoreFactors, setScoreFactors] = useState<ScoreFactors>({ ...DEFAULT_SCORE_FACTORS });
   const [notes, setNotes] = useState("");
   const [needsFollowUp, setNeedsFollowUp] = useState(false);
   const [followUpAt, setFollowUpAt] = useState("");
   const [nextActionNote, setNextActionNote] = useState("");
   const [existingSiteStatus, setExistingSiteStatus] = useState<ExistingSiteStatus>("unknown");
+  const [owner, setOwner] = useState<LeadOwner | null>(null);
 
   // ── Validation errors ───────────────────────────────────────────────────
   const [businessNameError, setBusinessNameError] = useState<string | null>(null);
@@ -125,10 +103,19 @@ export default function AddLeadForm({ onCreated, onCancel }: AddLeadFormProps) {
   }, []);
 
   // ── Score live preview ──────────────────────────────────────────────────
-  const previewScore = computeScore(scoreFactors);
+  // Niche fit (and the LOW-tier cap) follow whatever niche is currently
+  // selected. "Other" with no free-text falls through to "Other" which is
+  // medium-fit; once the user types a free-text niche it's treated as
+  // medium-fit too (the niche-tier map defaults unknowns to medium).
+  const resolvedNicheForScore =
+    niche === "Other" ? nicheOther.trim() || "Other" : niche;
+  const previewScore = computeScore(scoreFactors, resolvedNicheForScore);
+  const scoreCapped = isScoreCappedByNiche(scoreFactors, resolvedNicheForScore);
+  const nicheFitValue = getNicheFitFromNiche(resolvedNicheForScore);
+  const nicheTier = getNicheTier(resolvedNicheForScore);
 
-  function toggleFactor(key: keyof typeof scoreFactors) {
-    setScoreFactors((prev) => ({ ...prev, [key]: !prev[key] }));
+  function setFactor(key: keyof ScoreFactors, value: ScoreFactor) {
+    setScoreFactors((prev) => ({ ...prev, [key]: value }));
   }
 
   // ── Focus-next on Enter for single-line inputs ──────────────────────────
@@ -177,7 +164,6 @@ export default function AddLeadForm({ onCreated, onCancel }: AddLeadFormProps) {
           phone: phone.trim(),
           email: email.trim(),
           contactName: contactName.trim(),
-          source: source.trim(),
           stage,
           notes: notes.trim(),
           nextActionNote: nextActionNote.trim(),
@@ -186,6 +172,7 @@ export default function AddLeadForm({ onCreated, onCancel }: AddLeadFormProps) {
           emailedAt: null,
           calledAt: null,
           existingSiteStatus,
+          owner,
           scoreFactors,
         }),
       });
@@ -381,7 +368,6 @@ export default function AddLeadForm({ onCreated, onCancel }: AddLeadFormProps) {
                 if (emailError) setEmailError(validateEmail(e.target.value));
               }}
               onBlur={(e) => setEmailError(validateEmail(e.target.value))}
-              onKeyDown={(e) => onEnterNext(e, "new-source")}
               placeholder="owner@business.com"
               aria-invalid={!!emailError}
               aria-describedby={emailError ? "email-error" : undefined}
@@ -415,22 +401,6 @@ export default function AddLeadForm({ onCreated, onCancel }: AddLeadFormProps) {
       <div className="flex flex-col gap-4 pb-6">
         <p className={sectionLabelClass}>Pipeline</p>
 
-        {/* Source */}
-        <div className="flex flex-col gap-1.5">
-          <label htmlFor="new-source" className={labelClass}>Source</label>
-          <select
-            id="new-source"
-            value={source}
-            onChange={(e) => setSource(e.target.value)}
-            className="w-full rounded-md border border-hairline bg-surface-2 px-4 py-3.5 text-base text-ink transition-colors duration-200 focus:border-accent focus:outline-none"
-          >
-            <option value="">Select source…</option>
-            {SOURCE_OPTIONS.map((s) => (
-              <option key={s} value={s}>{s}</option>
-            ))}
-          </select>
-        </div>
-
         {/* Stage segmented control */}
         <div className="flex flex-col gap-1.5">
           <label className={labelClass}>Stage</label>
@@ -438,6 +408,41 @@ export default function AddLeadForm({ onCreated, onCancel }: AddLeadFormProps) {
             value={stage}
             onChange={setStage}
           />
+        </div>
+
+        {/* Owner — Unassigned / Noah / Bela */}
+        <div className="flex flex-col gap-1.5">
+          <label className={labelClass}>Owner</label>
+          <div
+            className="inline-flex rounded-md border border-hairline bg-surface-2 p-1"
+            role="radiogroup"
+            aria-label="Lead owner"
+          >
+            {([
+              { value: null,   label: "Unassigned" },
+              { value: "Noah", label: "Noah" },
+              { value: "Bela", label: "Bela" },
+            ] as { value: LeadOwner | null; label: string }[]).map((opt) => {
+              const active = owner === opt.value;
+              return (
+                <button
+                  key={opt.label}
+                  type="button"
+                  role="radio"
+                  aria-checked={active}
+                  onClick={() => setOwner(opt.value)}
+                  className={[
+                    "flex-1 rounded px-3 py-2 font-mono text-[11px] uppercase tracking-wider transition-colors duration-150",
+                    active
+                      ? "bg-accent/10 text-accent"
+                      : "text-ink-subtle hover:bg-surface-3 hover:text-ink",
+                  ].join(" ")}
+                >
+                  {opt.label}
+                </button>
+              );
+            })}
+          </div>
         </div>
 
         {/* Existing website */}
@@ -483,16 +488,21 @@ export default function AddLeadForm({ onCreated, onCancel }: AddLeadFormProps) {
         <div className="flex items-center justify-between">
           <p className={sectionLabelClass} style={{ marginBottom: 0 }}>Scoring</p>
           <div className="flex items-center gap-2">
+            {scoreCapped && (
+              <span className="font-mono text-[10px] uppercase tracking-wider text-red-400">
+                Low niche fit — capped at 3
+              </span>
+            )}
             <span className="font-mono text-[10px] uppercase tracking-wider text-ink-subtle">Score</span>
             <AnimatePresence mode="wait">
               <motion.span
-                key={previewScore}
+                key={previewScore.toFixed(1)}
                 initial={{ scale: 0.7, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
                 exit={{ scale: 0.7, opacity: 0 }}
                 transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
                 className={[
-                  "inline-flex h-8 w-8 items-center justify-center rounded-full font-mono text-sm font-semibold ring-2",
+                  "inline-flex h-8 w-10 items-center justify-center rounded-full font-mono text-sm font-semibold ring-2",
                   previewScore >= 7
                     ? "bg-accent/10 text-accent ring-accent/60"
                     : previewScore >= 4
@@ -500,24 +510,80 @@ export default function AddLeadForm({ onCreated, onCancel }: AddLeadFormProps) {
                     : "bg-surface-3 text-ink-subtle ring-hairline",
                 ].join(" ")}
               >
-                {previewScore % 1 === 0 ? previewScore : previewScore.toFixed(1)}
+                {previewScore.toFixed(1)}
               </motion.span>
             </AnimatePresence>
           </div>
         </div>
 
-        {/* Toggle switches */}
-        <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
-          {(Object.keys(SCORE_WEIGHTS) as Array<keyof typeof SCORE_WEIGHTS>).map((key) => (
-            <ScoreToggleSwitch
-              key={key}
-              id={`new-factor-${key}`}
-              checked={scoreFactors[key]}
-              onChange={() => toggleFactor(key)}
-              label={FACTOR_LABELS[key]}
-              weight={SCORE_WEIGHTS[key]}
-            />
-          ))}
+        {/* Three user-input factors as 0–3 segmented controls */}
+        <div className="flex flex-col gap-3">
+          {(Object.keys(SCORE_LABELS) as Array<keyof ScoreFactors>).map((key) => {
+            const value = scoreFactors[key];
+            return (
+              <div key={key} className="flex flex-col gap-1.5">
+                <label className={labelClass}>
+                  {SCORE_LABELS[key]}{" "}
+                  <span className="text-ink-subtle">· ×{SCORE_WEIGHTS[key]}</span>
+                </label>
+                <div
+                  className="inline-flex rounded-md border border-hairline bg-surface-2 p-1"
+                  role="radiogroup"
+                  aria-label={SCORE_LABELS[key]}
+                >
+                  {([0, 1, 2, 3] as ScoreFactor[]).map((n) => {
+                    const active = value === n;
+                    return (
+                      <button
+                        key={n}
+                        type="button"
+                        role="radio"
+                        aria-checked={active}
+                        onClick={() => setFactor(key, n)}
+                        className={[
+                          "flex-1 rounded px-3 py-2 font-mono text-[11px] uppercase tracking-wider transition-colors duration-150",
+                          active
+                            ? "bg-accent/10 text-accent"
+                            : "text-ink-subtle hover:bg-surface-3 hover:text-ink",
+                        ].join(" ")}
+                      >
+                        {n}
+                      </button>
+                    );
+                  })}
+                </div>
+                <p className="font-mono text-[10px] text-ink-subtle">
+                  {SCORE_ANCHORS[key][value]}
+                </p>
+              </div>
+            );
+          })}
+
+          {/* Read-only niche-fit row — derived from niche selection */}
+          <div className="flex flex-col gap-1.5">
+            <label className={labelClass}>
+              Niche Fit <span className="text-ink-subtle">· auto from niche · ×{SCORE_WEIGHTS.nicheFit}</span>
+            </label>
+            <div
+              className={[
+                "inline-flex items-center gap-2 rounded-md border px-3 py-2 font-mono text-[11px]",
+                nicheTier === "low"
+                  ? "border-red-500/40 bg-red-500/5 text-red-400"
+                  : nicheTier === "high"
+                  ? "border-accent/30 bg-accent/5 text-accent"
+                  : "border-hairline bg-surface-2 text-ink-secondary",
+              ].join(" ")}
+            >
+              <span className="font-semibold">{nicheFitValue}</span>
+              <span className="text-ink-subtle">/</span>
+              <span>
+                {resolvedNicheForScore || "no niche"} — {NICHE_TIER_LABEL[nicheTier]}
+              </span>
+              {nicheTier === "low" && (
+                <span className="ml-auto uppercase tracking-wider">Gates score</span>
+              )}
+            </div>
+          </div>
         </div>
       </div>
 

@@ -28,9 +28,30 @@ import {
   type CreateClientBody,
   type UpdateClientBody,
   computeScore,
+  migrateScoreFactors,
+  DEFAULT_SCORE_FACTORS,
   PIPELINE_STAGES,
   TERMINAL_STAGES,
 } from '@/lib/admin/types';
+
+// ---------------------------------------------------------------------------
+// Migration helpers
+// ---------------------------------------------------------------------------
+
+/**
+ * Migrate a lead read from storage into the current scoring shape and
+ * recompute its score. Legacy (boolean-toggle) records are upgraded in-memory
+ * here so callers always see the new shape. We don't proactively write the
+ * migrated form back — the first PATCH after this deploy persists it.
+ */
+function migrateLead(raw: Lead): Lead {
+  const migrated = migrateScoreFactors(raw.scoreFactors);
+  return {
+    ...raw,
+    scoreFactors: migrated,
+    score: computeScore(migrated, raw.niche ?? ''),
+  };
+}
 
 // ---------------------------------------------------------------------------
 // Storage backend
@@ -122,6 +143,7 @@ export async function listLeads(opts?: {
   search?: string;
 }): Promise<Lead[]> {
   let leads = await readJson<Lead[]>('leads', []);
+  leads = leads.map(migrateLead);
 
   if (opts?.stage) {
     const stageFilter = opts.stage;
@@ -158,17 +180,25 @@ export async function listLeads(opts?: {
 
 export async function getLead(id: string): Promise<Lead | null> {
   const leads = await readJson<Lead[]>('leads', []);
-  return leads.find((l) => l.id === id) ?? null;
+  const lead = leads.find((l) => l.id === id);
+  return lead ? migrateLead(lead) : null;
 }
 
 export async function createLead(input: CreateLeadBody): Promise<Lead> {
   const leads = await readJson<Lead[]>('leads', []);
   const timestamp = now();
 
+  // Migrate whatever the caller sent (could be legacy shape from a stale
+  // client during deploy rollover, or already the new shape).
+  const factors = input.scoreFactors
+    ? migrateScoreFactors(input.scoreFactors)
+    : { ...DEFAULT_SCORE_FACTORS };
+  const niche = input.niche ?? '';
+
   const lead: Lead = {
     id: crypto.randomUUID(),
     businessName: input.businessName,
-    niche: input.niche,
+    niche,
     neighborhood: input.neighborhood,
     phone: input.phone,
     email: input.email,
@@ -177,22 +207,11 @@ export async function createLead(input: CreateLeadBody): Promise<Lead> {
     source: input.source ?? '',
     stage: input.stage ?? 'Found',
     stageHistory: [{ stage: input.stage ?? 'Found', at: timestamp }],
-    scoreFactors: input.scoreFactors ?? {
-      badOrNoWebsite: false,
-      clearlyMakingMoney: false,
-      easyToReach: false,
-      goodNicheFit: false,
-    },
-    score: computeScore(
-      input.scoreFactors ?? {
-        badOrNoWebsite: false,
-        clearlyMakingMoney: false,
-        easyToReach: false,
-        goodNicheFit: false,
-      }
-    ),
+    scoreFactors: factors,
+    score: computeScore(factors, niche),
     touchCount: 0,
     hotness: input.hotness ?? null,
+    owner: input.owner ?? null,
     emailedAt: input.emailedAt ?? null,
     calledAt: input.calledAt ?? null,
     followUpAt: input.followUpAt ?? null,
@@ -216,23 +235,27 @@ export async function updateLead(
   const idx = leads.findIndex((l) => l.id === id);
   if (idx === -1) return null;
 
-  const existing = leads[idx];
+  // Migrate the existing record up to the current shape before merging so
+  // we never write legacy fields back to storage.
+  const existing = migrateLead(leads[idx]);
   const timestamp = now();
 
   // Detect stage change — append to history
   const stageChanged =
     patch.stage !== undefined && patch.stage !== existing.stage;
 
-  // Detect score factor change — recompute score
+  // Recompute score using the merged factors + the (possibly patched) niche.
   const newFactors = patch.scoreFactors
-    ? { ...existing.scoreFactors, ...patch.scoreFactors }
+    ? { ...existing.scoreFactors, ...migrateScoreFactors(patch.scoreFactors) }
     : existing.scoreFactors;
+  const newNiche = patch.niche ?? existing.niche;
 
   const updated: Lead = {
     ...existing,
     ...patch,
+    niche: newNiche,
     scoreFactors: newFactors,
-    score: computeScore(newFactors),
+    score: computeScore(newFactors, newNiche),
     stageHistory: stageChanged
       ? [
           ...existing.stageHistory,
@@ -282,24 +305,24 @@ export async function bulkImportLeads(
 ): Promise<{ added: number; skipped: number; leads: Lead[] }> {
   const timestamp = now();
 
-  // 1. Normalize incoming leads — fill in defaults the API caller may have omitted
-  const normalized: Lead[] = incoming.map((l) => ({
-    ...l,
-    id: l.id ?? crypto.randomUUID(),
-    score: computeScore(
-      l.scoreFactors ?? {
-        badOrNoWebsite: false,
-        clearlyMakingMoney: false,
-        easyToReach: false,
-        goodNicheFit: false,
-      }
-    ),
-    stageHistory: l.stageHistory ?? [{ stage: l.stage ?? 'Found', at: timestamp }],
-    touchCount: l.touchCount ?? 0,
-    convertedClientId: l.convertedClientId ?? null,
-    createdAt: l.createdAt ?? timestamp,
-    updatedAt: l.updatedAt ?? timestamp,
-  }));
+  // 1. Normalize incoming leads — migrate legacy score factors and recompute
+  // score against the niche so imports stay consistent with the live model.
+  const normalized: Lead[] = incoming.map((l) => {
+    const factors = l.scoreFactors
+      ? migrateScoreFactors(l.scoreFactors)
+      : { ...DEFAULT_SCORE_FACTORS };
+    return {
+      ...l,
+      id: l.id ?? crypto.randomUUID(),
+      scoreFactors: factors,
+      score: computeScore(factors, l.niche ?? ''),
+      stageHistory: l.stageHistory ?? [{ stage: l.stage ?? 'Found', at: timestamp }],
+      touchCount: l.touchCount ?? 0,
+      convertedClientId: l.convertedClientId ?? null,
+      createdAt: l.createdAt ?? timestamp,
+      updatedAt: l.updatedAt ?? timestamp,
+    };
+  });
 
   // 2. Dedup within the batch (keep first occurrence)
   const seenKeys = new Set<string>();

@@ -71,48 +71,127 @@ export const TERMINAL_STAGES: PipelineStage[] = ["Won", "Lost"];
 export const AVG_PROJECT_VALUE = 800;
 
 // ---------------------------------------------------------------------------
-// Scoring
+// Scoring (v2 — 0–3 weighted scale, normalized to /10, niche-tier gated)
 // ---------------------------------------------------------------------------
 
+export type ScoreFactor = 0 | 1 | 2 | 3;
+
 /**
- * Four boolean factors that drive lead scoring.
- * Weights sum to 9.0 (max score).
+ * Per-factor weights. Three user-input factors + one niche-fit factor
+ * (derived from `niche` via getNicheFitFromNiche).
+ *
+ * Raw max = 3*3 + 3*2.5 + 3*1.5 + 3*2 = 27.
+ * Final score is normalized to /10 then gated when niche tier is low.
  */
 export const SCORE_WEIGHTS = {
-  /** Bad or no existing website — clearest buying signal. */
-  badOrNoWebsite: 3.0,
-  /** Clearly making money — they can afford the project. */
-  clearlyMakingMoney: 2.5,
-  /** Easy to reach — contact info found; likely responsive. */
-  easyToReach: 2.0,
-  /** Good niche fit — restaurant, HVAC, law, salon. Noah's sweet spot. */
-  goodNicheFit: 1.5,
+  webOpportunity: 3,
+  provenMoney: 2.5,
+  reachableDecisionMaker: 1.5,
+  nicheFit: 2,
 } as const satisfies Record<string, number>;
 
+/** Raw max = 3*3 + 3*2.5 + 3*1.5 + 3*2 = 27 */
+export const SCORE_RAW_MAX = 27;
+/** Cap applied to the final /10 score when niche tier is LOW. */
+export const NICHE_GATE_CAP = 3;
+
 export type ScoreFactors = {
-  badOrNoWebsite: boolean;
-  clearlyMakingMoney: boolean;
-  easyToReach: boolean;
-  goodNicheFit: boolean;
+  /** 0 = good modern site · 1 = dated-but-works · 2 = FB-only/thin · 3 = none or broken/404 */
+  webOpportunity: ScoreFactor;
+  /** 0 = no signal · 1 = some reviews/activity · 2 = strong (100+ reviews) · 3 = clearly thriving */
+  provenMoney: ScoreFactor;
+  /** 0 = corporate/gatekept · 1 = generic contact · 2 = owner findable · 3 = owner direct (talked) */
+  reachableDecisionMaker: ScoreFactor;
+};
+
+/** Anchor labels for each factor at each 0–3 level. Used by UI hints. */
+export const SCORE_ANCHORS: Record<keyof ScoreFactors, [string, string, string, string]> = {
+  webOpportunity: [
+    "good modern site",
+    "dated-but-works",
+    "FB-only/thin",
+    "none or broken/404",
+  ],
+  provenMoney: [
+    "no signal",
+    "some reviews/activity",
+    "strong (100+ reviews)",
+    "clearly thriving",
+  ],
+  reachableDecisionMaker: [
+    "corporate/gatekept",
+    "generic contact",
+    "owner findable",
+    "owner direct (talked)",
+  ],
+};
+
+/** Human-readable label for each scoring factor. */
+export const SCORE_LABELS: Record<keyof ScoreFactors, string> = {
+  webOpportunity: "Web Opportunity",
+  provenMoney: "Proven Money",
+  reachableDecisionMaker: "Reachable Decision-Maker",
 };
 
 /**
- * Compute the lead score from its factor flags.
- * Returns a number in [0.0, 9.0].
- * Called on every Lead PATCH that touches scoreFactors.
+ * Niche-fit value derived from niche selection.
+ *   high → 3, medium → 2, low → 0 (also triggers the gate cap).
+ *
+ * Note: 1 is intentionally unused — niche fit is tier-derived, not graded.
  */
-export function computeScore(factors: ScoreFactors): number {
-  let score = 0;
-  if (factors.badOrNoWebsite) score += SCORE_WEIGHTS.badOrNoWebsite;
-  if (factors.clearlyMakingMoney) score += SCORE_WEIGHTS.clearlyMakingMoney;
-  if (factors.easyToReach) score += SCORE_WEIGHTS.easyToReach;
-  if (factors.goodNicheFit) score += SCORE_WEIGHTS.goodNicheFit;
-  return score;
+export function getNicheFitFromNiche(niche: string): 0 | 2 | 3 {
+  const tier = getNicheTier(niche);
+  if (tier === "high") return 3;
+  if (tier === "medium") return 2;
+  return 0; // low
 }
 
 /**
+ * Compute the normalized /10 lead score from factors + niche.
+ * If niche tier is LOW, caps the result at NICHE_GATE_CAP (3.0).
+ *
+ * Called on every Lead PATCH that touches scoreFactors or niche, and on
+ * every read (via migrateLead) to keep stored scores current with the model.
+ */
+export function computeScore(factors: ScoreFactors, niche: string): number {
+  const fit = getNicheFitFromNiche(niche);
+  const raw =
+    factors.webOpportunity * SCORE_WEIGHTS.webOpportunity +
+    factors.provenMoney * SCORE_WEIGHTS.provenMoney +
+    factors.reachableDecisionMaker * SCORE_WEIGHTS.reachableDecisionMaker +
+    fit * SCORE_WEIGHTS.nicheFit;
+  const normalized = (raw / SCORE_RAW_MAX) * 10;
+  if (getNicheTier(niche) === "low") {
+    return Math.min(normalized, NICHE_GATE_CAP);
+  }
+  return normalized;
+}
+
+/**
+ * True when the score is being capped by the niche gate (low-tier niche).
+ * UI uses this to display a "capped at 3" warning beside the score badge.
+ */
+export function isScoreCappedByNiche(factors: ScoreFactors, niche: string): boolean {
+  if (getNicheTier(niche) !== "low") return false;
+  const fit = getNicheFitFromNiche(niche);
+  const raw =
+    factors.webOpportunity * SCORE_WEIGHTS.webOpportunity +
+    factors.provenMoney * SCORE_WEIGHTS.provenMoney +
+    factors.reachableDecisionMaker * SCORE_WEIGHTS.reachableDecisionMaker +
+    fit * SCORE_WEIGHTS.nicheFit;
+  return (raw / SCORE_RAW_MAX) * 10 > NICHE_GATE_CAP;
+}
+
+/** Default factors for a brand-new lead. */
+export const DEFAULT_SCORE_FACTORS: ScoreFactors = {
+  webOpportunity: 0,
+  provenMoney: 0,
+  reachableDecisionMaker: 0,
+};
+
+/**
  * Score thresholds for the hot/warm/cold badge.
- * Inclusive lower bound.
+ * Inclusive lower bound. Still operates on the /10 score range.
  */
 export const SCORE_TIERS = {
   hot: 7,   // score >= 7
@@ -126,6 +205,55 @@ export function getScoreTier(score: number): ScoreTier {
   if (score >= SCORE_TIERS.hot) return "hot";
   if (score >= SCORE_TIERS.warm) return "warm";
   return "cold";
+}
+
+// ---- Legacy migration ------------------------------------------------------
+
+/** Old boolean-toggle shape (kept ONLY for migrating data on read). */
+type LegacyScoreFactors = {
+  badOrNoWebsite: boolean;
+  clearlyMakingMoney: boolean;
+  easyToReach: boolean;
+  goodNicheFit: boolean;
+};
+
+function isLegacyScoreFactors(sf: unknown): sf is LegacyScoreFactors {
+  return (
+    !!sf &&
+    typeof sf === "object" &&
+    "badOrNoWebsite" in (sf as object)
+  );
+}
+
+/**
+ * Convert a possibly-legacy scoreFactors blob to the new shape.
+ *  - Old true → new 2 (the "moderate" middle value — safest assumption)
+ *  - Old false → new 0
+ *  - goodNicheFit (old) is dropped; niche fit is now derived from `niche`
+ *  - If already new shape: clamp values to 0..3 ints
+ *  - If garbage / undefined: return a copy of DEFAULT_SCORE_FACTORS
+ */
+export function migrateScoreFactors(sf: unknown): ScoreFactors {
+  if (!sf || typeof sf !== "object") return { ...DEFAULT_SCORE_FACTORS };
+  if (isLegacyScoreFactors(sf)) {
+    return {
+      webOpportunity: sf.badOrNoWebsite ? 2 : 0,
+      provenMoney: sf.clearlyMakingMoney ? 2 : 0,
+      reachableDecisionMaker: sf.easyToReach ? 2 : 0,
+    };
+  }
+  const obj = sf as Record<string, unknown>;
+  const clamp = (v: unknown): ScoreFactor => {
+    const n = typeof v === "number" ? Math.round(v) : 0;
+    if (n <= 0) return 0;
+    if (n >= 3) return 3;
+    return n as ScoreFactor;
+  };
+  return {
+    webOpportunity: clamp(obj.webOpportunity),
+    provenMoney: clamp(obj.provenMoney),
+    reachableDecisionMaker: clamp(obj.reachableDecisionMaker),
+  };
 }
 
 // ---------------------------------------------------------------------------
@@ -143,6 +271,78 @@ export const EXISTING_SITE_DEFAULT: ExistingSiteStatus = "unknown";
  */
 export function getExistingSiteStatus(lead: { existingSiteStatus?: ExistingSiteStatus }): ExistingSiteStatus {
   return lead.existingSiteStatus ?? EXISTING_SITE_DEFAULT;
+}
+
+// ---------------------------------------------------------------------------
+// Niche
+// ---------------------------------------------------------------------------
+
+export const NICHE_OPTIONS = [
+  "Restaurant",
+  "Salon",
+  "Retail",
+  "Dental/Medical",
+  "Lodging",
+  "HVAC",
+  "Trades",
+  "Law",
+  "Other",
+  "B2B/Industrial",
+  "Contractor (B2G)",
+] as const;
+export type Niche = (typeof NICHE_OPTIONS)[number];
+
+export type NicheTier = "high" | "medium" | "low";
+
+/**
+ * Tier classification — does a website actually drive revenue for this niche?
+ *   high   = web is core to revenue (Restaurant, Salon, Retail, Dental/Medical, Lodging)
+ *   medium = web helps but isn't primary (HVAC, Trades, Law, Other)
+ *   low    = web doesn't drive revenue; B2B/relationship/bid-driven sales
+ *            (B2B/Industrial, Contractor (B2G))
+ *
+ * Used by the scoring system to gate leads where the niche fundamentally
+ * doesn't fit NRG's value proposition.
+ */
+const NICHE_TIER_MAP: Record<string, NicheTier> = {
+  Restaurant: "high",
+  Salon: "high",
+  Retail: "high",
+  "Dental/Medical": "high",
+  Lodging: "high",
+  HVAC: "medium",
+  Trades: "medium",
+  Law: "medium",
+  Other: "medium",
+  "B2B/Industrial": "low",
+  "Contractor (B2G)": "low",
+};
+
+export function getNicheTier(niche: string): NicheTier {
+  return NICHE_TIER_MAP[niche] ?? "medium"; // unknown / legacy → medium
+}
+
+/** Per-tier label for chips / hints */
+export const NICHE_TIER_LABEL: Record<NicheTier, string> = {
+  high:   "High fit",
+  medium: "Medium fit",
+  low:    "Low fit — gated",
+};
+
+// ---------------------------------------------------------------------------
+// Owner — who's working this lead (Noah / Bela / unassigned)
+// ---------------------------------------------------------------------------
+
+export const LEAD_OWNERS = ["Noah", "Bela"] as const;
+export type LeadOwner = (typeof LEAD_OWNERS)[number];
+
+/**
+ * Read a lead's owner. Returns null when the lead is unassigned (existing
+ * leads pre-dating this field; intentional null choice rather than a string
+ * "unassigned" so type-checks can lean on it).
+ */
+export function getLeadOwner(lead: { owner?: LeadOwner | null }): LeadOwner | null {
+  return lead.owner ?? null;
 }
 
 // ---------------------------------------------------------------------------
@@ -285,6 +485,15 @@ export type Lead = {
    * Optional for back-compat: existing leads without this field render as null.
    */
   hotness?: number | null;
+
+  /**
+   * Which team member is working this lead. Null = unassigned (default for
+   * leads created before owner-tracking existed, and for new leads where
+   * the user hasn't picked an owner yet).
+   *
+   * Optional for back-compat: existing leads without this field render as null.
+   */
+  owner?: LeadOwner | null;
 
   /**
    * Set to the Client.id after successful convert-to-client operation.

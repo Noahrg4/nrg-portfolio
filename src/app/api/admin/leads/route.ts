@@ -70,15 +70,15 @@ export async function POST(req: NextRequest) {
     source: body.source ?? '',
     stage: body.stage ?? 'Found',
     scoreFactors: body.scoreFactors ?? {
-      badOrNoWebsite: false,
-      clearlyMakingMoney: false,
-      easyToReach: false,
-      goodNicheFit: false,
+      webOpportunity: 0,
+      provenMoney: 0,
+      reachableDecisionMaker: 0,
     },
     emailedAt: body.emailedAt ?? null,
     calledAt: body.calledAt ?? null,
     followUpAt: body.followUpAt ?? null,
     nextActionNote: body.nextActionNote ?? '',
+    owner: body.owner ?? null,
   };
 
   const lead = await createLead(input);

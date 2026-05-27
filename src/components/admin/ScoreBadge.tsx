@@ -3,10 +3,10 @@
 /**
  * src/components/admin/ScoreBadge.tsx
  *
- * Circular badge showing lead score (0–9).
+ * Circular badge showing lead score (0–10).
  * Color tiers:
  *   hot  (≥7): cyan fill — bg-accent text-canvas
- *   warm (4–6): amber tint — bg-yellow-500/20 text-yellow-300
+ *   warm (4–6.99): amber tint — bg-yellow-500/20 text-yellow-300
  *   cold (<4): dim — bg-surface-2 text-ink-subtle
  *
  * Size variants: "sm" (28px) | "md" (32px) | "lg" (40px)
@@ -33,7 +33,7 @@ const TIER_STYLES = {
 
 export default function ScoreBadge({ score, size = "md" }: ScoreBadgeProps) {
   const tier = getScoreTier(score);
-  const displayScore = score % 1 === 0 ? score : score.toFixed(1);
+  const displayScore = score % 1 === 0 ? String(score) : score.toFixed(1);
 
   return (
     <span
@@ -42,8 +42,8 @@ export default function ScoreBadge({ score, size = "md" }: ScoreBadgeProps) {
         SIZE_CLASSES[size],
         TIER_STYLES[tier],
       ].join(" ")}
-      title={`Score: ${score} (${tier})`}
-      aria-label={`Lead score ${score}, ${tier}`}
+      title={`Score: ${displayScore} (${tier})`}
+      aria-label={`Lead score ${displayScore}, ${tier}`}
     >
       {displayScore}
     </span>
